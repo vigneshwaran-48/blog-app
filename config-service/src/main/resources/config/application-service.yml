@@ -11,3 +11,7 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+oauth2:
+  server:
+    url: http://localhost:9090
