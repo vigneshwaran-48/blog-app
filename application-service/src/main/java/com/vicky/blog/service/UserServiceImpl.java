@@ -2,6 +2,7 @@ package com.vicky.blog.service;
 
 import java.util.Optional;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
         if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             LOGGER.error("User with email id {} already exists", userDTO.getEmail());
-            throw new AppException(409, "User with email id already exists");
+            throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
         }
         User user = User.build(userDTO);
         User addedUser = userRepository.save(user);
@@ -40,14 +41,51 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+        Optional<User> existingUser = userRepository.findById(user.getId());
+
+        if(existingUser.isEmpty()) {
+            LOGGER.error("User with userId {} not found", user.getId());
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists");
+        }
+
+        if(user.getAge() == 0) {
+            user.setAge(existingUser.get().getAge());
+        }
+        if(user.getName() == null) {
+            user.setName(existingUser.get().getName());
+        }
+        if(user.getDescripton() == null) {
+            user.setDescription(existingUser.get().getDescription());
+        }
+        if(user.getEmail() == null) {
+            user.setEmail(existingUser.get().getEmail());
+        }
+        else { 
+            Optional<User> userWithEmail = userRepository.findByEmail(user.getEmail());
+            if(userWithEmail.isPresent() && !userWithEmail.get().getId().equals(user.getId())) {
+                LOGGER.error("User with email id {} already exists", user.getEmail());
+                throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
+            }
+        }
+        if(user.getImage() == null) {
+            user.setImage(existingUser.get().getImage());
+        }
+        if(user.getTheme() == null) {
+            user.setTheme(existingUser.get().getTheme());
+        }
+
+        User updatedUser = userRepository.save(User.build(user));
+        if(updatedUser == null) {
+            LOGGER.error("Error while updating user {}", user.getId());
+            throw new AppException("Error while updating user");
+        }
+        return Optional.of(updatedUser.toDTO());
     }
 
     @Override
     public boolean deleteUser(String userId) throws AppException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+        userRepository.deleteById(userId);
+        return true;
     }
 
     @Override
