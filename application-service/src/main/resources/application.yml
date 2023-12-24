@@ -1,0 +1,15 @@
+
+spring:
+    application:
+        name: application-service
+    config:
+        import: "configserver:http://localhost:8099"
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+    datasource:
+        url: jdbc:mysql://localhost:3306/blog_application
+        username: root
+        password: 
+        driver-class-name: com.mysql.cj.jdbc.Driver

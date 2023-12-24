@@ -1,0 +1,6 @@
+server:
+  port: 8099
+
+spring:
+  profiles:
+    active: native
