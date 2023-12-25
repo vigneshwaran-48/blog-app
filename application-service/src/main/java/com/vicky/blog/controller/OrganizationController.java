@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
-import com.vicky.blog.common.dto.organization.OrganizationResponse;
 import com.vicky.blog.common.dto.organization.OrganizationResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.organization.OrganizationUserResponseData;
@@ -91,7 +91,7 @@ public class OrganizationController {
             throw new AppException("Error while deleting organization");
         }
         
-        OrganizationResponse response = new OrganizationResponse();
+        EmptyResponse response = new EmptyResponse();
         response.setMessage("Deleted organization");
         response.setStatus(HttpStatus.SC_OK);
         response.setPath(request.getServletPath());
@@ -132,6 +132,23 @@ public class OrganizationController {
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());            
         response.setOrganizationUsers(orgUser.get());
+        
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{organizationId}/user")
+    public ResponseEntity<?> getUsersOfOrganization(@PathVariable Long organizationId, HttpServletRequest request, 
+        Principal principal) throws AppException {
+        
+        String userId = userIdExtracter.getUserId(principal);
+        Optional<OrganizationUserDTO> orgUsers = organizationService.getUsersOfOrganization(userId, organizationId);
+
+        OrganizationUserResponseData response = new OrganizationUserResponseData();
+        response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());            
+        response.setOrganizationUsers(orgUsers.get());
         
         return ResponseEntity.ok().body(response);
     }

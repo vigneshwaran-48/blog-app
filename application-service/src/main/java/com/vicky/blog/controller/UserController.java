@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.user.UserDTO;
-import com.vicky.blog.common.dto.user.UserResponse;
 import com.vicky.blog.common.dto.user.UserResponseData;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UserService;
@@ -98,7 +98,7 @@ public class UserController {
         if(!deleted) {
             throw new AppException("Unable to delete the user");
         }
-        UserResponse response = new UserResponse();
+        EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
         response.setMessage("success");
         response.setPath(request.getServletPath());

@@ -116,7 +116,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         if(organization.get().getVisibility() == Visibility.PRIVATE && !organization.get().getOwner().getId().equals(userId)) {
 
-            List<OrganizationUser> orgUsers = organizationUserRepository.findAllById(List.of(id));
+            List<OrganizationUser> orgUsers = organizationUserRepository.findByOrganizationId(id);
             boolean isPresent = orgUsers.stream().anyMatch(orgUser -> orgUser.getUser().getId().equals(userId));
 
             if(!isPresent) {
@@ -186,6 +186,25 @@ public class OrganizationServiceImpl implements OrganizationService {
             Optional<OrganizationUserDTO> orgUser = addUserToOrganization(userId, organizationId, userToAdd);
             organizationUserDTO.getUsers().add(orgUser.get().getUsers().get(0));
         }
+        return Optional.of(organizationUserDTO);
+    }
+
+    @Override
+    public Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId)
+            throws AppException {
+        getUser(userId); // Validating user
+        Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
+
+        OrganizationUserDTO organizationUserDTO = new OrganizationUserDTO();
+        organizationUserDTO.setOrganization(organization.get());
+        organizationUserDTO.setUsers(new ArrayList<>());
+
+        List<OrganizationUser> orgUsers = organizationUserRepository.findByOrganizationId(organizationId);
+        orgUsers.forEach(orgUser -> {
+            OrgUser oUser = organizationUserDTO.new OrgUser(orgUser.getUser().toDTO(), orgUser.getRole());
+            organizationUserDTO.getUsers().add(oUser);
+        });
+
         return Optional.of(organizationUserDTO);
     }
 

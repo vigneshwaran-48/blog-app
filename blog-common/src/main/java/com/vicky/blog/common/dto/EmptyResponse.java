@@ -1,8 +1,8 @@
-package com.vicky.blog.common.dto.organization;
+package com.vicky.blog.common.dto;
 
 import java.time.LocalDateTime;
 
-public class OrganizationResponse {
+public class EmptyResponse {
     
     private int status;
     private String message;

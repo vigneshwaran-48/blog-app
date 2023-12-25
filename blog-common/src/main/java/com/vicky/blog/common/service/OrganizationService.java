@@ -22,4 +22,8 @@ public interface OrganizationService {
 
     Optional<OrganizationUserDTO> addUsersToOrganization(String userId, Long organizationId, List<String> usersToAdd) 
         throws AppException;
+
+    Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId) throws AppException;
+
+    
 }
