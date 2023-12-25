@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -141,6 +142,9 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_FORBIDDEN, "Only organization owner can delete the organization");
         }
 
+        organizationUserRepository.deleteByOrganizationId(id);
+        LOGGER.info("Deleted all users from the Organization {}", id);
+
         organizationRepository.deleteById(id);
         return true;
     }
@@ -206,6 +210,48 @@ public class OrganizationServiceImpl implements OrganizationService {
         });
 
         return Optional.of(organizationUserDTO);
+    }
+
+    @Override
+    public void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove)
+            throws AppException {
+        
+        getUser(userId); // Validating user
+        getOrganization(userId, organizationId); // Validating organization
+
+        Optional<OrganizationUser> organizationUser = 
+            organizationUserRepository.findByOrganizationIdAndUserId(organizationId, userId);
+
+        if(organizationUser.isEmpty()) {
+            LOGGER.error("User {} is not part of the organization {}", userId, organizationId);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, "You are not an part of this organization!");
+        }
+        
+        if(organizationUser.get().getRole() != UserOrganizationRole.ADMIN && 
+            organizationUser.get().getRole() != UserOrganizationRole.MODERATOR) {
+            LOGGER.warn("Illegal operation on organization {} by user {}", organizationId, userId);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, "You don't have privilege to do this operation");
+        }
+
+        for(String userToRemove : usersToRemove) {
+            if(userId.equals(userToRemove)) {
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, "You can't remove yourself from the organization");
+            }
+            getUser(userToRemove); // Validating user
+            Optional<OrganizationUser> orgUserToRemove =
+                    organizationUserRepository.findByOrganizationIdAndUserId(organizationId, userToRemove);
+            
+            if(orgUserToRemove.isEmpty()) continue;
+
+            if(orgUserToRemove.get().getRole() == UserOrganizationRole.ADMIN) {
+                LOGGER.error("User {} tried to remove the Orgnanization {}'s Admin {}", userId, 
+                            organizationId, userToRemove);
+                throw new AppException(HttpStatus.SC_FORBIDDEN, "You can't remove the Admin of the organization");
+            }
+            organizationUserRepository.deleteByOrganizationIdAndUserId(organizationId, userToRemove);
+
+            LOGGER.info("Removed User {} from organization {} by User {}", userToRemove, organizationUser, userId);
+        }
     }
 
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {

@@ -25,5 +25,5 @@ public interface OrganizationService {
 
     Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId) throws AppException;
 
-    
+    void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove) throws AppException;
 }

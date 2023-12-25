@@ -152,4 +152,21 @@ public class OrganizationController {
         
         return ResponseEntity.ok().body(response);
     }
+
+    @DeleteMapping("/{organizationId}/user")
+    public ResponseEntity<?> removeUsersFromOrganization(@PathVariable Long organizationId,
+                        @RequestParam List<String> usersToRemove,
+                        HttpServletRequest request, Principal principal) throws AppException {
+                        
+        String userId = userIdExtracter.getUserId(principal);
+        organizationService.removeUsersFromOrganization(userId, organizationId, usersToRemove);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Removed users from organization");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
 }

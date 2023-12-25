@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,5 +33,13 @@ public class RestControllerAdviceHandler {
         AppErrorResponse response = new AppErrorResponse(ex.getStatus(), ex.getMessage(), 
                                                         LocalDateTime.now(), request.getServletPath());
         return ResponseEntity.status(ex.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleException(DataIntegrityViolationException ex, HttpServletRequest request) {
+        LOGGER.error(ex.getMessage(), ex);
+        AppErrorResponse response = new AppErrorResponse(500, "DB operation failure", 
+                LocalDateTime.now(), request.getServletPath());
+        return ResponseEntity.internalServerError().body(response);
     }
 }
