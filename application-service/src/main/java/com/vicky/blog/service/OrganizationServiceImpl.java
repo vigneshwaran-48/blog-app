@@ -16,7 +16,6 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Organization;
-import com.vicky.blog.model.User;
 import com.vicky.blog.repository.OrganizationRepository;
 
 @Service
@@ -50,8 +49,45 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Optional<OrganizationDTO> updateOrganization(String userId, OrganizationDTO organizationDTO)
             throws AppException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateOrganization'");
+        
+        getUser(userId); // Validating user
+        Optional<Organization> existingOrganization = organizationRepository.findById(organizationDTO.getId());
+        
+        if(existingOrganization.isEmpty()) {
+            LOGGER.error("Organization {} does not exists", organizationDTO.getId());
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
+        }
+
+        if(!existingOrganization.get().getOwner().getId().equals(userId)) {
+            LOGGER.error("Illegal operation on Organization {} by user {}", organizationDTO.getId(), userId);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, "Only Organization owner can update the organization!");
+        }
+        // Not allowing to change the created time of the organization
+        organizationDTO.setCreatedTime(existingOrganization.get().getCreatedTime());
+
+        if(organizationDTO.getDescription() == null) {
+            organizationDTO.setDescription(existingOrganization.get().getDescription());
+        }
+        if(organizationDTO.getImage() == null) {
+            organizationDTO.setImage(existingOrganization.get().getImage());
+        }
+        if(organizationDTO.getJoinType() == null) {
+            organizationDTO.setJoinType(existingOrganization.get().getJoinType());
+        }
+        if(organizationDTO.getName() == null) {
+            organizationDTO.setName(existingOrganization.get().getName());
+        }
+        if(organizationDTO.getOwner() == null) {
+            organizationDTO.setOwner(existingOrganization.get().getOwner().toDTO());
+        }
+        if(organizationDTO.getVisibility() == null) {
+            organizationDTO.setVisibility(existingOrganization.get().getVisibility());
+        }
+        Organization updatedOrganization = organizationRepository.save(Organization.build(organizationDTO));
+        if(updatedOrganization == null) {
+            throw new AppException("Error while updating organization!");
+        }
+        return Optional.of(updatedOrganization.toDTO());
     }
 
     @Override
@@ -76,8 +112,19 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public boolean deleteOrganization(String userId, Long id) throws AppException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteOrganization'");
+        Optional<Organization> organization = organizationRepository.findById(id);
+        if(organization.isEmpty()) {
+            LOGGER.error("Organization {} does not exists", id);
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
+        }
+
+        if(!organization.get().getOwner().getId().equals(userId)) {
+            LOGGER.error("Illegal operation on Organization {} by user {}", id, userId);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, "Only organization owner can delete the organization");
+        }
+
+        organizationRepository.deleteById(id);
+        return true;
     }
     
     private UserDTO getUser(String userId) throws AppException {

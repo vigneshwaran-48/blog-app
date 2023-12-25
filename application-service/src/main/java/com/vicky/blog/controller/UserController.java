@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) 
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO, HttpServletRequest request) 
         throws AppException {
 
         Optional<UserDTO> updatedUser = userService.updateUser(userDTO);

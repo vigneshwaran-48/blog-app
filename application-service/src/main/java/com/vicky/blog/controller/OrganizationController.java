@@ -7,14 +7,17 @@ import java.util.Optional;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
+import com.vicky.blog.common.dto.organization.OrganizationResponse;
 import com.vicky.blog.common.dto.organization.OrganizationResponseData;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
@@ -70,5 +73,44 @@ public class OrganizationController {
         response.setOrganization(organization);
 
         return ResponseEntity.ok().body(response);
+    }
+
+    @DeleteMapping("/{organizationId}")
+    public ResponseEntity<?> deleteOrganization(@PathVariable Long organizationId, HttpServletRequest request, 
+            Principal principal) throws AppException {
+        
+        String userId = userIdExtracter.getUserId(principal);
+
+        boolean isDeleted = organizationService.deleteOrganization(userId, organizationId);
+
+        if(!isDeleted) {
+            throw new AppException("Error while deleting organization");
+        }
+        
+        OrganizationResponse response = new OrganizationResponse();
+        response.setMessage("Deleted organization");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> updateOrganization(@RequestBody OrganizationDTO organizationDTO, HttpServletRequest request, 
+        Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+
+        Optional<OrganizationDTO> updatedOrganization = organizationService.updateOrganization(userId, organizationDTO);
+
+        OrganizationResponseData response = new OrganizationResponseData();
+        response.setMessage("Updated organization!");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setOrganization(updatedOrganization.get());
+
+        return ResponseEntity.status(HttpStatus.SC_OK).body(response);
     }
 }
