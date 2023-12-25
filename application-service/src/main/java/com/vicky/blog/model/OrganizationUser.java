@@ -1,5 +1,8 @@
 package com.vicky.blog.model;
 
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,12 +18,15 @@ public class OrganizationUser {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "organization_id", unique = true)
+    @JoinColumn(nullable = false, name = "organization_id")
     private Organization organization;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "user_id", unique = true)
+    @JoinColumn(nullable = false, name = "user_id")
     private User user;
+
+    @Column(nullable = false)
+    private UserOrganizationRole role = UserOrganizationRole.MEMEBER;
 
     public Long getId() {
         return id;
@@ -46,5 +52,11 @@ public class OrganizationUser {
         this.user = user;
     }
 
-    
+    public UserOrganizationRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserOrganizationRole role) {
+        this.role = role;
+    }
 }

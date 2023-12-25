@@ -2,6 +2,7 @@ package com.vicky.blog.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.HttpStatus;
@@ -14,11 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationResponse;
 import com.vicky.blog.common.dto.organization.OrganizationResponseData;
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
+import com.vicky.blog.common.dto.organization.OrganizationUserResponseData;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.utility.UserIdExtracter;
@@ -112,5 +116,23 @@ public class OrganizationController {
         response.setOrganization(updatedOrganization.get());
 
         return ResponseEntity.status(HttpStatus.SC_OK).body(response);
+    }
+
+    @PostMapping("/{organizationId}/user")
+    public ResponseEntity<?> addUserToOrganization(@PathVariable Long organizationId, 
+                        @RequestParam("usersToAdd") List<String> usersToAdd,
+                        HttpServletRequest request, Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        Optional<OrganizationUserDTO> orgUser = organizationService.addUsersToOrganization(userId, organizationId, usersToAdd);
+
+        OrganizationUserResponseData response = new OrganizationUserResponseData();
+        response.setMessage("Added users to organization!");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());            
+        response.setOrganizationUsers(orgUser.get());
+        
+        return ResponseEntity.ok().body(response);
     }
 }
