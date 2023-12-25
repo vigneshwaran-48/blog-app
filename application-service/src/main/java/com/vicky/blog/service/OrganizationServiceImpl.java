@@ -169,7 +169,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
       
         OrganizationUser addedUser = addUserToOrg(Organization.build(organization.get()), User.build(userToAddDto), 
-                                                UserOrganizationRole.MEMEBER);
+                                                UserOrganizationRole.MEMBER);
  
         if(addedUser == null) {
             LOGGER.error("Error while adding user {} to organization {}", userToAdd, organizationId);
@@ -252,6 +252,52 @@ public class OrganizationServiceImpl implements OrganizationService {
 
             LOGGER.info("Removed User {} from organization {} by User {}", userToRemove, organizationUser, userId);
         }
+    }
+
+    @Override
+    public void changePermissionForUser(String userId, Long organizationId, String userToChangePermission,
+            UserOrganizationRole role) throws AppException {
+        
+        getUser(userId); // Validating user
+        Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
+
+        if(organization.isEmpty()) {
+            LOGGER.error("Organization {} does not exists", organizationId);
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
+        }
+
+        Optional<OrganizationUser> orgUser = organizationUserRepository.findByOrganizationIdAndUserId(organizationId, userId);
+
+        if(orgUser.isEmpty()) {
+            LOGGER.error("User {} is not part of the organization {}", userId, organizationId);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, "You are not part of the organization!");
+        }
+
+        if(orgUser.get().getRole() != UserOrganizationRole.ADMIN) {
+            LOGGER.error("Illegal operation on Organization {} by user {}", organizationId, userId);
+            throw new AppException(HttpStatus.SC_FORBIDDEN, "Only Admin can change the permission of users!");
+        }
+
+        Optional<OrganizationUser> orgUserToChange = organizationUserRepository
+            .findByOrganizationIdAndUserId(organizationId, userToChangePermission);
+        
+        if(orgUserToChange.isEmpty()) {
+            LOGGER.error("User {} is not part of the organization {}", userToChangePermission, organizationId);
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "User is not part of the organization!");
+        }
+        orgUserToChange.get().setRole(role);
+        OrganizationUser updatedUser = organizationUserRepository.save(orgUserToChange.get());
+
+        if(updatedUser.getRole() == UserOrganizationRole.ADMIN) {
+            orgUser.get().setRole(UserOrganizationRole.MODERATOR);
+            organizationUserRepository.save(orgUser.get());
+            LOGGER.info("Admin {} has been changed to Moderator by himself", userId);
+
+            organization.get().setOwner(updatedUser.getUser().toDTO());
+            updateOrganization(userId, organization.get());
+        }
+
+        LOGGER.info("Changed permission of user {} to {}", userToChangePermission, role);
     }
 
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {

@@ -23,6 +23,7 @@ import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.organization.OrganizationUserResponseData;
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.utility.UserIdExtracter;
@@ -163,6 +164,22 @@ public class OrganizationController {
 
         EmptyResponse response = new EmptyResponse();
         response.setMessage("Removed users from organization");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping("/{organizationId}/user/{userToChange}")
+    public ResponseEntity<?> changePermissionOfUser(@PathVariable Long organizationId, @PathVariable String userToChange, 
+            @RequestParam UserOrganizationRole role, HttpServletRequest request, Principal principal) throws AppException {
+        
+        String userId = userIdExtracter.getUserId(principal);
+        organizationService.changePermissionForUser(userId, organizationId, userToChange, role);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Changed permission of the user");
         response.setStatus(HttpStatus.SC_OK);
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());

@@ -26,7 +26,7 @@ public class OrganizationUser {
     private User user;
 
     @Column(nullable = false)
-    private UserOrganizationRole role = UserOrganizationRole.MEMEBER;
+    private UserOrganizationRole role = UserOrganizationRole.MEMBER;
 
     public Long getId() {
         return id;

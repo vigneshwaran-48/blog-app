@@ -36,7 +36,7 @@ public class OrganizationUserDTO {
     public enum UserOrganizationRole {
         ADMIN,
         MODERATOR,
-        MEMEBER
+        MEMBER
     }
 
     private OrganizationDTO organization;

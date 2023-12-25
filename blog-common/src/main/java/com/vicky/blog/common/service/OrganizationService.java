@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.common.exception.AppException;
 
 public interface OrganizationService {
@@ -26,4 +27,6 @@ public interface OrganizationService {
     Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId) throws AppException;
 
     void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove) throws AppException;
+
+    void changePermissionForUser(String userId, Long organizationId, String userToChangePermission, UserOrganizationRole role) throws AppException;
 }
