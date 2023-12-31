@@ -1,23 +1,15 @@
-package com.vicky.blog.common.dto.user;
+package com.vicky.blog.common.dto.organization;
 
 import java.time.LocalDateTime;
 
-public class UserResponse {
-
+public class OrganizationUserResponseData {
+    
     private int status;
     private String message;
     private String path;
     private LocalDateTime time;
+    private OrganizationUserDTO organizationUsers;
 
-    public UserResponse() {}
-
-    public UserResponse(int status, String message, String path, LocalDateTime time) {
-        this.status = status;
-        this.message = message;
-        this.path = path;
-        this.time = time;
-    }
-    
     public int getStatus() {
         return status;
     }
@@ -42,4 +34,11 @@ public class UserResponse {
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
+    public OrganizationUserDTO getOrganizationUsers() {
+        return organizationUsers;
+    }
+    public void setOrganizationUsers(OrganizationUserDTO organizationUsers) {
+        this.organizationUsers = organizationUsers;
+    }
+    
 }

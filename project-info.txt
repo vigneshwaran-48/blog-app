@@ -51,6 +51,12 @@ Create, edit, and delete blog posts
 Manage blog post categories and tags
 Implement features like comments and likes
 
+Blog categories
+
+Feature: categories
+Responsibilities:
+Users can add tags to their posts and also give the tags in which they are interested.
+
 
 Group Management:
 
