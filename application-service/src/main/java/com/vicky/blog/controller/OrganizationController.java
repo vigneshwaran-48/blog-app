@@ -23,6 +23,7 @@ import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.organization.OrganizationUserResponseData;
+import com.vicky.blog.common.dto.organization.OrganizationsResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
@@ -60,6 +61,23 @@ public class OrganizationController {
         response.setOrganization(organization.get());
 
         return ResponseEntity.status(HttpStatus.SC_CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getOrganizationsOfUser(HttpServletRequest request, Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<OrganizationDTO> organizations = organizationService.getOrganizationsOfUser(userId);
+
+        OrganizationsResponseData response = new OrganizationsResponseData();
+        response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+        response.setPath(request.getServletPath());
+        response.setOrganization(organizations);
+
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{organizationId}")

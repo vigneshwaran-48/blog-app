@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -297,6 +298,20 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         LOGGER.info("Changed permission of user {} to {}", userToChangePermission, role);
+    }
+
+    @Override
+    public List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException {
+        getUser(userId); // Validating user
+
+        List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
+
+        if(orgsOfUser.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return orgsOfUser
+                    .stream()
+                    .map(org -> org.getOrganization().toDTO()).collect(Collectors.toList());
     }
 
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {

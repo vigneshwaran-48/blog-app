@@ -29,4 +29,6 @@ public interface OrganizationService {
     void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove) throws AppException;
 
     void changePermissionForUser(String userId, Long organizationId, String userToChangePermission, UserOrganizationRole role) throws AppException;
+
+    List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException;
 }
