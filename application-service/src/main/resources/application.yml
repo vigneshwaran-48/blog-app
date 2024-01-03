@@ -15,7 +15,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
 
     profiles:
-        active: development
+        active: production
     security:
         oauth2:
             resourceserver:
