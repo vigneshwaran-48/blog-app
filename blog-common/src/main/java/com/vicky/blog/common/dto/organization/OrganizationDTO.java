@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import com.vicky.blog.common.dto.user.UserDTO;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class OrganizationDTO {
 
     public enum Visibility {
@@ -17,6 +19,7 @@ public class OrganizationDTO {
     }
     
     private Long id;
+    @NotBlank
     private String name;
     private String description;
     private LocalDateTime createdTime;

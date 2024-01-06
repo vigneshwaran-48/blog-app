@@ -1,6 +1,8 @@
 package com.vicky.blog.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
@@ -97,6 +99,22 @@ public class UserServiceImpl implements UserService {
             return Optional.empty();
         }
         return Optional.of(user.get().toDTO());
+    }
+
+    @Override
+    public List<UserDTO> getUsers(String userId) throws AppException {
+        if(getUser(userId).isEmpty()) {
+            LOGGER.error("User {} is not registered", userId);
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Current session user is not registered");
+        }
+
+        List<User> users = userRepository.findAll();
+        if(users.isEmpty()) {
+            return List.of();
+        }
+        return users.stream().map(user -> {
+                                    return user.toDTO();
+                                }).collect(Collectors.toList());
     }
     
 }
