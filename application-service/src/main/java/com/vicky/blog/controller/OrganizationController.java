@@ -75,7 +75,7 @@ public class OrganizationController {
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
         response.setPath(request.getServletPath());
-        response.setOrganization(organizations);
+        response.setOrganizations(organizations);
 
         return ResponseEntity.ok().body(response);
     }

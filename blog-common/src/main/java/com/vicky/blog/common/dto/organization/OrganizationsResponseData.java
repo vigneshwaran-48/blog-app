@@ -35,10 +35,10 @@ public class OrganizationsResponseData {
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
-    public List<OrganizationDTO> getOrganization() {
+    public List<OrganizationDTO> getOrganizations() {
         return organizations;
     }
-    public void setOrganization(List<OrganizationDTO> organizations) {
+    public void setOrganizations(List<OrganizationDTO> organizations) {
         this.organizations = organizations;
     }
     
