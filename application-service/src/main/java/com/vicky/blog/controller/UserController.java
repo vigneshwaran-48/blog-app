@@ -1,6 +1,8 @@
 package com.vicky.blog.controller;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.HttpStatus;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserResponseData;
+import com.vicky.blog.common.dto.user.UsersResponseData;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UserService;
+import com.vicky.blog.common.utility.UserIdExtracter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -30,6 +34,9 @@ public class UserController {
     
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserIdExtracter userIdExtracter;
 
     /**
      * Need to remove this controller later because user should be created by the login process only.
@@ -85,6 +92,22 @@ public class UserController {
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
         response.setUser(user);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getUsers(HttpServletRequest request, Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        List<UserDTO> users = userService.getUsers(userId);
+
+        UsersResponseData response = new UsersResponseData();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setUsers(users);
 
         return ResponseEntity.ok().body(response);
     }
