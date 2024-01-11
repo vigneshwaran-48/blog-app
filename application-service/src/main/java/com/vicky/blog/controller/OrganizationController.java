@@ -64,11 +64,21 @@ public class OrganizationController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getOrganizationsOfUser(HttpServletRequest request, Principal principal) throws AppException {
+    public ResponseEntity<?> getOrganizationsOfUser(
+                HttpServletRequest request, 
+                @RequestParam(required = false) UserOrganizationRole role, 
+                Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
 
-        List<OrganizationDTO> organizations = organizationService.getOrganizationsOfUser(userId);
+        List<OrganizationDTO> organizations;
+        
+        if(role != null) {
+            organizations = organizationService.getOrganizationUserHasPermission(userId, role);
+        }
+        else {
+            organizations = organizationService.getOrganizationsOfUser(userId);
+        }
 
         OrganizationsResponseData response = new OrganizationsResponseData();
         response.setMessage("success");

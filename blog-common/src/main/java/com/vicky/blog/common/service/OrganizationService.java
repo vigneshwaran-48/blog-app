@@ -31,4 +31,6 @@ public interface OrganizationService {
     void changePermissionForUser(String userId, Long organizationId, String userToChangePermission, UserOrganizationRole role) throws AppException;
 
     List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException;
+
+    List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) throws AppException;
 }
