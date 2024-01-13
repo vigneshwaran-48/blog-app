@@ -1,0 +1,17 @@
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:9000/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+oauth2:
+  server:
+    url: http://localhost:9090

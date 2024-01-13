@@ -314,6 +314,20 @@ public class OrganizationServiceImpl implements OrganizationService {
                     .map(org -> org.getOrganization().toDTO()).collect(Collectors.toList());
     }
 
+    @Override
+    public List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) throws AppException {
+        List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
+
+        List<OrganizationDTO> organizations = new ArrayList<>();
+
+        for(OrganizationUser orgUser: orgsOfUser) {
+            if(orgUser.getRole() == role) {
+                organizations.add(orgUser.getOrganization().toDTO());
+            }
+        }
+        return organizations;
+    }
+
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {
 
         OrganizationUser organizationUser = new OrganizationUser();
@@ -342,4 +356,5 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return dto;
     }
+
 }
