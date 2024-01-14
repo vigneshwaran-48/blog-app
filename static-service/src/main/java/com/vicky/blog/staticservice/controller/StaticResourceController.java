@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO;
 import com.vicky.blog.common.dto.staticservice.StaticResourceResponse;
-import com.vicky.blog.common.dto.staticservice.StaticResourceResponse;
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO.ContentType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.StaticService;

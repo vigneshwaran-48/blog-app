@@ -1,0 +1,18 @@
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import:
+    - configserver:http://localhost:8099
+  cloud:
+    gateway:
+        routes:
+            - id: application-service
+              uri: lb://application-service
+              predicates:
+                - Path=/api/v1/app/**
+            - id: static-service
+              uri: lb://static-service
+              predicates:
+                - Path=/static/**
