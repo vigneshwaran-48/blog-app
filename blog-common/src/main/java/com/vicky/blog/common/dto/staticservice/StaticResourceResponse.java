@@ -2,7 +2,7 @@ package com.vicky.blog.common.dto.staticservice;
 
 import java.time.LocalDateTime;
 
-public class StaticResourceIdResponse {
+public class StaticResourceResponse {
     
     private int status;
     private String message;
@@ -10,9 +10,9 @@ public class StaticResourceIdResponse {
     private LocalDateTime time;
     private Long id;
 
-    public StaticResourceIdResponse() {}
+    public StaticResourceResponse() {}
 
-    public StaticResourceIdResponse(int status, String message, String path, LocalDateTime time, Long id) {
+    public StaticResourceResponse(int status, String message, String path, LocalDateTime time, Long id) {
         this.status = status;
         this.message = message;
         this.path = path;

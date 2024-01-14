@@ -28,7 +28,7 @@ public class StaticResource {
     private ContentType type = ContentType.TEXT_PLAIN;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "BLOB")
+    @Column(nullable = false, length = 100000)
     private byte[] data;
 
     @Column(nullable = false)
