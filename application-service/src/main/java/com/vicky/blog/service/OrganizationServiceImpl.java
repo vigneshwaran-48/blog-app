@@ -42,9 +42,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private OrganizationUserRepository organizationUserRepository;
 
-    @Autowired
-    private StaticServiceClient staticServiceClient;
-
     @Override
     public Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException {
         

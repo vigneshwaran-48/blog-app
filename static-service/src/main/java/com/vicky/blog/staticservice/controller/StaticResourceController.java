@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO;
 import com.vicky.blog.common.dto.staticservice.StaticResourceResponse;
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO.ContentType;
+import com.vicky.blog.common.dto.staticservice.StaticResourceDTO.Visibility;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.StaticService;
 import com.vicky.blog.common.utility.UserIdExtracter;
@@ -41,7 +42,8 @@ public class StaticResourceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceController.class);
     
     @PostMapping
-    public ResponseEntity<?> addResource(@RequestParam("resource") MultipartFile resource, HttpServletRequest request,
+    public ResponseEntity<?> addResource(@RequestParam("resource") MultipartFile resource, 
+        @RequestParam(name = "private", required = false) Boolean isPrivate, HttpServletRequest request,
         Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -49,7 +51,8 @@ public class StaticResourceController {
         ContentType contentType = ContentType.getContenType(resource.getContentType());
 
         if(contentType == null) {
-            throw new AppException(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported Resource type");
+            throw new AppException(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE, 
+                                    "Unsupported Resource type " + resource.getContentType());
         }
 
         StaticResourceDTO staticResource = new StaticResourceDTO();
@@ -59,6 +62,9 @@ public class StaticResourceController {
             staticResource.setContentType(contentType);
             staticResource.setName(resource.getName());
             staticResource.setData(resource.getBytes());
+            if(isPrivate != null && isPrivate) {
+                staticResource.setVisibility(Visibility.PRIVATE);
+            }
         }
         catch(Exception e) {
             LOGGER.error("Error while parsing the resource", e);
