@@ -5,6 +5,7 @@ public class StaticResourceDTO {
     public enum ContentType {
 
         IMAGE_JPG("image/jpg"),
+        IMAGE_JPEG("image/jpeg"),
         IMAGE_PNG("image/png"),
         TEXT_HTML("text/html"),
         TEXT_PLAIN("text/plain")
@@ -39,7 +40,7 @@ public class StaticResourceDTO {
     private String name;
     private ContentType contentType;
     private byte[] data;
-    private Visibility visibility;
+    private Visibility visibility = Visibility.PUBLIC;
 
     public Long getId() {
         return id;

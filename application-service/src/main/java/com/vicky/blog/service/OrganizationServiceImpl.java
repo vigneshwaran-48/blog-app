@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.vicky.blog.client.StaticServiceClient;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.OrgUser;
@@ -41,9 +40,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Autowired
     private OrganizationUserRepository organizationUserRepository;
-
-    @Autowired
-    private StaticServiceClient staticServiceClient;
 
     @Override
     public Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException {
@@ -301,6 +297,16 @@ public class OrganizationServiceImpl implements OrganizationService {
             updateOrganization(userId, organization.get());
         }
 
+        if(orgUserToChange.get().getUser().getId().equals(userId)) {
+            // The organization admin changing his own role to some other
+            // In this case we will make some moderator or member as Admin.
+            OrganizationUser nextAdmin = getNextAdmin(userId, organizationId);
+            nextAdmin.setRole(UserOrganizationRole.ADMIN);
+
+            organizationUserRepository.save(nextAdmin);
+            LOGGER.info("Next Admin of the organization {} is {}", organizationId, nextAdmin.getUser().getId());
+        }
+
         LOGGER.info("Changed permission of user {} to {}", userToChangePermission, role);
     }
 
@@ -359,6 +365,44 @@ public class OrganizationServiceImpl implements OrganizationService {
         dto.setUsers(List.of(oUser));
 
         return dto;
+    }
+
+    private OrganizationUser getNextAdmin(String currentAdmin, Long organizationId) throws AppException {
+
+        List<OrganizationUser> moderators = organizationUserRepository
+                    .findByOrganizationIdAndRole(organizationId, UserOrganizationRole.MODERATOR);
+
+        if(!moderators.isEmpty() && moderators.size() > 1) {
+            // Assuming the currentAdmin is a part of the organization. If this method has to be public
+            // then a check for whether the currentAdmin is the organization's member only.
+
+            moderators = moderators
+                                .stream()
+                                .sorted((orgUser1, orgUser2) -> 
+                                        orgUser1.getUser().getName().compareTo(orgUser2.getUser().getName()))
+                                .collect(Collectors.toList());
+            
+            return moderators.get(0);
+        }
+
+        // Going to find a member for Admin role here
+        List<OrganizationUser> members = organizationUserRepository
+                .findByOrganizationIdAndRole(organizationId, UserOrganizationRole.MEMBER);
+
+        if(!members.isEmpty() && members.size() > 1) {
+            // Assuming the currentAdmin is a part of the organization
+            members = members
+                                .stream()
+                                .sorted((orgUser1, orgUser2) -> 
+                                        orgUser1.getUser().getName().compareTo(orgUser2.getUser().getName()))
+                                .collect(Collectors.toList());
+            
+            return members.get(0);
+        }
+
+        LOGGER.error("There are no users to make admin other than the current Admin {}", currentAdmin);
+        throw new AppException(HttpStatus.SC_BAD_REQUEST, 
+                "There are no users to make admin other than the current Admin");
     }
 
 }
