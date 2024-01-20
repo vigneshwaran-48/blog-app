@@ -1,8 +1,6 @@
 package com.vicky.blog.common.dto.user;
 
 import java.io.Serializable;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 public class UserDTO implements Serializable {
 
@@ -13,13 +11,10 @@ public class UserDTO implements Serializable {
     
     private String id;
 
-    @NotBlank
     private String name;
 
     private int age;
 
-    @Email
-    @NotBlank
     private String email;
 
     private String image;

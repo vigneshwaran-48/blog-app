@@ -26,6 +26,7 @@ import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.OrganizationRepository;
 import com.vicky.blog.repository.OrganizationUserRepository;
+import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
@@ -41,12 +42,17 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private OrganizationUserRepository organizationUserRepository;
 
+    @Autowired
+    private I18NMessages i18nMessages;
+
     @Override
     public Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException {
         
         UserDTO user = getUser(userId);
         organizationDTO.setOwner(user);
         organizationDTO.setId(null);
+
+        validateOrganizationData(organizationDTO);
         
         Organization organization = Organization.build(organizationDTO);
         organization.setCreatedTime(LocalDateTime.now());
@@ -403,6 +409,24 @@ public class OrganizationServiceImpl implements OrganizationService {
         LOGGER.error("There are no users to make admin other than the current Admin {}", currentAdmin);
         throw new AppException(HttpStatus.SC_BAD_REQUEST, 
                 "There are no users to make admin other than the current Admin");
+    }
+
+    private void validateOrganizationData(OrganizationDTO organizationDTO) throws AppException {
+
+        if(organizationDTO.getName() == null) {
+            if(organizationDTO.getName().length() < OrganizationConstants.NAME_MIN_LENGTH
+                || organizationDTO.getName().length() > OrganizationConstants.NAME_MAX_LENGTH) {
+
+                LOGGER.error("Organization name {} not matched with the MIN_MAX rule", organizationDTO.getName());
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX));
+            }
+        }
+        else {
+            LOGGER.error("Organization name is empty");
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NAME_REQUIRED));
+        }
+
+
     }
 
 }
