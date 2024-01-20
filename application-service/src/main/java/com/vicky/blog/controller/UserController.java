@@ -96,6 +96,24 @@ public class UserController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUser(HttpServletRequest request, Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+
+        UserDTO user = userService.getUser(userId).orElseThrow(() -> 
+                                        new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists"));
+
+        UserResponseData response = new UserResponseData();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setUser(user);
+
+        return ResponseEntity.ok().body(response);
+    }
+
     @GetMapping
     public ResponseEntity<?> getUsers(HttpServletRequest request, Principal principal) throws AppException {
 
