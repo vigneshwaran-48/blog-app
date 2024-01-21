@@ -34,6 +34,7 @@ public class I18NMessages {
     }
 
     public String getMessage(I18NMessage message, Object[] args) {
+        System.out.println(LocaleContextHolder.getLocale());
         return messageSource.getMessage(message.getMessageCode(), args, LocaleContextHolder.getLocale());
     }
 }

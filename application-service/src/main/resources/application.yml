@@ -28,3 +28,6 @@ logging:
         org:
             springframework:
                 security: trace
+            web:
+                servlet:
+                    i18n: DEBUG

@@ -16,13 +16,15 @@ public class AppConfig {
 
         AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
         localeResolver.setDefaultLocale(Locale.US);
-        
         return localeResolver;
     }
 
     @Bean
     ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        messageSource.setBasename("lang/messages");
+        messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
+
 }

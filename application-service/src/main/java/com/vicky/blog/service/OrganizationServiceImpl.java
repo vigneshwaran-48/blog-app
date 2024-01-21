@@ -413,7 +413,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private void validateOrganizationData(OrganizationDTO organizationDTO) throws AppException {
 
-        if(organizationDTO.getName() == null) {
+        if(organizationDTO.getName() != null) {
             if(organizationDTO.getName().length() < OrganizationConstants.NAME_MIN_LENGTH
                 || organizationDTO.getName().length() > OrganizationConstants.NAME_MAX_LENGTH) {
 
