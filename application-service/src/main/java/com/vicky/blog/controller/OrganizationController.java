@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,10 @@ public class OrganizationController {
             HttpServletRequest request, Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
+
+        System.out.println("Locale is => " + LocaleContextHolder.getLocale());
+
+        System.out.println("Request Locale => " + request.getLocale());
 
         Optional<OrganizationDTO> organization = organizationService.addOrganization(userId, organizationDTO);
         if(organization.isEmpty()) {

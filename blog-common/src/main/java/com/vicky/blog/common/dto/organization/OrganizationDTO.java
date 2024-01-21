@@ -19,7 +19,6 @@ public class OrganizationDTO {
     }
     
     private Long id;
-    @NotBlank
     private String name;
     private String description;
     private LocalDateTime createdTime;
