@@ -14,7 +14,10 @@ public class I18NMessages {
     public enum I18NMessage {
 
         NAME_REQUIRED("blog.organization.name.required"),
-        MIN_MAX("blog.organization.name.minmax")
+        MIN_MAX("blog.minmax"),
+        MAX_LENGTH("blog.maxlength"),
+        REQUIRED("blog.required"),
+        INVALID("blog.invalid")
         
         ;
 

@@ -1,4 +1,4 @@
-package com.vicky.blog.service;
+package com.vicky.blog.service.organization;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.OrganizationRepository;
 import com.vicky.blog.repository.OrganizationUserRepository;
-import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
@@ -43,7 +42,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private OrganizationUserRepository organizationUserRepository;
 
     @Autowired
-    private I18NMessages i18nMessages;
+    private OrganizationUtil organizationUtil;
 
     @Override
     public Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException {
@@ -52,7 +51,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationDTO.setOwner(user);
         organizationDTO.setId(null);
 
-        validateOrganizationData(organizationDTO);
+        organizationUtil.validateOrganizationData(organizationDTO);
         
         Organization organization = Organization.build(organizationDTO);
         organization.setCreatedTime(LocalDateTime.now());
@@ -78,31 +77,15 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
         }
 
+        organizationUtil.validateOrganizationData(organizationDTO);
+
         if(!existingOrganization.get().getOwner().getId().equals(userId)) {
             LOGGER.error("Illegal operation on Organization {} by user {}", organizationDTO.getId(), userId);
             throw new AppException(HttpStatus.SC_FORBIDDEN, "Only Organization owner can update the organization!");
         }
-        // Not allowing to change the created time of the organization
-        organizationDTO.setCreatedTime(existingOrganization.get().getCreatedTime());
+        
+        organizationUtil.checkAndFillMissingDataForPatchUpdate(organizationDTO, existingOrganization.get());
 
-        if(organizationDTO.getDescription() == null) {
-            organizationDTO.setDescription(existingOrganization.get().getDescription());
-        }
-        if(organizationDTO.getImage() == null) {
-            organizationDTO.setImage(existingOrganization.get().getImage());
-        }
-        if(organizationDTO.getJoinType() == null) {
-            organizationDTO.setJoinType(existingOrganization.get().getJoinType());
-        }
-        if(organizationDTO.getName() == null) {
-            organizationDTO.setName(existingOrganization.get().getName());
-        }
-        if(organizationDTO.getOwner() == null) {
-            organizationDTO.setOwner(existingOrganization.get().getOwner().toDTO());
-        }
-        if(organizationDTO.getVisibility() == null) {
-            organizationDTO.setVisibility(existingOrganization.get().getVisibility());
-        }
         Organization updatedOrganization = organizationRepository.save(Organization.build(organizationDTO));
         if(updatedOrganization == null) {
             throw new AppException("Error while updating organization!");
@@ -410,23 +393,4 @@ public class OrganizationServiceImpl implements OrganizationService {
         throw new AppException(HttpStatus.SC_BAD_REQUEST, 
                 "There are no users to make admin other than the current Admin");
     }
-
-    private void validateOrganizationData(OrganizationDTO organizationDTO) throws AppException {
-
-        if(organizationDTO.getName() != null) {
-            if(organizationDTO.getName().length() < OrganizationConstants.NAME_MIN_LENGTH
-                || organizationDTO.getName().length() > OrganizationConstants.NAME_MAX_LENGTH) {
-
-                LOGGER.error("Organization name {} not matched with the MIN_MAX rule", organizationDTO.getName());
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX));
-            }
-        }
-        else {
-            LOGGER.error("Organization name is empty");
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NAME_REQUIRED));
-        }
-
-
-    }
-
 }
