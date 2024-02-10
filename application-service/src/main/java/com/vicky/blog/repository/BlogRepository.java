@@ -7,10 +7,13 @@ import org.springframework.stereotype.Repository;
 
 import com.vicky.blog.model.Blog;
 
+import jakarta.transaction.Transactional;
+
 @Repository
 public interface BlogRepository extends JpaRepository<Blog, Long> {
 
-    Optional<Blog> findByUserIdAndId(String userId, Long id);
+    Optional<Blog> findByOwnerIdAndId(String userId, Long id);
 
-    void deleteByUserIdAndId(String userId, Long id);
+    @Transactional
+    void deleteByOwnerIdAndId(String userId, Long id);
 }

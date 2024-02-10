@@ -58,7 +58,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Optional<BlogDTO> getBlog(String userId, Long id) throws AppException {
         
-        Optional<Blog> blog = blogRepository.findByUserIdAndId(userId, id);
+        Optional<Blog> blog = blogRepository.findByOwnerIdAndId(userId, id);
 
         if(blog.isEmpty()) {
             return Optional.empty();
@@ -78,6 +78,8 @@ public class BlogServiceImpl implements BlogService {
 
         blogUtil.checkAndFillMissingDataForPatchUpdate(blogDTO, existingBlog.get());
 
+        blogUtil.validateBlogData(blogDTO);
+
         Blog savedBlog = blogRepository.save(Blog.build(blogDTO, userService.getUser(blogDTO.getOwnerId()).get()));
 
         if(savedBlog == null) {
@@ -89,7 +91,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public void deleteBlog(String userId, Long id) throws AppException {
-        blogRepository.deleteByUserIdAndId(userId, id);
+        blogRepository.deleteByOwnerIdAndId(userId, id);
     }
     
 }
