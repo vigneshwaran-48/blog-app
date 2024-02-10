@@ -9,9 +9,9 @@ public interface BlogService {
     
     Long addBlog(BlogDTO blogDTO) throws AppException;
 
-    Optional<BlogDTO> getBlog(Long id) throws AppException;
+    Optional<BlogDTO> getBlog(String userId, Long id) throws AppException;
 
     Optional<BlogDTO> updateBlog(BlogDTO blogDTO) throws AppException;
 
-    void deleteBlog(Long id) throws AppException;
+    void deleteBlog(String userId, Long id) throws AppException;
 }

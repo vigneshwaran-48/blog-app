@@ -60,7 +60,8 @@ class OrganizationUtil {
             }
         }
         else {
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NAME_REQUIRED));
+            Object[] args = { "Organization name" };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NAME_REQUIRED, args));
         }
     }
 

@@ -3,6 +3,7 @@ package com.vicky.blog.service.blog;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.model.Blog;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 
@@ -24,6 +26,22 @@ class BlogUtil {
         validateImage(blogDTO.getImage());
     }
 
+    void checkAndFillMissingDataForPatchUpdate(BlogDTO newBlog, BlogDTO existingBlog) {
+
+        if(newBlog.getContent() == null) {
+            newBlog.setContent(existingBlog.getContent());
+        }
+        if(newBlog.getImage() == null) {
+            newBlog.setImage(existingBlog.getImage());
+        }
+        if(newBlog.getTitle() == null) {
+            newBlog.setTitle(existingBlog.getTitle());
+        }
+
+        // Owner of a blog post can't be changed 
+        newBlog.setOwnerId(existingBlog.getOwnerId());
+    }
+
     private void validateTitle(String title) throws AppException {
         if(title != null) {
             if(title.length() < BlogConstants.TITLE_MIN_LENGTH
@@ -35,7 +53,8 @@ class BlogUtil {
             }
         }
         else {
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NAME_REQUIRED));
+            Object[] args = { "Blog title" };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, args));
         }
     }
 
