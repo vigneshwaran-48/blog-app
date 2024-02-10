@@ -2,6 +2,7 @@ package com.vicky.blog.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.HttpStatus;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.dto.blog.BlogResponse;
+import com.vicky.blog.common.dto.blog.BlogsResponse;
+import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.utility.UserIdExtracter;
@@ -31,7 +34,6 @@ public class BlogController {
 
     @Autowired
     private BlogService blogService;
-
     @Autowired
     private UserIdExtracter userIdExtracter;
     
@@ -41,7 +43,9 @@ public class BlogController {
 
         String userId = userIdExtracter.getUserId(principal);
 
-        blogDTO.setOwnerId(userId);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(userId);
+        blogDTO.setOwner(userDTO);
 
         Long id = blogService.addBlog(blogDTO);
         BlogDTO blog = blogService.getBlog(userId, id).get();
@@ -49,6 +53,22 @@ public class BlogController {
         BlogResponse response = new BlogResponse();
         response.setBlog(blog);
         response.setMessage("Added blog!");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getBlogsOfUser(Principal principal, HttpServletRequest request) throws AppException {
+        
+        String userId = userIdExtracter.getUserId(principal);
+        List<BlogDTO> blogs = blogService.getAllBlogsOfUser(userId);
+
+        BlogsResponse response = new BlogsResponse();
+        response.setBlogs(blogs);
+        response.setMessage("success");
         response.setPath(request.getServletPath());
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
@@ -80,7 +100,9 @@ public class BlogController {
 
         String userId = userIdExtracter.getUserId(principal);
 
-        blogDTO.setOwnerId(userId);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(userId);
+        blogDTO.setOwner(userDTO);
 
         BlogDTO savedBlog = blogService.updateBlog(blogDTO).get();
 

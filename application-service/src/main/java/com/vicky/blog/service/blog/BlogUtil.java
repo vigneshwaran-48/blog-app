@@ -37,9 +37,17 @@ class BlogUtil {
         if(newBlog.getTitle() == null) {
             newBlog.setTitle(existingBlog.getTitle());
         }
+        newBlog.setDescription(getDescriptionForBlog(newBlog.getContent()));
 
         // Owner of a blog post can't be changed 
-        newBlog.setOwnerId(existingBlog.getOwnerId());
+        newBlog.setOwner(existingBlog.getOwner());
+    }
+
+    String getDescriptionForBlog(String content) {
+        if(content.length() >= BlogConstants.BLOG_DESCRIPTION_LENGTH) {
+            return content.substring(0, BlogConstants.BLOG_DESCRIPTION_LENGTH);
+        }
+        return content;
     }
 
     private void validateTitle(String title) throws AppException {

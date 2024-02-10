@@ -37,14 +37,18 @@ public class Blog {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    public static Blog build(BlogDTO blogDTO, UserDTO userDTO) {
+    @Column(length = BlogConstants.BLOG_DESCRIPTION_LENGTH)
+    private String description;
+
+    public static Blog build(BlogDTO blogDTO) {
 
         Blog blog = new Blog();
         blog.setTitle(blogDTO.getTitle());
         blog.setContent(blogDTO.getContent().getBytes(StandardCharsets.UTF_16));
         blog.setId(blogDTO.getId());
         blog.setImage(blogDTO.getImage());
-        blog.setOwner(User.build(userDTO));
+        blog.setOwner(User.build(blogDTO.getOwner()));
+        blog.setDescription(blogDTO.getDescription());
 
         return blog;
     }
@@ -56,7 +60,8 @@ public class Blog {
         blogDTO.setTitle(title);
         blogDTO.setContent(new String(content, StandardCharsets.UTF_16));
         blogDTO.setImage(image);
-        blogDTO.setOwnerId(owner.getId());
+        blogDTO.setOwner(owner.toDTO());
+        blogDTO.setDescription(description);
         
         return blogDTO;
     }

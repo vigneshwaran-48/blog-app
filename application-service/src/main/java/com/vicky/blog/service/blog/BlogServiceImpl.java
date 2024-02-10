@@ -1,6 +1,8 @@
 package com.vicky.blog.service.blog;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -33,19 +35,18 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Long addBlog(BlogDTO blogDTO) throws AppException {
         
-        UserDTO user = null;
-
         try {
-            user = userService.getUser(blogDTO.getOwnerId())
+            userService.getUser(blogDTO.getOwner().getId())
                                 .orElseThrow(() -> new AppException(HttpStatus.SC_BAD_REQUEST, "Owner not exists"));
         } 
         catch (Exception e) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid owner");
         }
 
+        blogDTO.setDescription(blogUtil.getDescriptionForBlog(blogDTO.getContent()));
         blogUtil.validateBlogData(blogDTO);
-        Blog blog = Blog.build(blogDTO, user);
 
+        Blog blog = Blog.build(blogDTO);
         Blog savedBlog = blogRepository.save(blog);
 
         if(savedBlog == null) {
@@ -69,7 +70,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Optional<BlogDTO> updateBlog(BlogDTO blogDTO) throws AppException {
         
-        Optional<BlogDTO> existingBlog = getBlog(blogDTO.getOwnerId(), blogDTO.getId());
+        Optional<BlogDTO> existingBlog = getBlog(blogDTO.getOwner().getId(), blogDTO.getId());
 
         if(existingBlog.isEmpty()) {
             LOGGER.error("Blog {} not exists", blogDTO.getId());
@@ -77,10 +78,9 @@ public class BlogServiceImpl implements BlogService {
         }
 
         blogUtil.checkAndFillMissingDataForPatchUpdate(blogDTO, existingBlog.get());
-
         blogUtil.validateBlogData(blogDTO);
 
-        Blog savedBlog = blogRepository.save(Blog.build(blogDTO, userService.getUser(blogDTO.getOwnerId()).get()));
+        Blog savedBlog = blogRepository.save(Blog.build(blogDTO));
 
         if(savedBlog == null) {
             LOGGER.error("Error while saving blog {}", blogDTO);
@@ -92,6 +92,16 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public void deleteBlog(String userId, Long id) throws AppException {
         blogRepository.deleteByOwnerIdAndId(userId, id);
+    }
+
+    @Override
+    public List<BlogDTO> getAllBlogsOfUser(String userId) throws AppException {
+        List<Blog> blogs = blogRepository.findByOwnerId(userId);
+
+        if(blogs.isEmpty()) {
+            return List.of();
+        }
+        return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
     }
     
 }
