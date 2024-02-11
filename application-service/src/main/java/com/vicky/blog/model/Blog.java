@@ -28,13 +28,14 @@ public class Blog {
     @Column(nullable = false)
     private String image = "";
 
+    @Column(length = 100000, columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(length = BlogConstants.BLOG_DESCRIPTION_LENGTH)
+    @Column(length = BlogConstants.BLOG_DESCRIPTION_LENGTH + 10)
     private String description;
 
     @Column(name = "posted_time")

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
-import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.service.UserService;
@@ -67,7 +66,10 @@ public class BlogServiceImpl implements BlogService {
         if(blog.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(blog.get().toDTO());
+        BlogDTO blogDTO = blog.get().toDTO();
+        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+
+        return Optional.of(blogDTO);
     }
 
     @Override
@@ -104,7 +106,13 @@ public class BlogServiceImpl implements BlogService {
         if(blogs.isEmpty()) {
             return List.of();
         }
-        return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
+        return blogs.stream()
+                    .map(blog -> {
+                        BlogDTO blogDTO = blog.toDTO();
+                        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+                        return blogDTO;
+                    })
+                    .collect(Collectors.toList());
     }
     
 }

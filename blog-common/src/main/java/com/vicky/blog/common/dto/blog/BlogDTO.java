@@ -16,5 +16,6 @@ public class BlogDTO {
     private UserDTO owner;
     private String description;
     private LocalDateTime postedTime;
+    private String displayPostedDate;
 
 }

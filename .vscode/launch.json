@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "BlogUtil",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.service.blog.BlogUtil",
+            "projectName": "application-service"
+        },
+        {
+            "type": "java",
             "name": "ApiGatewayApplication",
             "request": "launch",
             "mainClass": "com.vicky.blog.apigateway.ApiGatewayApplication",
