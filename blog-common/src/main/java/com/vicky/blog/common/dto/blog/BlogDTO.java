@@ -1,5 +1,7 @@
 package com.vicky.blog.common.dto.blog;
 
+import java.time.LocalDateTime;
+
 import com.vicky.blog.common.dto.user.UserDTO;
 
 import lombok.Data;
@@ -13,5 +15,6 @@ public class BlogDTO {
     private String image;
     private UserDTO owner;
     private String description;
+    private LocalDateTime postedTime;
 
 }

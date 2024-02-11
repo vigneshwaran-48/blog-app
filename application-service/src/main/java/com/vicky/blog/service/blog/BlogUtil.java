@@ -3,7 +3,6 @@ package com.vicky.blog.service.blog;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.exception.AppException;
-import com.vicky.blog.model.Blog;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 
@@ -37,10 +35,11 @@ class BlogUtil {
         if(newBlog.getTitle() == null) {
             newBlog.setTitle(existingBlog.getTitle());
         }
-        newBlog.setDescription(getDescriptionForBlog(newBlog.getContent()));
 
-        // Owner of a blog post can't be changed 
+        // These are all can't be edited directly
         newBlog.setOwner(existingBlog.getOwner());
+        newBlog.setDescription(getDescriptionForBlog(newBlog.getContent()));
+        newBlog.setPostedTime(existingBlog.getPostedTime());
     }
 
     String getDescriptionForBlog(String content) {

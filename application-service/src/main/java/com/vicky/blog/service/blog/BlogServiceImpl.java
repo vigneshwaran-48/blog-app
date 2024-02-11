@@ -1,5 +1,6 @@
 package com.vicky.blog.service.blog;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +46,8 @@ public class BlogServiceImpl implements BlogService {
 
         blogDTO.setDescription(blogUtil.getDescriptionForBlog(blogDTO.getContent()));
         blogUtil.validateBlogData(blogDTO);
+
+        blogDTO.setPostedTime(LocalDateTime.now());
 
         Blog blog = Blog.build(blogDTO);
         Blog savedBlog = blogRepository.save(blog);

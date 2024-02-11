@@ -1,9 +1,8 @@
 package com.vicky.blog.model;
 
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
-import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.service.blog.BlogConstants;
 
 import jakarta.persistence.Column;
@@ -12,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
@@ -30,8 +28,7 @@ public class Blog {
     @Column(nullable = false)
     private String image = "";
 
-    @Lob
-    private byte[] content;
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
@@ -40,15 +37,19 @@ public class Blog {
     @Column(length = BlogConstants.BLOG_DESCRIPTION_LENGTH)
     private String description;
 
+    @Column(name = "posted_time")
+    private LocalDateTime postedTime;
+
     public static Blog build(BlogDTO blogDTO) {
 
         Blog blog = new Blog();
         blog.setTitle(blogDTO.getTitle());
-        blog.setContent(blogDTO.getContent().getBytes(StandardCharsets.UTF_16));
+        blog.setContent(blogDTO.getContent());
         blog.setId(blogDTO.getId());
         blog.setImage(blogDTO.getImage());
         blog.setOwner(User.build(blogDTO.getOwner()));
         blog.setDescription(blogDTO.getDescription());
+        blog.setPostedTime(blogDTO.getPostedTime());
 
         return blog;
     }
@@ -58,10 +59,11 @@ public class Blog {
         BlogDTO blogDTO = new BlogDTO();
         blogDTO.setId(id);
         blogDTO.setTitle(title);
-        blogDTO.setContent(new String(content, StandardCharsets.UTF_16));
+        blogDTO.setContent(content);
         blogDTO.setImage(image);
         blogDTO.setOwner(owner.toDTO());
         blogDTO.setDescription(description);
+        blogDTO.setPostedTime(postedTime);
         
         return blogDTO;
     }
