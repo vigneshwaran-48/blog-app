@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.http.HttpStatus;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,10 +44,11 @@ class BlogUtil {
     }
 
     String getDescriptionForBlog(String content) {
-        if(content.length() >= BlogConstants.BLOG_DESCRIPTION_LENGTH) {
-            return content.substring(0, BlogConstants.BLOG_DESCRIPTION_LENGTH);
+        String htmlTextContent = Jsoup.parse(content).text();
+        if(htmlTextContent.length() >= BlogConstants.BLOG_DESCRIPTION_LENGTH) {
+            return htmlTextContent.substring(0, BlogConstants.BLOG_DESCRIPTION_LENGTH);
         }
-        return content;
+        return htmlTextContent;
     }
 
     private void validateTitle(String title) throws AppException {
