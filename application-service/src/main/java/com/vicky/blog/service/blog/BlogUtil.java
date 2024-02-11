@@ -38,11 +38,7 @@ class BlogUtil {
         if(newBlog.getTitle() == null) {
             newBlog.setTitle(existingBlog.getTitle());
         }
-
-        // These are all can't be edited directly
-        newBlog.setOwner(existingBlog.getOwner());
-        newBlog.setDescription(getDescriptionForBlog(newBlog.getContent()));
-        newBlog.setPostedTime(existingBlog.getPostedTime());
+        setNonEditableData(newBlog, existingBlog);
     }
 
     String getDescriptionForBlog(String content) {
@@ -57,11 +53,11 @@ class BlogUtil {
 
         long minutesDifference = ChronoUnit.MINUTES.between(postedDateTime, LocalDateTime.now());
         if(minutesDifference <= 60) {
-            return minutesDifference + " minutes ago";
+            return minutesDifference + (minutesDifference == 1 ? " minute ago" : " minutes ago");
         }
         long hoursDifference = ChronoUnit.HOURS.between(postedDateTime, LocalDateTime.now());
         if(hoursDifference <= 24) {
-            return hoursDifference + " hours ago";
+            return hoursDifference + (hoursDifference == 1 ? " hour ago" : " hours ago");
         }
         long daysDifference = ChronoUnit.DAYS.between(postedDateTime, LocalDateTime.now());
         if(daysDifference <= 3) {
@@ -109,5 +105,11 @@ class BlogUtil {
         } catch (URISyntaxException e) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
         }
+    }
+
+    private void setNonEditableData(BlogDTO newBlog, BlogDTO existingBlog) {
+        newBlog.setOwner(existingBlog.getOwner());
+        newBlog.setDescription(getDescriptionForBlog(newBlog.getContent()));
+        newBlog.setPostedTime(existingBlog.getPostedTime());
     }
 }
