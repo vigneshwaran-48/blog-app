@@ -31,7 +31,7 @@ public class StaticServiceImpl implements StaticService {
 
         StaticResource savedStaticResource = staticResourceRepository.save(staticResource);
 
-        LOGGER.info("Added resource {}", resource.getId());
+        LOGGER.info("Added resource {}", savedStaticResource.getId());
         return savedStaticResource.getId();
     }
 

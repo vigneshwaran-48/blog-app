@@ -1,4 +1,4 @@
-package com.vicky.blog.service;
+package com.vicky.blog.service.user;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +16,7 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.UserRepository;
+import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Service
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private I18NMessages i18nMessages;
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override

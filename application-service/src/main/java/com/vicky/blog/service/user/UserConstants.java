@@ -1,4 +1,4 @@
-package com.vicky.blog.service;
+package com.vicky.blog.service.user;
 
 public class UserConstants {
     

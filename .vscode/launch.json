@@ -1,0 +1,49 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "BlogUtil",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.service.blog.BlogUtil",
+            "projectName": "application-service"
+        },
+        {
+            "type": "java",
+            "name": "ApiGatewayApplication",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.apigateway.ApiGatewayApplication",
+            "projectName": "api-gateway"
+        },
+        {
+            "type": "java",
+            "name": "ApplicationServiceApplication",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.ApplicationServiceApplication",
+            "projectName": "application-service"
+        },
+        {
+            "type": "java",
+            "name": "ConfigServiceApplication",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.config.ConfigServiceApplication",
+            "projectName": "config-service"
+        },
+        {
+            "type": "java",
+            "name": "ServieRegistryApplication",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.servieregistry.ServieRegistryApplication",
+            "projectName": "servie-registry"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-StaticServiceApplication<static-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.vicky.blog.staticservice.StaticServiceApplication",
+            "projectName": "static-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

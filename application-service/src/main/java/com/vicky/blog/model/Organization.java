@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.JoinType;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
+import com.vicky.blog.service.organization.OrganizationConstants;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,13 +22,14 @@ public class Organization {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = OrganizationConstants.NAME_MAX_LENGTH)
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    @Column(length = OrganizationConstants.DESCRIPTION_MAX_LENGTH)
     private String description;
 
     @Column(name = "created_time", nullable = false)
