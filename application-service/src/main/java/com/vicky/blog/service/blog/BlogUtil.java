@@ -22,8 +22,8 @@ class BlogUtil {
     @Autowired
     private I18NMessages i18nMessages;
 
-    void validateBlogData(BlogDTO blogDTO) throws AppException {
-        validateTitle(blogDTO.getTitle());
+    void validateAndFormatBlogData(BlogDTO blogDTO) throws AppException {
+        formatTitle(blogDTO);
         validateImage(blogDTO.getImage());
     }
 
@@ -80,19 +80,9 @@ class BlogUtil {
         }
     }
 
-    private void validateTitle(String title) throws AppException {
-        if(title != null) {
-            if(title.length() < BlogConstants.TITLE_MIN_LENGTH
-                || title.length() > BlogConstants.TITLE_MAX_LENGTH) {
-
-                Object[] args = { "Blog title",
-                    BlogConstants.TITLE_MIN_LENGTH, BlogConstants.TITLE_MAX_LENGTH };
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX, args));
-            }
-        }
-        else {
-            Object[] args = { "Blog title" };
-            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, args));
+    private void formatTitle(BlogDTO blog) throws AppException {
+        if(blog.getTitle() == null || blog.getTitle().isBlank()) {
+            blog.setTitle(BlogConstants.BLOG_EMPTY_TITLE);
         }
     }
 
