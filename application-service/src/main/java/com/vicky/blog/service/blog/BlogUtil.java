@@ -23,7 +23,6 @@ class BlogUtil {
     private I18NMessages i18nMessages;
 
     void validateAndFormatBlogData(BlogDTO blogDTO) throws AppException {
-        formatTitle(blogDTO);
         validateImage(blogDTO.getImage());
     }
 
@@ -77,12 +76,6 @@ class BlogUtil {
                 return "rd";
             default:
                 return "th";
-        }
-    }
-
-    private void formatTitle(BlogDTO blog) throws AppException {
-        if(blog.getTitle() == null || blog.getTitle().isBlank()) {
-            blog.setTitle(BlogConstants.BLOG_EMPTY_TITLE);
         }
     }
 
