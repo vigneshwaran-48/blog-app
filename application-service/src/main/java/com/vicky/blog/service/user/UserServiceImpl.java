@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         if(newData.getName() == null) {
             newData.setName(existingData.getName());
         }
-        if(newData.getDescripton() == null) {
+        if(newData.getDescription() == null) {
             newData.setDescription(existingData.getDescription());
         }
         if(newData.getEmail() == null) {
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
     private void validateUser(UserDTO userDTO) throws AppException {
         validateName(userDTO.getName());
         validateAge(userDTO.getAge());
-        validateDescription(userDTO.getDescripton());
+        validateDescription(userDTO.getDescription());
         validateEmail(userDTO.getEmail());
     }
 

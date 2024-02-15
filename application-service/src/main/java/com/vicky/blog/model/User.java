@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 /**
  * 
  * In this class the property id and email both are unique. Id will be used to identify a unique user in the
- * application level. But for the users emailId will be the unique identifier.
+ * application level. Email id will be used to contact the user.
  * 
  */
 @Entity
@@ -115,7 +115,7 @@ public class User {
         user.setEmail(userDTO.getEmail());
         user.setId(userDTO.getId());
         user.setName(userDTO.getName());
-        user.setDescription(userDTO.getDescripton());
+        user.setDescription(userDTO.getDescription());
 
         if(userDTO.getTheme() != null) {
             user.setTheme(userDTO.getTheme());
