@@ -15,6 +15,7 @@ import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
+import com.vicky.blog.service.organization.OrganizationConstants;
 
 @Component
 class BlogUtil {
@@ -23,6 +24,7 @@ class BlogUtil {
     private I18NMessages i18nMessages;
 
     void validateAndFormatBlogData(BlogDTO blogDTO) throws AppException {
+        validateTitle(blogDTO.getTitle());
         validateImage(blogDTO.getImage());
     }
 
@@ -87,6 +89,17 @@ class BlogUtil {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
         } catch (URISyntaxException e) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
+        }
+    }
+
+    private void validateTitle(String title) throws AppException {
+        if(title == null) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, 
+                i18nMessages.getMessage(I18NMessage.REQUIRED, new Object[] { "Title" }));
+        }
+        if(title.length() > BlogConstants.TITLE_MAX_LENGTH) {
+            Object[] args = { "Blog Title", 0, OrganizationConstants.NAME_MAX_LENGTH };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX, args));
         }
     }
 
