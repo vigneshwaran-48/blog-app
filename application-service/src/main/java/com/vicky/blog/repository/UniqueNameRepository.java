@@ -6,7 +6,7 @@ import com.vicky.blog.model.UniqueName;
 
 public interface UniqueNameRepository extends JpaRepository<UniqueName, Long> {
     
-    Optional<UniqueName> findByEntityId(Long entityId);
+    Optional<UniqueName> findByEntityId(String entityId);
 
     boolean existsByUniqueName(String uniqueName);
 }

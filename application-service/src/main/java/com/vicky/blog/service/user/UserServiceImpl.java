@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.UniqueNameService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.UserRepository;
@@ -27,6 +28,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private I18NMessages i18nMessages;
+
+    @Autowired
+    private UniqueNameService uniqueNameService;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -37,14 +41,13 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("User with email id {} already exists", userDTO.getEmail());
             throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
         }
-
-        validateUser(userDTO);
-
+        validateUser(userDTO, true);
         User user = User.build(userDTO);
         User addedUser = userRepository.save(user);
 
         if(addedUser != null) {
             LOGGER.info("Added user {}", addedUser.getId());
+            uniqueNameService.addUniqueName(addedUser.getId(), userDTO.getUniqueName());
             return true;
         }
         return false;
@@ -59,7 +62,7 @@ public class UserServiceImpl implements UserService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists");
         }
 
-        validateUser(user);
+        validateUser(user, false);
 
         checkAndFillMissingDataForPatchUpdate(user, existingUser.get());
 
@@ -133,7 +136,10 @@ public class UserServiceImpl implements UserService {
         }
     }
     
-    private void validateUser(UserDTO userDTO) throws AppException {
+    private void validateUser(UserDTO userDTO, boolean validateUniqueName) throws AppException {
+        if(validateUniqueName) {
+            validateUniqueName(userDTO.getUniqueName());
+        }
         validateName(userDTO.getName());
         validateAge(userDTO.getAge());
         validateDescription(userDTO.getDescription());
@@ -173,6 +179,16 @@ public class UserServiceImpl implements UserService {
         if(!Pattern.compile(UserConstants.EMAIL_REGEX).matcher(email).matches()) {
             Object[] args = { "Email" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
+        }
+    }
+
+    private void validateUniqueName(String uniqueName) throws AppException {
+        if(uniqueName == null) {
+            return;
+        }
+        if(uniqueNameService.isUniqueNameExists(uniqueName)) {
+            Object[] args = { "User Name" };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
         }
     }
 

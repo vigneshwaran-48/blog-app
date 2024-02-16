@@ -7,8 +7,8 @@ import com.vicky.blog.common.exception.AppException;
 
 public interface UniqueNameService {
     
-    Optional<UniqueNameDTO> addUniqueName(Long entityId, String uniqueName) throws AppException;
+    Optional<UniqueNameDTO> addUniqueName(String entityId, String uniqueName) throws AppException;
     boolean isUniqueNameExists(String uniqueName) throws AppException;
-    Optional<String> getUniqueName(Long entityId) throws AppException;
+    Optional<String> getUniqueName(String entityId) throws AppException;
 
 }

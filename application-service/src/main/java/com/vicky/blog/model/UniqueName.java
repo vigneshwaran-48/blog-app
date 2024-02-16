@@ -21,7 +21,7 @@ public class UniqueName {
     private String uniqueName;
 
     @Column(name = "entity_id", unique = true)
-    private Long entityId;
+    private String entityId;
 
     public UniqueNameDTO toDTO() {
         UniqueNameDTO uniqueNameDTO = new UniqueNameDTO();

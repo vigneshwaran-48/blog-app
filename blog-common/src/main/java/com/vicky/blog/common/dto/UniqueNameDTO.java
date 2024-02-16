@@ -6,5 +6,5 @@ import lombok.Data;
 public class UniqueNameDTO {
     private Long id;
     private String uniqueName;
-    private Long entityId;
+    private String entityId;
 }
