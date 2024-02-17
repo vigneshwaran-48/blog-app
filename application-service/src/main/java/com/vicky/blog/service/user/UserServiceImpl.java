@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.vicky.blog.common.dto.ProfileIdDTO;
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
         if(addedUser != null) {
             LOGGER.info("Added user {}", addedUser.getId());
-            profileIdService.addProfileId(addedUser.getId(), userDTO.getProfileId());
+            profileIdService.addProfileId(addedUser.getId(), userDTO.getProfileId(), ProfileType.USER);
             return true;
         }
         return false;
@@ -66,7 +67,7 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("Error while updating user {}", user.getId());
             throw new AppException("Error while updating user");
         }
-        profileIdService.updateProfileId(updatedUser.getId(), user.getProfileId());
+        profileIdService.updateProfileId(updatedUser.getId(), user.getProfileId(), ProfileType.USER);
         UserDTO updateUserDTO = updatedUser.toDTO();
         Optional<String> profileId = profileIdService.getProfileIdByEntityId(updateUserDTO.getId());
         updateUserDTO.setProfileId(profileId.isPresent() ? profileId.get() : updateUserDTO.getId());
@@ -198,8 +199,6 @@ public class UserServiceImpl implements UserService {
             if(uniqueNameDTO.get().getEntityId().equals(userId)) {
                 return;
             }
-            // TODO If you can, Change all uniqueId name to profileId because showing it as profile id to the user will
-            // make sense.
             Object[] args = { "Profile Id" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
         }

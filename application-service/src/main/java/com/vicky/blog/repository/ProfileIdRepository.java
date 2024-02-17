@@ -11,7 +11,7 @@ public interface ProfileIdRepository extends JpaRepository<ProfileId, Long> {
     
     Optional<ProfileId> findByEntityId(String entityId);
 
-    boolean existsByUniqueName(String profileId);
+    boolean existsByProfileId(String profileId);
 
-    Optional<ProfileId> findByUniqueName(String profileId);
+    Optional<ProfileId> findByProfileId(String profileId);
 }

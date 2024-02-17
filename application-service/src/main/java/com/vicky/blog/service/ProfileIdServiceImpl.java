@@ -8,11 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.vicky.blog.common.dto.ProfileIdDTO;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.ProfileIdRepository;
+import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Service
 public class ProfileIdServiceImpl implements ProfileIdService {
@@ -22,20 +24,25 @@ public class ProfileIdServiceImpl implements ProfileIdService {
     @Autowired
     private ProfileIdRepository profileIdRepository;
 
+    @Autowired
+    private I18NMessages i18NMessages;
+
     @Override
-    public Optional<ProfileIdDTO> addProfileId(String entityId, String profileId) throws AppException {
+    public Optional<ProfileIdDTO> addProfileId(String entityId, String profileId, ProfileType type) throws AppException {
+        checkProfileId(profileId);
         Optional<ProfileId> profileIdModel = profileIdRepository.findByEntityId(entityId);
         if(profileIdModel.isPresent()) {
             LOGGER.error("Already unique name {} exists for {}", profileIdModel.get().getProfileId(), entityId);
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Already unique name exists for " + entityId);
         }
-        if(profileIdRepository.existsByUniqueName(profileId)) {
+        if(profileIdRepository.existsByProfileId(profileId)) {
             LOGGER.error("Already unique name {} exists", profileId);
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Unique name already exists");
         }
         ProfileId uNameModel = new ProfileId();
         uNameModel.setEntityId(entityId);
         uNameModel.setProfileId(profileId);
+        uNameModel.setType(type);
         ProfileId savedUniqueName = profileIdRepository.save(uNameModel);
         if(savedUniqueName == null) {
             LOGGER.error("Error while saving unique name {}", profileId);
@@ -46,7 +53,7 @@ public class ProfileIdServiceImpl implements ProfileIdService {
 
     @Override
     public boolean isProfileIdExists(String profileId) throws AppException {
-        return profileIdRepository.existsByUniqueName(profileId);
+        return profileIdRepository.existsByProfileId(profileId);
     }
 
     @Override
@@ -60,7 +67,8 @@ public class ProfileIdServiceImpl implements ProfileIdService {
 
     @Override
     public Optional<ProfileIdDTO> getProfileId(String profileId) throws AppException {
-        Optional<ProfileId> profileIdModel = profileIdRepository.findByUniqueName(profileId);
+        checkProfileId(profileId);
+        Optional<ProfileId> profileIdModel = profileIdRepository.findByProfileId(profileId);
         if(profileIdModel.isEmpty()) {
             return Optional.empty();
         }
@@ -68,7 +76,8 @@ public class ProfileIdServiceImpl implements ProfileIdService {
     }
 
     @Override
-    public Optional<ProfileIdDTO> updateProfileId(String entityId, String profileId) throws AppException {
+    public Optional<ProfileIdDTO> updateProfileId(String entityId, String profileId, ProfileType type) throws AppException {
+        checkProfileId(profileId);
         Optional<ProfileId> profileIdModel = profileIdRepository.findByEntityId(entityId);
         if(profileIdModel.isEmpty()) {
             LOGGER.error("Unique Name not exists for the entity {} already", entityId);
@@ -83,6 +92,7 @@ public class ProfileIdServiceImpl implements ProfileIdService {
         uniqueNameToAdd.setId(profileIdModel.get().getId());
         uniqueNameToAdd.setEntityId(entityId);
         uniqueNameToAdd.setProfileId(profileId);
+        uniqueNameToAdd.setType(type);
 
         ProfileId savedUniqueName = profileIdRepository.save(uniqueNameToAdd);
         if(savedUniqueName == null) {
@@ -92,4 +102,10 @@ public class ProfileIdServiceImpl implements ProfileIdService {
         return Optional.of(savedUniqueName.toDTO());
     }
     
+    private void checkProfileId(String profileId) throws AppException {
+        if(profileId == null) {
+            Object[] args = { "Profile Id" };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18NMessages.getMessage(I18NMessage.REQUIRED, args));
+        }
+    }
 }

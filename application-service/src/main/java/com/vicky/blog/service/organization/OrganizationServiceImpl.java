@@ -16,6 +16,7 @@ import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.OrgUser;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
@@ -62,7 +63,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         Organization addedOrganization = organizationRepository.save(organization);
         if(addedOrganization != null) {
-            profileIdService.addProfileId(String.valueOf(addedOrganization.getId()), organizationDTO.getProfileId());
+            profileIdService.addProfileId(String.valueOf(addedOrganization.getId()), organizationDTO.getProfileId(),
+                                        ProfileType.ORGANIZATION);
             addUserToOrg(addedOrganization, User.build(user), UserOrganizationRole.ADMIN);
             return Optional.of(addedOrganization.toDTO());
         }
