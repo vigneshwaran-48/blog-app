@@ -1,6 +1,6 @@
 package com.vicky.blog.model;
 
-import com.vicky.blog.common.dto.UniqueNameDTO;
+import com.vicky.blog.common.dto.ProfileIdDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,23 +11,23 @@ import lombok.Data;
 
 @Entity
 @Data
-public class UniqueName {
+public class ProfileId {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "unique_name", unique = true)
-    private String uniqueName;
+    private String profileId;
 
     @Column(name = "entity_id", unique = true)
     private String entityId;
 
-    public UniqueNameDTO toDTO() {
-        UniqueNameDTO uniqueNameDTO = new UniqueNameDTO();
-        uniqueNameDTO.setEntityId(entityId);
-        uniqueNameDTO.setUniqueName(uniqueName);
-        uniqueNameDTO.setId(id);
-        return uniqueNameDTO;
+    public ProfileIdDTO toDTO() {
+        ProfileIdDTO profileIdDTO = new ProfileIdDTO();
+        profileIdDTO.setEntityId(entityId);
+        profileIdDTO.setProfileId(profileId);
+        profileIdDTO.setId(id);
+        return profileIdDTO;
     }
 }

@@ -21,7 +21,7 @@ public class OrganizationDTO {
     
     private Long id;
     private String name;
-    private String uniqueName;
+    private String profileId;
     private String description;
     private LocalDateTime createdTime;
     private Visibility visibility;

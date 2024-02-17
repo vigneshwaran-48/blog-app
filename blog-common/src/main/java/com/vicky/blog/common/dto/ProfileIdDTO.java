@@ -3,8 +3,8 @@ package com.vicky.blog.common.dto;
 import lombok.Data;
 
 @Data
-public class UniqueNameDTO {
+public class ProfileIdDTO {
     private Long id;
-    private String uniqueName;
+    private String profileId;
     private String entityId;
 }

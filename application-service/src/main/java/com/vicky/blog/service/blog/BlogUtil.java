@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.exception.AppException;
-import com.vicky.blog.common.service.UniqueNameService;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 import com.vicky.blog.service.organization.OrganizationConstants;
@@ -74,6 +73,9 @@ class BlogUtil {
             case 1:
                 return "st";
             case 2:
+                if(date < 20) {
+                    return "th";
+                }
                 return "nd";
             case 3:
                 return "rd";

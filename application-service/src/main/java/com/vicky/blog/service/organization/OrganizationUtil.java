@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.exception.AppException;
-import com.vicky.blog.common.service.UniqueNameService;
+import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.Organization;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
@@ -19,13 +19,13 @@ class OrganizationUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationUtil.class);
 
     @Autowired
-    private UniqueNameService uniqueNameService;
+    private ProfileIdService profileIdService;
     @Autowired
     private I18NMessages i18nMessages;
     
     public void validateOrganizationData(OrganizationDTO organizationDTO, boolean isUpdate) throws AppException {
         if(!isUpdate) {
-            validateUniqueName(organizationDTO.getUniqueName());
+            validateUniqueName(organizationDTO.getProfileId());
         }
         validateOrganizationName(organizationDTO.getName());
         validateOrganizationDescription(organizationDTO.getDescription());
@@ -82,8 +82,8 @@ class OrganizationUtil {
         }
     }
 
-    private void validateUniqueName(String uniqueName) throws AppException {
-        if(uniqueNameService.isUniqueNameExists(uniqueName)) {
+    private void validateUniqueName(String profileId) throws AppException {
+        if(profileIdService.isProfileIdExists(profileId)) {
             Object[] args = { "User Name" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
         }
