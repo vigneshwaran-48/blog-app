@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.common.dto.UniqueNameDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UniqueNameService;
@@ -25,13 +26,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private I18NMessages i18nMessages;
-
     @Autowired
     private UniqueNameService uniqueNameService;
-    
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
@@ -41,7 +39,7 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("User with email id {} already exists", userDTO.getEmail());
             throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
         }
-        validateUser(userDTO, true);
+        validateUser(userDTO);
         User user = User.build(userDTO);
         User addedUser = userRepository.save(user);
 
@@ -61,17 +59,18 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("User with userId {} not found", user.getId());
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists");
         }
-
-        validateUser(user, false);
-
+        validateUser(user);
         checkAndFillMissingDataForPatchUpdate(user, existingUser.get());
-
         User updatedUser = userRepository.save(User.build(user));
         if(updatedUser == null) {
             LOGGER.error("Error while updating user {}", user.getId());
             throw new AppException("Error while updating user");
         }
-        return Optional.of(updatedUser.toDTO());
+        uniqueNameService.updateUniqueName(updatedUser.getId(), user.getUniqueName());
+        UserDTO updateUserDTO = updatedUser.toDTO();
+        Optional<String> uniqueName = uniqueNameService.getUniqueNameByEntity(updateUserDTO.getId());
+        updateUserDTO.setUniqueName(uniqueName.isPresent() ? uniqueName.get() : updateUserDTO.getId());
+        return Optional.of(updateUserDTO);
     }
 
     @Override
@@ -88,7 +87,10 @@ public class UserServiceImpl implements UserService {
         if(user.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(user.get().toDTO());
+        UserDTO userDTO = user.get().toDTO();
+        Optional<String> uniqueName = uniqueNameService.getUniqueNameByEntity(userDTO.getId());
+        userDTO.setUniqueName(uniqueName.isPresent() ? uniqueName.get() : userDTO.getId());
+        return Optional.of(userDTO);
     }
 
     @Override
@@ -103,7 +105,14 @@ public class UserServiceImpl implements UserService {
             return List.of();
         }
         return users.stream().map(user -> {
-                                    return user.toDTO();
+                                    UserDTO userDTO = user.toDTO();
+                                    try {
+                                        Optional<String> uniqueName = uniqueNameService.getUniqueNameByEntity(userDTO.getId());
+                                        userDTO.setUniqueName(uniqueName.isPresent() ? uniqueName.get() : userDTO.getId());
+                                    } catch (AppException e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                    }
+                                    return userDTO;
                                 }).collect(Collectors.toList());
     }
 
@@ -136,10 +145,8 @@ public class UserServiceImpl implements UserService {
         }
     }
     
-    private void validateUser(UserDTO userDTO, boolean validateUniqueName) throws AppException {
-        if(validateUniqueName) {
-            validateUniqueName(userDTO.getUniqueName());
-        }
+    private void validateUser(UserDTO userDTO) throws AppException {
+        validateUniqueName(userDTO.getId(), userDTO.getUniqueName());
         validateName(userDTO.getName());
         validateAge(userDTO.getAge());
         validateDescription(userDTO.getDescription());
@@ -182,12 +189,18 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateUniqueName(String uniqueName) throws AppException {
+    private void validateUniqueName(String userId, String uniqueName) throws AppException {
         if(uniqueName == null) {
             return;
         }
-        if(uniqueNameService.isUniqueNameExists(uniqueName)) {
-            Object[] args = { "User Name" };
+        Optional<UniqueNameDTO> uniqueNameDTO = uniqueNameService.getUniqueName(uniqueName);
+        if(uniqueNameDTO.isPresent()) {
+            if(uniqueNameDTO.get().getEntityId().equals(userId)) {
+                return;
+            }
+            // TODO If you can, Change all uniqueId name to profileId because showing it as profile id to the user will
+            // make sense.
+            Object[] args = { "Profile Id" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
         }
     }

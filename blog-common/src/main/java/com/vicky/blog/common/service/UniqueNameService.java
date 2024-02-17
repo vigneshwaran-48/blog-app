@@ -9,6 +9,7 @@ public interface UniqueNameService {
     
     Optional<UniqueNameDTO> addUniqueName(String entityId, String uniqueName) throws AppException;
     boolean isUniqueNameExists(String uniqueName) throws AppException;
-    Optional<String> getUniqueName(String entityId) throws AppException;
-
+    Optional<String> getUniqueNameByEntity(String entityId) throws AppException;
+    Optional<UniqueNameDTO> getUniqueName(String uniqueName) throws AppException;
+    Optional<UniqueNameDTO> updateUniqueName(String entityId, String uniqueName) throws AppException;
 }
