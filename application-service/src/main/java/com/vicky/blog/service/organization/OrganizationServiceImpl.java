@@ -56,17 +56,21 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationDTO.setOwner(user);
         organizationDTO.setId(null);
 
-        organizationUtil.validateOrganizationData(organizationDTO, false);
+        organizationUtil.validateOrganizationData(organizationDTO);
         
         Organization organization = Organization.build(organizationDTO);
         organization.setCreatedTime(LocalDateTime.now());
 
         Organization addedOrganization = organizationRepository.save(organization);
         if(addedOrganization != null) {
-            profileIdService.addProfileId(String.valueOf(addedOrganization.getId()), organizationDTO.getProfileId(),
-                                        ProfileType.ORGANIZATION);
+            String entityId = String.valueOf(addedOrganization.getId());
+            String profileId = organizationDTO.getProfileId();
+            if(profileId == null) {
+                profileId = entityId;
+            }
+            profileIdService.addProfileId(entityId, profileId, ProfileType.ORGANIZATION);
             addUserToOrg(addedOrganization, User.build(user), UserOrganizationRole.ADMIN);
-            return Optional.of(addedOrganization.toDTO());
+            return Optional.of(addedOrganization.toDTO(profileId));
         }
         LOGGER.error("Created organization is null, Requested DTO", organizationDTO);
         return Optional.empty();
@@ -84,7 +88,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
         }
 
-        organizationUtil.validateOrganizationData(organizationDTO, true);
+        organizationUtil.validateOrganizationData(organizationDTO);
 
         if(!existingOrganization.get().getOwner().getId().equals(userId)) {
             LOGGER.error("Illegal operation on Organization {} by user {}", organizationDTO.getId(), userId);
@@ -97,7 +101,9 @@ public class OrganizationServiceImpl implements OrganizationService {
         if(updatedOrganization == null) {
             throw new AppException("Error while updating organization!");
         }
-        return Optional.of(updatedOrganization.toDTO());
+        profileIdService.updateProfileId(String.valueOf(updatedOrganization.getId()), organizationDTO.getProfileId(), 
+                                        ProfileType.ORGANIZATION);
+        return Optional.of(updatedOrganization.toDTO(organizationDTO.getProfileId()));
     }
 
     @Override
@@ -121,8 +127,8 @@ public class OrganizationServiceImpl implements OrganizationService {
                 throw new AppException(HttpStatus.SC_FORBIDDEN, "You are not allowed to see this organization");
             }
         }
-
-        return Optional.of(organization.get().toDTO());
+        Optional<String> profileId = profileIdService.getProfileIdByEntityId(String.valueOf(id));
+        return Optional.of(organization.get().toDTO(profileId.get()));
     }
 
     @Override
@@ -315,9 +321,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         if(orgsOfUser.isEmpty()) {
             return new ArrayList<>();
         }
-        return orgsOfUser
-                    .stream()
-                    .map(org -> org.getOrganization().toDTO()).collect(Collectors.toList());
+        List<OrganizationDTO> organizationDTOs = new ArrayList<>();
+        for(OrganizationUser orgUser : orgsOfUser) {
+            Organization org = orgUser.getOrganization();
+            String profileId = profileIdService.getProfileIdByEntityId(String.valueOf(org.getId())).get();
+            organizationDTOs.add(orgUser.getOrganization().toDTO(profileId));
+        }
+        return organizationDTOs;
     }
 
     @Override
@@ -328,7 +338,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         for(OrganizationUser orgUser: orgsOfUser) {
             if(orgUser.getRole() == role) {
-                organizations.add(orgUser.getOrganization().toDTO());
+                Organization org = orgUser.getOrganization();
+                String profileId = profileIdService.getProfileIdByEntityId(String.valueOf(org.getId())).get();
+                organizations.add(orgUser.getOrganization().toDTO(profileId));
             }
         }
         return organizations;
@@ -353,9 +365,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         return user.get();
     }
 
-    private OrganizationUserDTO getOrganizationUserDTO(OrganizationUser organizationUser) {
+    private OrganizationUserDTO getOrganizationUserDTO(OrganizationUser organizationUser) throws AppException {
         OrganizationUserDTO dto = new OrganizationUserDTO();
-        dto.setOrganization(organizationUser.getOrganization().toDTO());
+        Organization org = organizationUser.getOrganization();
+        String profileId = profileIdService.getProfileIdByEntityId(String.valueOf(org.getId())).get();
+        dto.setOrganization(org.toDTO(profileId));
 
         OrgUser oUser = dto.new OrgUser(organizationUser.getUser().toDTO(), organizationUser.getRole());
         dto.setUsers(List.of(oUser));
