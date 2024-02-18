@@ -60,10 +60,10 @@ public class BlogController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping
-    public ResponseEntity<?> getBlogsOfUser(Principal principal, HttpServletRequest request) throws AppException {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getBlogsOfUser(@PathVariable String userId, HttpServletRequest request) throws AppException {
         
-        String userId = userIdExtracter.getUserId(principal);
+        // Everyone can see everyones blog for now. Should be adding some restriction in furture.
         List<BlogDTO> blogs = blogService.getAllBlogsOfUser(userId);
 
         BlogsResponse response = new BlogsResponse();

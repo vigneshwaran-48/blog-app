@@ -17,5 +17,6 @@ public class BlogDTO {
     private String description;
     private LocalDateTime postedTime;
     private String displayPostedDate;
+    private String postedProfileId;
 
 }

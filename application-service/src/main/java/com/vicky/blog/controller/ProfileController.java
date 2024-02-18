@@ -62,11 +62,13 @@ public class ProfileController {
             Optional<UserDTO> user = userService.getUser(entityId);
             profileDTO.setName(user.get().getName());
             profileDTO.setDescription(user.get().getDescription());
+            profileDTO.setBannerImage(user.get().getImage());
         }
         else {
             Optional<OrganizationDTO> organization = organizationService.getOrganization(userId, Long.parseLong(entityId));
             profileDTO.setName(organization.get().getName());
             profileDTO.setDescription(organization.get().getDescription()); 
+            profileDTO.setBannerImage(organization.get().getImage());
         }
         ProfileResponse response = ProfileResponse.builder()
                                                     .status(HttpStatus.SC_OK)

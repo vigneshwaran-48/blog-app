@@ -55,6 +55,21 @@ public class Blog {
         return blog;
     }
 
+    public BlogDTO toDTO(String profileId) {
+
+        BlogDTO blogDTO = new BlogDTO();
+        blogDTO.setId(id);
+        blogDTO.setTitle(title);
+        blogDTO.setContent(content);
+        blogDTO.setImage(image);
+        blogDTO.setOwner(owner.toDTO());
+        blogDTO.setDescription(description);
+        blogDTO.setPostedTime(postedTime);
+        blogDTO.setPostedProfileId(profileId);
+        
+        return blogDTO;
+    }
+
     public BlogDTO toDTO() {
 
         BlogDTO blogDTO = new BlogDTO();

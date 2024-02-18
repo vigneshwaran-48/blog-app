@@ -15,4 +15,5 @@ public class ProfileDTO {
     private String description;
     private ProfileType type;
     private String entityId;
+    private String bannerImage;
 }
