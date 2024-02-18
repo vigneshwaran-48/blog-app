@@ -44,7 +44,7 @@ public class BlogServiceImpl implements BlogService {
         }
 
         blogDTO.setDescription(blogUtil.getDescriptionForBlog(blogDTO.getContent()));
-        blogUtil.validateBlogData(blogDTO);
+        blogUtil.validateAndFormatBlogData(blogDTO);
 
         blogDTO.setPostedTime(LocalDateTime.now());
 
@@ -83,7 +83,7 @@ public class BlogServiceImpl implements BlogService {
         }
 
         blogUtil.checkAndFillMissingDataForPatchUpdate(blogDTO, existingBlog.get());
-        blogUtil.validateBlogData(blogDTO);
+        blogUtil.validateAndFormatBlogData(blogDTO);
 
         Blog savedBlog = blogRepository.save(Blog.build(blogDTO));
 

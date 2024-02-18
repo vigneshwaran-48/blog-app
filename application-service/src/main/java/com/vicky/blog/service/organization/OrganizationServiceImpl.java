@@ -16,10 +16,12 @@ import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.OrgUser;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
+import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Organization;
 import com.vicky.blog.model.OrganizationUser;
@@ -44,6 +46,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private OrganizationUtil organizationUtil;
 
+    @Autowired
+    private ProfileIdService profileIdService;
+
     @Override
     public Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException {
         
@@ -51,13 +56,15 @@ public class OrganizationServiceImpl implements OrganizationService {
         organizationDTO.setOwner(user);
         organizationDTO.setId(null);
 
-        organizationUtil.validateOrganizationData(organizationDTO);
+        organizationUtil.validateOrganizationData(organizationDTO, false);
         
         Organization organization = Organization.build(organizationDTO);
         organization.setCreatedTime(LocalDateTime.now());
 
         Organization addedOrganization = organizationRepository.save(organization);
         if(addedOrganization != null) {
+            profileIdService.addProfileId(String.valueOf(addedOrganization.getId()), organizationDTO.getProfileId(),
+                                        ProfileType.ORGANIZATION);
             addUserToOrg(addedOrganization, User.build(user), UserOrganizationRole.ADMIN);
             return Optional.of(addedOrganization.toDTO());
         }
@@ -77,7 +84,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
         }
 
-        organizationUtil.validateOrganizationData(organizationDTO);
+        organizationUtil.validateOrganizationData(organizationDTO, true);
 
         if(!existingOrganization.get().getOwner().getId().equals(userId)) {
             LOGGER.error("Illegal operation on Organization {} by user {}", organizationDTO.getId(), userId);

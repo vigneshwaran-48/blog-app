@@ -1,7 +1,6 @@
 package com.vicky.blog.model;
 
 import java.util.Arrays;
-import java.util.List;
 
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.OrgUser;

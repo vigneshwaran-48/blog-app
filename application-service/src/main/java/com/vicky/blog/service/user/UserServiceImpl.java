@@ -11,8 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.UserRepository;
@@ -24,10 +27,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private I18NMessages i18nMessages;
-    
+    @Autowired
+    private ProfileIdService profileIdService;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
@@ -37,14 +40,13 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("User with email id {} already exists", userDTO.getEmail());
             throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
         }
-
         validateUser(userDTO);
-
         User user = User.build(userDTO);
         User addedUser = userRepository.save(user);
 
         if(addedUser != null) {
             LOGGER.info("Added user {}", addedUser.getId());
+            profileIdService.addProfileId(addedUser.getId(), userDTO.getProfileId(), ProfileType.USER);
             return true;
         }
         return false;
@@ -58,17 +60,18 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("User with userId {} not found", user.getId());
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists");
         }
-
         validateUser(user);
-
         checkAndFillMissingDataForPatchUpdate(user, existingUser.get());
-
         User updatedUser = userRepository.save(User.build(user));
         if(updatedUser == null) {
             LOGGER.error("Error while updating user {}", user.getId());
             throw new AppException("Error while updating user");
         }
-        return Optional.of(updatedUser.toDTO());
+        profileIdService.updateProfileId(updatedUser.getId(), user.getProfileId(), ProfileType.USER);
+        UserDTO updateUserDTO = updatedUser.toDTO();
+        Optional<String> profileId = profileIdService.getProfileIdByEntityId(updateUserDTO.getId());
+        updateUserDTO.setProfileId(profileId.isPresent() ? profileId.get() : updateUserDTO.getId());
+        return Optional.of(updateUserDTO);
     }
 
     @Override
@@ -85,7 +88,10 @@ public class UserServiceImpl implements UserService {
         if(user.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(user.get().toDTO());
+        UserDTO userDTO = user.get().toDTO();
+        Optional<String> profileId = profileIdService.getProfileIdByEntityId(userDTO.getId());
+        userDTO.setProfileId(profileId.isPresent() ? profileId.get() : userDTO.getId());
+        return Optional.of(userDTO);
     }
 
     @Override
@@ -100,7 +106,14 @@ public class UserServiceImpl implements UserService {
             return List.of();
         }
         return users.stream().map(user -> {
-                                    return user.toDTO();
+                                    UserDTO userDTO = user.toDTO();
+                                    try {
+                                        Optional<String> profileId = profileIdService.getProfileIdByEntityId(userDTO.getId());
+                                        userDTO.setProfileId(profileId.isPresent() ? profileId.get() : userDTO.getId());
+                                    } catch (AppException e) {
+                                        LOGGER.error(e.getMessage(), e);
+                                    }
+                                    return userDTO;
                                 }).collect(Collectors.toList());
     }
 
@@ -112,7 +125,7 @@ public class UserServiceImpl implements UserService {
         if(newData.getName() == null) {
             newData.setName(existingData.getName());
         }
-        if(newData.getDescripton() == null) {
+        if(newData.getDescription() == null) {
             newData.setDescription(existingData.getDescription());
         }
         if(newData.getEmail() == null) {
@@ -134,9 +147,10 @@ public class UserServiceImpl implements UserService {
     }
     
     private void validateUser(UserDTO userDTO) throws AppException {
+        validateUniqueName(userDTO.getId(), userDTO.getProfileId());
         validateName(userDTO.getName());
         validateAge(userDTO.getAge());
-        validateDescription(userDTO.getDescripton());
+        validateDescription(userDTO.getDescription());
         validateEmail(userDTO.getEmail());
     }
 
@@ -173,6 +187,20 @@ public class UserServiceImpl implements UserService {
         if(!Pattern.compile(UserConstants.EMAIL_REGEX).matcher(email).matches()) {
             Object[] args = { "Email" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
+        }
+    }
+
+    private void validateUniqueName(String userId, String profileId) throws AppException {
+        if(profileId == null) {
+            return;
+        }
+        Optional<ProfileIdDTO> uniqueNameDTO = profileIdService.getProfileId(profileId);
+        if(uniqueNameDTO.isPresent()) {
+            if(uniqueNameDTO.get().getEntityId().equals(userId)) {
+                return;
+            }
+            Object[] args = { "Profile Id" };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
         }
     }
 

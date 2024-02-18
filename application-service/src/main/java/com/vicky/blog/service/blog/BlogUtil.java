@@ -15,6 +15,7 @@ import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
+import com.vicky.blog.service.organization.OrganizationConstants;
 
 @Component
 class BlogUtil {
@@ -22,7 +23,7 @@ class BlogUtil {
     @Autowired
     private I18NMessages i18nMessages;
 
-    void validateBlogData(BlogDTO blogDTO) throws AppException {
+    void validateAndFormatBlogData(BlogDTO blogDTO) throws AppException {
         validateTitle(blogDTO.getTitle());
         validateImage(blogDTO.getImage());
     }
@@ -72,27 +73,14 @@ class BlogUtil {
             case 1:
                 return "st";
             case 2:
+                if(date < 20) {
+                    return "th";
+                }
                 return "nd";
             case 3:
                 return "rd";
             default:
                 return "th";
-        }
-    }
-
-    private void validateTitle(String title) throws AppException {
-        if(title != null) {
-            if(title.length() < BlogConstants.TITLE_MIN_LENGTH
-                || title.length() > BlogConstants.TITLE_MAX_LENGTH) {
-
-                Object[] args = { "Blog title",
-                    BlogConstants.TITLE_MIN_LENGTH, BlogConstants.TITLE_MAX_LENGTH };
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX, args));
-            }
-        }
-        else {
-            Object[] args = { "Blog title" };
-            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, args));
         }
     }
 
@@ -104,6 +92,17 @@ class BlogUtil {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
         } catch (URISyntaxException e) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
+        }
+    }
+
+    private void validateTitle(String title) throws AppException {
+        if(title == null) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, 
+                i18nMessages.getMessage(I18NMessage.REQUIRED, new Object[] { "Title" }));
+        }
+        if(title.length() > BlogConstants.TITLE_MAX_LENGTH) {
+            Object[] args = { "Blog Title", 0, OrganizationConstants.NAME_MAX_LENGTH };
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX, args));
         }
     }
 

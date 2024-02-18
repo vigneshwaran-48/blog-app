@@ -17,7 +17,8 @@ public class I18NMessages {
         MIN_MAX("blog.minmax"),
         MAX_LENGTH("blog.maxlength"),
         REQUIRED("blog.required"),
-        INVALID("blog.invalid")
+        INVALID("blog.invalid"),
+        EXISTS("blog.exists")
         
         ;
 
