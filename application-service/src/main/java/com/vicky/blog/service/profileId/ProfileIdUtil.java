@@ -20,10 +20,15 @@ public class ProfileIdUtil {
 
     @Autowired
     private I18NMessages i18nMessages;
+
+    private static final String SPACE = " ";
     
     public void validateUniqueName(String entityId, String profileId) throws AppException {
         if(profileId == null) {
             return;
+        }
+        if(profileId.contains(SPACE)) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Space not allowed in profile id");
         }
         Optional<ProfileIdDTO> uniqueNameDTO = profileIdService.getProfileId(profileId);
         if(uniqueNameDTO.isPresent()) {
