@@ -21,8 +21,11 @@ import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.dto.blog.BlogResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
+import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
+import com.vicky.blog.common.dto.bloglike.BlogLikesCountResponse;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.BlogLikeService;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.utility.UserIdExtracter;
 
@@ -36,6 +39,8 @@ public class BlogController {
     private BlogService blogService;
     @Autowired
     private UserIdExtracter userIdExtracter;
+    @Autowired
+    private BlogLikeService blogLikeService;
     
     @PostMapping
     public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, 
@@ -130,6 +135,55 @@ public class BlogController {
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
 
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/{blogId}/like")
+    public ResponseEntity<?> likeBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
+        throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        blogLikeService.addLike(blogId, userId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("Liked Blog!");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        
+        return ResponseEntity.ok().body(response);
+    }
+
+    @DeleteMapping("/{blogId}/like")
+    public ResponseEntity<?> unLikeBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
+        throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        blogLikeService.removeLike(blogId, userId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("UnLiked Blog!");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{blogId}/like/count")
+    public ResponseEntity<?> getLikesCountOfBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
+        throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId);
+
+        BlogLikesCountResponse response = new BlogLikesCountResponse();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("Liked Blog!");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setLikesCount(blogLikes.size());
+        
         return ResponseEntity.ok().body(response);
     }
 }

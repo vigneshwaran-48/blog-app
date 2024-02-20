@@ -22,12 +22,13 @@ public class ProfileIdUtil {
     private I18NMessages i18nMessages;
 
     private static final String SPACE = " ";
+    private static final String HASH = "#";
     
     public void validateUniqueName(String entityId, String profileId) throws AppException {
         if(profileId == null) {
             return;
         }
-        if(profileId.contains(SPACE)) {
+        if(profileId.contains(SPACE) || profileId.contains(HASH)) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Space not allowed in profile id");
         }
         Optional<ProfileIdDTO> uniqueNameDTO = profileIdService.getProfileId(profileId);
