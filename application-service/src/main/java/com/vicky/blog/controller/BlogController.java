@@ -23,6 +23,7 @@ import com.vicky.blog.common.dto.blog.BlogResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
 import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
 import com.vicky.blog.common.dto.bloglike.BlogLikesCountResponse;
+import com.vicky.blog.common.dto.bloglike.BlogLikesResponse;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogLikeService;
@@ -133,6 +134,23 @@ public class BlogController {
         response.setMessage("Deleted blog!");
         response.setPath(request.getServletPath());
         response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{blogId}/like")
+    public ResponseEntity<?> getLikesOfBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
+        throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId);
+
+        BlogLikesResponse response = new BlogLikesResponse();
+        response.setLikes(blogLikes);
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
 
         return ResponseEntity.ok().body(response);
