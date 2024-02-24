@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
@@ -42,6 +43,8 @@ public class BlogController {
     private UserIdExtracter userIdExtracter;
     @Autowired
     private BlogLikeService blogLikeService;
+
+    // private ProfileIdSer
     
     @PostMapping
     public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, 
@@ -49,11 +52,7 @@ public class BlogController {
 
         String userId = userIdExtracter.getUserId(principal);
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(userId);
-        blogDTO.setOwner(userDTO);
-
-        Long id = blogService.addBlog(blogDTO);
+        Long id = blogService.addBlog(userId, blogDTO);
         BlogDTO blog = blogService.getBlog(userId, id).get();
 
         BlogResponse response = new BlogResponse();
@@ -106,11 +105,7 @@ public class BlogController {
 
         String userId = userIdExtracter.getUserId(principal);
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(userId);
-        blogDTO.setOwner(userDTO);
-
-        BlogDTO savedBlog = blogService.updateBlog(blogDTO).get();
+        BlogDTO savedBlog = blogService.updateBlog(userId, blogDTO).get();
 
         BlogResponse response = new BlogResponse();
         response.setBlog(savedBlog);
@@ -204,4 +199,40 @@ public class BlogController {
         
         return ResponseEntity.ok().body(response);
     }
+
+    @PostMapping("/{blogId}/publish")
+    public ResponseEntity<EmptyResponse> publishBlog(@PathVariable Long blogId, @RequestParam String publishAt, 
+        Principal principal, HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        blogService.publishBlog(userId, blogId, publishAt);
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Published blog!");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    // @GetMapping("/{id}/profile/{profileId}")
+    // public ResponseEntity<?> getBlogOfProfile(
+    //         @PathVariable Long id, @PathVariable String profileId,
+    //         HttpServletRequest request, 
+    //         Principal principal
+    // ) throws AppException {
+        
+    //     String userId = userIdExtracter.getUserId(principal);
+
+    //     Optional<BlogDTO> blog = blogService.getBlog(userId, id);
+
+    //     BlogResponse response = new BlogResponse();
+    //     response.setBlog(blog.isPresent() ? blog.get() : null);
+    //     response.setMessage(blog.isPresent() ? "success" : "Blog not exists!");
+    //     response.setPath(request.getServletPath());
+    //     response.setStatus(blog.isPresent() ? HttpStatus.SC_OK : HttpStatus.SC_NO_CONTENT);
+    //     response.setTime(LocalDateTime.now());
+
+    //     return ResponseEntity.ok().body(response);
+    // }
 }

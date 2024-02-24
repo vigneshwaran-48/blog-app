@@ -1,7 +1,6 @@
 package com.vicky.blog.model;
 
-import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,9 +9,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
-@Entity
 @Data
-public class BlogLike {
+@Entity
+public class BlogPublish {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,15 +21,4 @@ public class BlogLike {
     @JoinColumn(name = "blog_id", nullable = false)
     private Blog blog;
 
-    @ManyToOne
-    @JoinColumn(name = "liked_user_id", nullable = false)
-    private User likedBy;
-
-    public BlogLikeDTO toDTO() {
-        BlogLikeDTO blogLikeDTO = new BlogLikeDTO();
-        blogLikeDTO.setBlog(blog.toDTO());
-        blogLikeDTO.setUser(likedBy.toDTO());
-        blogLikeDTO.setId(id);
-        return blogLikeDTO;
-    }
 }

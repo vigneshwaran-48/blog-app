@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
@@ -26,6 +27,7 @@ class BlogUtil {
     void validateAndFormatBlogData(BlogDTO blogDTO) throws AppException {
         validateTitle(blogDTO.getTitle());
         validateImage(blogDTO.getImage());
+        validateBlogPublish(blogDTO.isPublised(), blogDTO.getPublishedAt());
     }
 
     void checkAndFillMissingDataForPatchUpdate(BlogDTO newBlog, BlogDTO existingBlog) {
@@ -38,6 +40,9 @@ class BlogUtil {
         }
         if(newBlog.getTitle() == null) {
             newBlog.setTitle(existingBlog.getTitle());
+        }
+        if(!newBlog.isPublised()) {
+            newBlog.setPublishedAt(null);
         }
         setNonEditableData(newBlog, existingBlog);
     }
@@ -110,5 +115,12 @@ class BlogUtil {
         newBlog.setOwner(existingBlog.getOwner());
         newBlog.setDescription(getDescriptionForBlog(newBlog.getContent()));
         newBlog.setPostedTime(existingBlog.getPostedTime());
+    }
+
+    private void validateBlogPublish(boolean isPublished, ProfileIdDTO publishedAt) throws AppException {
+        if(isPublished && publishedAt == null) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, 
+                i18nMessages.getMessage(I18NMessage.REQUIRED, new Object[] { "publishAt" }));
+        }
     }
 }
