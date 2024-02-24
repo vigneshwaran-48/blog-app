@@ -17,6 +17,10 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     List<Blog> findByOwnerId(String userId);
 
+    Optional<Blog> findByIdAndPublishedAtProfileId(Long id, String profileId);
+
+    List<Blog> findByPublishedAtProfileId(String profileId);
+
     @Transactional
     void deleteByOwnerIdAndId(String userId, Long id);
 }

@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +66,10 @@ public class BlogController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getBlogsOfUser(@PathVariable String userId, HttpServletRequest request) throws AppException {
+    @GetMapping("/user")
+    public ResponseEntity<?> getBlogsOfUser(Principal principal, HttpServletRequest request) throws AppException {
         
-        // Everyone can see everyones blog for now. Should be adding some restriction in furture.
+        String userId = userIdExtracter.getUserId(principal);
         List<BlogDTO> blogs = blogService.getAllBlogsOfUser(userId);
 
         BlogsResponse response = new BlogsResponse();
@@ -135,11 +136,11 @@ public class BlogController {
     }
 
     @GetMapping("/{blogId}/like")
-    public ResponseEntity<?> getLikesOfBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> getLikesOfBlog(@PathVariable Long blogId, @RequestParam String profileId,
+        Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-        List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId);
+        List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId, profileId);
 
         BlogLikesResponse response = new BlogLikesResponse();
         response.setLikes(blogLikes);
@@ -152,11 +153,11 @@ public class BlogController {
     }
 
     @PostMapping("/{blogId}/like")
-    public ResponseEntity<?> likeBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> likeBlog(@PathVariable Long blogId, @RequestParam String profileId,
+        Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-        blogLikeService.addLike(blogId, userId);
+        blogLikeService.addLike(blogId, userId, profileId);
 
         EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
@@ -168,11 +169,11 @@ public class BlogController {
     }
 
     @DeleteMapping("/{blogId}/like")
-    public ResponseEntity<?> unLikeBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> unLikeBlog(@PathVariable Long blogId, @RequestParam String profileId,
+        Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-        blogLikeService.removeLike(blogId, userId);
+        blogLikeService.removeLike(blogId, userId, profileId);
 
         EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
@@ -184,11 +185,11 @@ public class BlogController {
     }
 
     @GetMapping("/{blogId}/like/count")
-    public ResponseEntity<?> getLikesCountOfBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> getLikesCountOfBlog(@PathVariable Long blogId, @RequestParam String profileId,
+        Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-        List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId);
+        List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId, profileId);
 
         BlogLikesCountResponse response = new BlogLikesCountResponse();
         response.setStatus(HttpStatus.SC_OK);
@@ -215,24 +216,42 @@ public class BlogController {
         return ResponseEntity.ok().body(response);
     }
 
-    // @GetMapping("/{id}/profile/{profileId}")
-    // public ResponseEntity<?> getBlogOfProfile(
-    //         @PathVariable Long id, @PathVariable String profileId,
-    //         HttpServletRequest request, 
-    //         Principal principal
-    // ) throws AppException {
+    @GetMapping("/{id}/profile/{profileId}")
+    public ResponseEntity<?> getBlogOfProfile(
+            @PathVariable Long id, @PathVariable String profileId,
+            HttpServletRequest request, 
+            Principal principal
+    ) throws AppException {
         
-    //     String userId = userIdExtracter.getUserId(principal);
+        String userId = userIdExtracter.getUserId(principal);
 
-    //     Optional<BlogDTO> blog = blogService.getBlog(userId, id);
+        Optional<BlogDTO> blog = blogService.getBlogOfProfile(userId, id, profileId);
 
-    //     BlogResponse response = new BlogResponse();
-    //     response.setBlog(blog.isPresent() ? blog.get() : null);
-    //     response.setMessage(blog.isPresent() ? "success" : "Blog not exists!");
-    //     response.setPath(request.getServletPath());
-    //     response.setStatus(blog.isPresent() ? HttpStatus.SC_OK : HttpStatus.SC_NO_CONTENT);
-    //     response.setTime(LocalDateTime.now());
+        BlogResponse response = new BlogResponse();
+        response.setBlog(blog.isPresent() ? blog.get() : null);
+        response.setMessage(blog.isPresent() ? "success" : "Blog not exists!");
+        response.setPath(request.getServletPath());
+        response.setStatus(blog.isPresent() ? HttpStatus.SC_OK : HttpStatus.SC_NO_CONTENT);
+        response.setTime(LocalDateTime.now());
 
-    //     return ResponseEntity.ok().body(response);
-    // }
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/profile/{profileId}")
+    public ResponseEntity<?> getAllBlogsOfProfile(@PathVariable String profileId, HttpServletRequest request, 
+        Principal principal) throws AppException {
+        
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<BlogDTO> blogs = blogService.getAllBlogsOfProfile(userId, profileId);
+
+        BlogsResponse response = new BlogsResponse();
+        response.setBlogs(blogs);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
 }

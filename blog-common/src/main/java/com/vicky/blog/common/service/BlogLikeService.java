@@ -8,9 +8,9 @@ import com.vicky.blog.common.exception.AppException;
 
 public interface BlogLikeService {
     
-    Optional<BlogLikeDTO> addLike(Long blogId, String userId) throws AppException;
+    Optional<BlogLikeDTO> addLike(Long blogId, String userId, String profileId) throws AppException;
 
-    void removeLike(Long blogId, String userId) throws AppException;
+    void removeLike(Long blogId, String userId, String profileId) throws AppException;
 
-    List<BlogLikeDTO> getLikesOfBlog(String userId, Long blogId) throws AppException;
+    List<BlogLikeDTO> getLikesOfBlog(String userId, Long blogId, String profileId) throws AppException;
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
@@ -144,7 +145,7 @@ public class BlogServiceImpl implements BlogService {
             }
         }
         else {
-            // Validating user can access organization.
+            // Validating does user can access organization.
             organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId()));
         }
 
@@ -154,4 +155,35 @@ public class BlogServiceImpl implements BlogService {
         LOGGER.info("Published blog at {}", profileIdDTO.getProfileId());
     }
     
+    @Override
+    @UserIdValidator(positions = 0)
+    public Optional<BlogDTO> getBlogOfProfile(String userId, Long blogId, String profileId) throws AppException {
+
+        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
+                                () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
+
+        if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
+            // Validating does user can access organization.
+            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId())).get();
+        }
+        Optional<Blog> blog = blogRepository.findByIdAndPublishedAtProfileId(blogId, profileId);
+        if(blog.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(blog.get().toDTO());
+    }
+
+	@Override
+    @UserIdValidator(positions = 0)
+	public List<BlogDTO> getAllBlogsOfProfile(String userId, String profileId) throws AppException {
+		ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
+                                () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
+
+        if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
+            // Validating does user can access organization.
+            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId())).get();
+        }
+        List<Blog> blogs = blogRepository.findByPublishedAtProfileId(profileId);
+        return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
+	}
 }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
@@ -41,9 +42,10 @@ public class BlogLikeServiceImpl implements BlogLikeService {
     private static final Logger LOG = LoggerFactory.getLogger(BlogLikeServiceImpl.class);
 
     @Override
-    public Optional<BlogLikeDTO> addLike(Long blogId, String userId) throws AppException {
-        UserDTO user = getUser(userId);
-        BlogDTO blog = getBlog(userId, blogId);
+    @UserIdValidator(positions = 1)
+    public Optional<BlogLikeDTO> addLike(Long blogId, String userId, String profileId) throws AppException {
+        UserDTO user = userService.getUser(userId).get();
+        BlogDTO blog = getBlog(userId, profileId, blogId);
 
         Optional<BlogLike> blogLikeOptional = blogLikeRepository.findByBlogIdAndLikedById(blogId, userId);
         if(blogLikeOptional.isPresent()) {
@@ -63,19 +65,19 @@ public class BlogLikeServiceImpl implements BlogLikeService {
     }
 
     @Override
-    public void removeLike(Long blogId, String userId) throws AppException {
+    public void removeLike(Long blogId, String userId, String profileId) throws AppException {
         // Just validating given details.
         getUser(userId);
-        getBlog(userId, blogId);
+        getBlog(userId, profileId, blogId);
 
         blogLikeRepository.deleteByBlogIdAndLikedById(blogId, userId);
     }
 
     @Override
-    public List<BlogLikeDTO> getLikesOfBlog(String userId, Long blogId) throws AppException {
+    public List<BlogLikeDTO> getLikesOfBlog(String userId, Long blogId, String profileId) throws AppException {
         // Just validating given details.
         getUser(userId);
-        getBlog(userId, blogId);
+        getBlog(userId, profileId, blogId);
 
         return blogLikeRepository.findByBlogId(blogId)
                                 .stream()
@@ -93,8 +95,8 @@ public class BlogLikeServiceImpl implements BlogLikeService {
         return user.get();
     }
 
-    private BlogDTO getBlog(String userId, Long blogId) throws AppException {
-        Optional<BlogDTO> blog = blogService.getBlog(userId, blogId);
+    private BlogDTO getBlog(String userId, String profileId, Long blogId) throws AppException {
+        Optional<BlogDTO> blog = blogService.getBlogOfProfile(userId, blogId, profileId);
         if(blog.isEmpty()) {
             LOG.error("Blog {} not exists", userId);
             Object[] args = { "Blog " + blogId };
