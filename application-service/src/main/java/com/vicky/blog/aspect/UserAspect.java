@@ -15,6 +15,8 @@ import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UserService;
+import com.vicky.blog.service.I18NMessages;
+import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Aspect
 @Configuration
@@ -22,6 +24,9 @@ public class UserAspect {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private I18NMessages i18nMessages;
     
     private static final Logger LOGGER = LoggerFactory.getLogger(UserAspect.class);
 
@@ -35,10 +40,16 @@ public class UserAspect {
         for(int position : positionsToCheck) {
             String id = (String) args[position];
 
+            if(id == null) {
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, 
+                    new Object[] { "User Id" }));
+            }
+
             Optional<UserDTO> user = userService.getUser(id);
             if(user.isEmpty()) {
                 LOGGER.error("User {} not exists", id);
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, "User Not exists");
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NOT_EXISTS, 
+                    new Object[] { "User" }));
             }
         }
     }
