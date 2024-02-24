@@ -35,4 +35,15 @@ public class ProfileId {
         profileIdDTO.setType(type);
         return profileIdDTO;
     }
+
+    public static ProfileId build(ProfileIdDTO profileIdDTO) {
+        
+        ProfileId profileId = new ProfileId();
+        profileId.setId(profileIdDTO.getId());
+        profileId.setEntityId(profileIdDTO.getEntityId());
+        profileId.setProfileId(profileIdDTO.getProfileId());
+        profileId.setType(profileIdDTO.getType());
+
+        return profileId;
+    }
 }

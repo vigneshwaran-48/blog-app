@@ -41,6 +41,13 @@ public class Blog {
     @Column(name = "posted_time")
     private LocalDateTime postedTime;
 
+    @Column(name = "is_published")
+    private boolean isPublised;
+
+    @ManyToOne
+    @JoinColumn(name = "published_at")
+    private ProfileId publishedAt;
+
     public static Blog build(BlogDTO blogDTO) {
 
         Blog blog = new Blog();
@@ -51,6 +58,8 @@ public class Blog {
         blog.setOwner(User.build(blogDTO.getOwner()));
         blog.setDescription(blogDTO.getDescription());
         blog.setPostedTime(blogDTO.getPostedTime());
+        blog.setPublised(blogDTO.isPublised());
+        blog.setPublishedAt(ProfileId.build(blogDTO.getPublishedAt()));
 
         return blog;
     }
@@ -66,6 +75,8 @@ public class Blog {
         blogDTO.setDescription(description);
         blogDTO.setPostedTime(postedTime);
         blogDTO.setPostedProfileId(profileId);
+        blogDTO.setPublised(isPublised);
+        blogDTO.setPublishedAt(publishedAt.toDTO());
         
         return blogDTO;
     }
@@ -80,6 +91,8 @@ public class Blog {
         blogDTO.setOwner(owner.toDTO());
         blogDTO.setDescription(description);
         blogDTO.setPostedTime(postedTime);
+        blogDTO.setPublised(isPublised);
+        blogDTO.setPublishedAt(publishedAt != null ? publishedAt.toDTO() : null);
         
         return blogDTO;
     }

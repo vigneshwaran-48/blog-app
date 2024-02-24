@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.OrgUser;
@@ -50,33 +51,38 @@ public class OrganizationServiceImpl implements OrganizationService {
     private ProfileIdService profileIdService;
 
     @Override
+    @UserIdValidator(positions = 0)
     public Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException {
         
-        UserDTO user = getUser(userId);
+        UserDTO user = userService.getUser(userId).get();
         organizationDTO.setOwner(user);
         organizationDTO.setId(null);
 
-        organizationUtil.validateOrganizationData(organizationDTO, false);
+        organizationUtil.validateOrganizationData(organizationDTO);
         
         Organization organization = Organization.build(organizationDTO);
         organization.setCreatedTime(LocalDateTime.now());
 
         Organization addedOrganization = organizationRepository.save(organization);
         if(addedOrganization != null) {
-            profileIdService.addProfileId(String.valueOf(addedOrganization.getId()), organizationDTO.getProfileId(),
-                                        ProfileType.ORGANIZATION);
+            String entityId = String.valueOf(addedOrganization.getId());
+            String profileId = organizationDTO.getProfileId();
+            if(profileId == null) {
+                profileId = entityId;
+            }
+            profileIdService.addProfileId(entityId, profileId, ProfileType.ORGANIZATION);
             addUserToOrg(addedOrganization, User.build(user), UserOrganizationRole.ADMIN);
-            return Optional.of(addedOrganization.toDTO());
+            return Optional.of(addedOrganization.toDTO(profileId));
         }
         LOGGER.error("Created organization is null, Requested DTO", organizationDTO);
         return Optional.empty();
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public Optional<OrganizationDTO> updateOrganization(String userId, OrganizationDTO organizationDTO)
             throws AppException {
         
-        getUser(userId); // Validating user
         Optional<Organization> existingOrganization = organizationRepository.findById(organizationDTO.getId());
         
         if(existingOrganization.isEmpty()) {
@@ -84,7 +90,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
         }
 
-        organizationUtil.validateOrganizationData(organizationDTO, true);
+        organizationUtil.validateOrganizationData(organizationDTO);
 
         if(!existingOrganization.get().getOwner().getId().equals(userId)) {
             LOGGER.error("Illegal operation on Organization {} by user {}", organizationDTO.getId(), userId);
@@ -97,13 +103,15 @@ public class OrganizationServiceImpl implements OrganizationService {
         if(updatedOrganization == null) {
             throw new AppException("Error while updating organization!");
         }
-        return Optional.of(updatedOrganization.toDTO());
+        profileIdService.updateProfileId(String.valueOf(updatedOrganization.getId()), organizationDTO.getProfileId(), 
+                                        ProfileType.ORGANIZATION);
+        return Optional.of(updatedOrganization.toDTO(organizationDTO.getProfileId()));
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public Optional<OrganizationDTO> getOrganization(String userId, Long id) throws AppException {
         
-        getUser(userId); // validating user
         Optional<Organization> organization = organizationRepository.findById(id);
 
         if(organization.isEmpty()) {
@@ -121,11 +129,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                 throw new AppException(HttpStatus.SC_FORBIDDEN, "You are not allowed to see this organization");
             }
         }
-
-        return Optional.of(organization.get().toDTO());
+        Optional<String> profileId = profileIdService.getProfileIdByEntityId(String.valueOf(id));
+        return Optional.of(organization.get().toDTO(profileId.get()));
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public boolean deleteOrganization(String userId, Long id) throws AppException {
         Optional<Organization> organization = organizationRepository.findById(id);
         if(organization.isEmpty()) {
@@ -146,10 +155,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public Optional<OrganizationUserDTO> addUserToOrganization(String userId, Long organizationId, String userToAdd)
             throws AppException {
         
-        getUser(userId); // Validating user
         UserDTO userToAddDto = getUser(userToAdd);
         Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
         
@@ -176,6 +185,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public Optional<OrganizationUserDTO> addUsersToOrganization(String userId, Long organizationId,
             List<String> usersToAdd) throws AppException {
         OrganizationUserDTO organizationUserDTO = new OrganizationUserDTO();
@@ -190,9 +200,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId)
             throws AppException {
-        getUser(userId); // Validating user
         Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
 
         OrganizationUserDTO organizationUserDTO = new OrganizationUserDTO();
@@ -209,10 +219,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove)
             throws AppException {
         
-        getUser(userId); // Validating user
         getOrganization(userId, organizationId); // Validating organization
 
         Optional<OrganizationUser> organizationUser = 
@@ -251,10 +261,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public void changePermissionForUser(String userId, Long organizationId, String userToChangePermission,
             UserOrganizationRole role) throws AppException {
         
-        getUser(userId); // Validating user
         Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
 
         if(organization.isEmpty()) {
@@ -307,20 +317,25 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException {
-        getUser(userId); // Validating user
 
         List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
 
         if(orgsOfUser.isEmpty()) {
             return new ArrayList<>();
         }
-        return orgsOfUser
-                    .stream()
-                    .map(org -> org.getOrganization().toDTO()).collect(Collectors.toList());
+        List<OrganizationDTO> organizationDTOs = new ArrayList<>();
+        for(OrganizationUser orgUser : orgsOfUser) {
+            Organization org = orgUser.getOrganization();
+            String profileId = profileIdService.getProfileIdByEntityId(String.valueOf(org.getId())).get();
+            organizationDTOs.add(orgUser.getOrganization().toDTO(profileId));
+        }
+        return organizationDTOs;
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) throws AppException {
         List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
 
@@ -328,7 +343,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         for(OrganizationUser orgUser: orgsOfUser) {
             if(orgUser.getRole() == role) {
-                organizations.add(orgUser.getOrganization().toDTO());
+                Organization org = orgUser.getOrganization();
+                String profileId = profileIdService.getProfileIdByEntityId(String.valueOf(org.getId())).get();
+                organizations.add(orgUser.getOrganization().toDTO(profileId));
             }
         }
         return organizations;
@@ -353,9 +370,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         return user.get();
     }
 
-    private OrganizationUserDTO getOrganizationUserDTO(OrganizationUser organizationUser) {
+    private OrganizationUserDTO getOrganizationUserDTO(OrganizationUser organizationUser) throws AppException {
         OrganizationUserDTO dto = new OrganizationUserDTO();
-        dto.setOrganization(organizationUser.getOrganization().toDTO());
+        Organization org = organizationUser.getOrganization();
+        String profileId = profileIdService.getProfileIdByEntityId(String.valueOf(org.getId())).get();
+        dto.setOrganization(org.toDTO(profileId));
 
         OrgUser oUser = dto.new OrgUser(organizationUser.getUser().toDTO(), organizationUser.getRole());
         dto.setUsers(List.of(oUser));

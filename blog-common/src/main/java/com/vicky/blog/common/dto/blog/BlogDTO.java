@@ -2,6 +2,7 @@ package com.vicky.blog.common.dto.blog;
 
 import java.time.LocalDateTime;
 
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 
 import lombok.Data;
@@ -18,5 +19,7 @@ public class BlogDTO {
     private LocalDateTime postedTime;
     private String displayPostedDate;
     private String postedProfileId;
+    private boolean isPublised;
+    private ProfileIdDTO publishedAt;
 
 }

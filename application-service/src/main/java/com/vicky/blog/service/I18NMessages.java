@@ -18,7 +18,8 @@ public class I18NMessages {
         MAX_LENGTH("blog.maxlength"),
         REQUIRED("blog.required"),
         INVALID("blog.invalid"),
-        EXISTS("blog.exists")
+        EXISTS("blog.exists"),
+        NOT_EXISTS("blog.notexists")
         
         ;
 

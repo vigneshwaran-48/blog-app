@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
@@ -21,16 +20,23 @@ import com.vicky.blog.model.User;
 import com.vicky.blog.repository.UserRepository;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
+import com.vicky.blog.service.profileId.ProfileIdUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private I18NMessages i18nMessages;
+
     @Autowired
     private ProfileIdService profileIdService;
+
+    @Autowired
+    private ProfileIdUtil profileIdUtil;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
@@ -46,7 +52,11 @@ public class UserServiceImpl implements UserService {
 
         if(addedUser != null) {
             LOGGER.info("Added user {}", addedUser.getId());
-            profileIdService.addProfileId(addedUser.getId(), userDTO.getProfileId(), ProfileType.USER);
+            String profileId = userDTO.getProfileId();
+            if(profileId == null) {
+                profileId = addedUser.getId();
+            }
+            profileIdService.addProfileId(addedUser.getId(), profileId, ProfileType.USER);
             return true;
         }
         return false;
@@ -147,7 +157,7 @@ public class UserServiceImpl implements UserService {
     }
     
     private void validateUser(UserDTO userDTO) throws AppException {
-        validateUniqueName(userDTO.getId(), userDTO.getProfileId());
+        profileIdUtil.validateUniqueName(userDTO.getId(), userDTO.getProfileId());
         validateName(userDTO.getName());
         validateAge(userDTO.getAge());
         validateDescription(userDTO.getDescription());
@@ -190,18 +200,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateUniqueName(String userId, String profileId) throws AppException {
-        if(profileId == null) {
-            return;
-        }
-        Optional<ProfileIdDTO> uniqueNameDTO = profileIdService.getProfileId(profileId);
-        if(uniqueNameDTO.isPresent()) {
-            if(uniqueNameDTO.get().getEntityId().equals(userId)) {
-                return;
-            }
-            Object[] args = { "Profile Id" };
-            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
-        }
-    }
+    
 
 }

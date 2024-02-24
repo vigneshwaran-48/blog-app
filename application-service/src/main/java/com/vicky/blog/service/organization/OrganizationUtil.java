@@ -1,5 +1,7 @@
 package com.vicky.blog.service.organization;
 
+import java.util.Optional;
+
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,26 +14,24 @@ import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.Organization;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
+import com.vicky.blog.service.profileId.ProfileIdUtil;
 
 @Component
 class OrganizationUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationUtil.class);
-
-    @Autowired
-    private ProfileIdService profileIdService;
     @Autowired
     private I18NMessages i18nMessages;
+    @Autowired
+    private ProfileIdUtil profileIdUtil;
+    @Autowired
+    private ProfileIdService profileIdService;
     
-    public void validateOrganizationData(OrganizationDTO organizationDTO, boolean isUpdate) throws AppException {
-        if(!isUpdate) {
-            validateUniqueName(organizationDTO.getProfileId());
-        }
+    public void validateOrganizationData(OrganizationDTO organizationDTO) throws AppException {
+        profileIdUtil.validateUniqueName(String.valueOf(organizationDTO.getId()), organizationDTO.getProfileId());
         validateOrganizationName(organizationDTO.getName());
         validateOrganizationDescription(organizationDTO.getDescription());
     }
 
-    public void checkAndFillMissingDataForPatchUpdate(OrganizationDTO newData, Organization existingData) {
+    public void checkAndFillMissingDataForPatchUpdate(OrganizationDTO newData, Organization existingData) throws AppException {
         // Not allowing to change the created time of the organization
         newData.setCreatedTime(existingData.getCreatedTime());
 
@@ -52,6 +52,15 @@ class OrganizationUtil {
         }
         if(newData.getVisibility() == null) {
             newData.setVisibility(existingData.getVisibility());
+        }
+        if(newData.getProfileId() == null) {
+            Optional<String> profileId = profileIdService.getProfileIdByEntityId(String.valueOf(existingData.getId()));
+            if(profileId.isPresent()) {
+                newData.setProfileId(profileId.get());
+            }
+            else {
+                newData.setProfileId(String.valueOf(existingData.getId()));
+            }
         }
     }
 
@@ -79,13 +88,6 @@ class OrganizationUtil {
                 throw new AppException(HttpStatus.SC_BAD_REQUEST,
                         i18nMessages.getMessage(I18NMessage.MAX_LENGTH, args));
             }
-        }
-    }
-
-    private void validateUniqueName(String profileId) throws AppException {
-        if(profileIdService.isProfileIdExists(profileId)) {
-            Object[] args = { "User Name" };
-            throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.EXISTS, args));
         }
     }
 }

@@ -1,9 +1,5 @@
 package com.vicky.blog.model;
 
-import java.util.Arrays;
-
-import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
-import com.vicky.blog.common.dto.organization.OrganizationUserDTO.OrgUser;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 
 import jakarta.persistence.Column;
@@ -62,16 +58,5 @@ public class OrganizationUser {
 
     public void setRole(UserOrganizationRole role) {
         this.role = role;
-    }
-
-    public OrganizationUserDTO toDTO() {
-
-        OrganizationUserDTO organizationUserDTO = new OrganizationUserDTO();
-        organizationUserDTO.setOrganization(organization.toDTO());
-
-        OrgUser orgUser = organizationUserDTO.new OrgUser(user.toDTO(), role);
-        organizationUserDTO.setUsers(Arrays.asList(orgUser));
-
-        return organizationUserDTO;
     }
 }

@@ -108,7 +108,7 @@ public class Organization {
         this.image = image;
     }
 
-    public OrganizationDTO toDTO() {
+    public OrganizationDTO toDTO(String profileId) {
 
         OrganizationDTO organizationDTO = new OrganizationDTO();
         organizationDTO.setCreatedTime(createdTime);
@@ -119,6 +119,7 @@ public class Organization {
         organizationDTO.setName(name);
         organizationDTO.setOwner(owner.toDTO());
         organizationDTO.setVisibility(visibility);
+        organizationDTO.setProfileId(profileId);
 
         return organizationDTO;
     }

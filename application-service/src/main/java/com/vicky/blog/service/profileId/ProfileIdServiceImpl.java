@@ -1,4 +1,4 @@
-package com.vicky.blog.service;
+package com.vicky.blog.service.profileId;
 
 import java.util.Optional;
 
@@ -14,6 +14,7 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.ProfileIdRepository;
+import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Service
