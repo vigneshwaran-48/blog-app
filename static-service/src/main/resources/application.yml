@@ -3,7 +3,7 @@ spring:
     application:
         name: static-service
     config:
-        import: "configserver:http://localhost:8099"
+        import: "configserver:http://config-service:8099"
 
     servlet:
         multipart:
@@ -13,10 +13,13 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQLDialect
     datasource:
-        url: jdbc:mysql://localhost:3306/static_server
+        url: jdbc:mysql://static-service-mysql:3306/static_server
         username: root
-        password: 
+        password: root@123
         driver-class-name: com.mysql.cj.jdbc.Driver
 
     profiles:
