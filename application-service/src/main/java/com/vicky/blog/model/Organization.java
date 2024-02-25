@@ -42,7 +42,7 @@ public class Organization {
     private JoinType joinType = JoinType.ANYONE;
 
     @Column(nullable = false)
-    private String image = "http://localhost:8083/static/resource/179rjncje98498983";
+    private String image = "http://localhost:7000/static/1";
 
     public Long getId() {
         return id;
