@@ -151,6 +151,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         LOGGER.info("Deleted all users from the Organization {}", id);
 
         organizationRepository.deleteById(id);
+
+        Optional<String> profileId = profileIdService.getProfileIdByEntityId(String.valueOf(id));
+        profileIdService.deleteProfileId(String.valueOf(id), profileId.get());
+        
         return true;
     }
 

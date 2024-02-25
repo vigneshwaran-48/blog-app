@@ -109,4 +109,9 @@ public class ProfileIdServiceImpl implements ProfileIdService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18NMessages.getMessage(I18NMessage.REQUIRED, args));
         }
     }
+
+    @Override
+    public void deleteProfileId(String entityId, String profileId) throws AppException {
+        profileIdRepository.deleteByProfileIdAndEntityId(profileId, entityId);
+    }
 }

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import com.vicky.blog.model.ProfileId;
 
+import jakarta.transaction.Transactional;
+
 @Repository
 public interface ProfileIdRepository extends JpaRepository<ProfileId, Long> {
     
@@ -14,4 +16,7 @@ public interface ProfileIdRepository extends JpaRepository<ProfileId, Long> {
     boolean existsByProfileId(String profileId);
 
     Optional<ProfileId> findByProfileId(String profileId);
+
+    @Transactional
+    void deleteByProfileIdAndEntityId(String profileId, String entityId);
 }
