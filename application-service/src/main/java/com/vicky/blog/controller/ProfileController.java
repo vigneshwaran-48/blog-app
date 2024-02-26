@@ -2,6 +2,7 @@ package com.vicky.blog.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.hc.core5.http.HttpStatus;
@@ -16,6 +17,7 @@ import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileResponse;
+import com.vicky.blog.common.dto.profile.ProfileIdsResponse;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
@@ -76,6 +78,23 @@ public class ProfileController {
                                                     .path(request.getServletPath())
                                                     .time(LocalDateTime.now())
                                                     .profile(profileDTO)
+                                                    .build();
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<ProfileIdsResponse> getAllProfilesOfUser(Principal principal, HttpServletRequest request) 
+        throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        List<ProfileIdDTO> profiles = profileIdService.getAllProfilesOfUser(userId);
+
+        ProfileIdsResponse response = ProfileIdsResponse.builder()
+                                                    .status(HttpStatus.SC_OK)
+                                                    .message("success")
+                                                    .path(request.getServletPath())
+                                                    .time(LocalDateTime.now())
+                                                    .profiles(profiles)
                                                     .build();
         return ResponseEntity.ok().body(response);
     }

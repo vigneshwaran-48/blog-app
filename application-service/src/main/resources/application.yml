@@ -4,6 +4,8 @@ spring:
         name: application-service
     config:
         import: "configserver:http://config-service:8099"
+    main:
+        allow-circular-references: true
 
     jpa:
         hibernate:
