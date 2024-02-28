@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
-import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
@@ -170,7 +169,9 @@ public class BlogServiceImpl implements BlogService {
         if(blog.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(blog.get().toDTO());
+        BlogDTO blogDTO = blog.get().toDTO();
+        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+        return Optional.of(blogDTO);
     }
 
 	@Override

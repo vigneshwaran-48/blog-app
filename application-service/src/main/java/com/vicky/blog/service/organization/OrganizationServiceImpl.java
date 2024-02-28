@@ -21,6 +21,7 @@ import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
@@ -126,7 +127,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
             if(!isPresent) {
                 LOGGER.warn("Illegal access on organization {} by user {}", id, userId);
-                throw new AppException(HttpStatus.SC_FORBIDDEN, "You are not allowed to see this organization");
+                throw new OrganizationNotAccessible();
             }
         }
         Optional<String> profileId = profileIdService.getProfileIdByEntityId(String.valueOf(id));
