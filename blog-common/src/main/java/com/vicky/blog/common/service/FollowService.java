@@ -11,4 +11,5 @@ public interface FollowService {
 
     List<FollowDTO> getFollowersOfProfile(String userId, String profileId) throws AppException;
     
+    void unFollowProfile(String userId, String profileId) throws AppException;
 }

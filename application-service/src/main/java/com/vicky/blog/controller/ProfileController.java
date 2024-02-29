@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -147,5 +148,21 @@ public class ProfileController {
         response.setFollowers(followerUserDTOs);
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{profileId}/follow")
+    public ResponseEntity<EmptyResponse> unFollowProfile(@PathVariable String profileId, Principal principal, 
+        HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        followService.unFollowProfile(userId, profileId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("UnFollowed profile " + profileId + "!");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
     }
 }

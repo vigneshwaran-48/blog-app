@@ -73,5 +73,14 @@ public class FollowServiceImpl implements FollowService {
         List<Follow> followers = followRepository.findByUserProfileProfileId(profileId);
         return followers.stream().map(follow -> follow.toDTO()).collect(Collectors.toList());
     }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @ProfileIdValidator(positions = 1)
+    @ProfileAccessValidator(userIdPosition = 0, profileIdPosition = 1)
+    public void unFollowProfile(String userId, String profileId) throws AppException {
+        String userProfileId = profileIdService.getProfileIdByEntityId(userId).get();
+        followRepository.deleteByUserProfileProfileIdAndFollowerProfileId(profileId, userProfileId);
+    }
     
 }
