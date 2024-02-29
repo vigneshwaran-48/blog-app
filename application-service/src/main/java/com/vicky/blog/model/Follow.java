@@ -23,6 +23,7 @@ public class Follow {
     private ProfileId userProfile;
 
     @JoinColumn(name = "follower_id", nullable = false)
+    @ManyToOne
     private ProfileId follower;
 
     public FollowDTO toDTO() {
