@@ -214,6 +214,21 @@ public class BlogController {
         return ResponseEntity.ok().body(response);
     }
 
+    @PostMapping("/{blogId}/unpublish")
+    public ResponseEntity<EmptyResponse> unPublishBlog(@PathVariable Long blogId, Principal principal, 
+        HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        blogService.unPublishBlog(userId, blogId);
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("UnPublished blog!");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
     @GetMapping("/{id}/profile/{profileId}")
     public ResponseEntity<?> getBlogOfProfile(
             @PathVariable Long id, @PathVariable String profileId,

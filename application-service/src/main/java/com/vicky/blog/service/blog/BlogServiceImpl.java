@@ -206,4 +206,20 @@ public class BlogServiceImpl implements BlogService {
         List<Blog> blogs = blogRepository.findByPublishedAtProfileId(profileId);
         return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
 	}
+
+	@Override
+    @UserIdValidator(positions = 0)
+    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
+	public void unPublishBlog(String userId, Long blogId) throws AppException {
+        BlogDTO blogDTO = getAllBlogsOfUser(userId)
+                                .stream()
+                                .filter(blog -> blog.getId().equals(blogId))
+                                .findFirst()
+                                .get();
+        
+        blogDTO.setPublised(false);
+        blogDTO.setPublishedAt(null);
+        updateBlog(userId, blogDTO);
+        LOGGER.info("UnPublished blog {}", blogId);
+	}
 }
