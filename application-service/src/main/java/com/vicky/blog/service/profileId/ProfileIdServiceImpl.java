@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
-import com.vicky.blog.common.dto.profile.ProfileDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.exception.AppException;

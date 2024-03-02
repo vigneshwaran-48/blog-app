@@ -70,14 +70,20 @@ public class BlogServiceImpl implements BlogService {
     @UserIdValidator(positions = 0)
     public Optional<BlogDTO> getBlog(String userId, Long id) throws AppException {
         
-        Optional<Blog> blog = blogRepository.findByOwnerIdAndId(userId, id);
+        Optional<Blog> blog = blogRepository.findById(id);
 
         if(blog.isEmpty()) {
             return Optional.empty();
         }
         BlogDTO blogDTO = blog.get().toDTO();
-        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
 
+        boolean isBlogOwnerNotTheUserAndBlogNotPublished = 
+                                    !blogDTO.getOwner().getId().equals(userId) && !blogDTO.isPublised();
+        if(isBlogOwnerNotTheUserAndBlogNotPublished) {
+            LOGGER.info("Blog {} owner is not the user {} and it is not published!", id, userId);
+            return Optional.empty();
+        }
+        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
         return Optional.of(blogDTO);
     }
 
