@@ -1,6 +1,7 @@
 package com.vicky.blog.service.blog;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,6 +84,9 @@ public class BlogServiceImpl implements BlogService {
             LOGGER.info("Blog {} owner is not the user {} and it is not published!", id, userId);
             return Optional.empty();
         }
+        String ownerProfileId = profileIdService.getProfileIdByEntityId(blogDTO.getOwner().getId()).get();
+        blogDTO.getOwner().setProfileId(ownerProfileId);
+
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
         return Optional.of(blogDTO);
     }
@@ -125,13 +129,16 @@ public class BlogServiceImpl implements BlogService {
         if(blogs.isEmpty()) {
             return List.of();
         }
-        return blogs.stream()
-                    .map(blog -> {
-                        BlogDTO blogDTO = blog.toDTO();
-                        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
-                        return blogDTO;
-                    })
-                    .collect(Collectors.toList());
+        List<BlogDTO> blogDTOs = new ArrayList<>();
+        for(Blog blog : blogs) {
+            BlogDTO blogDTO = blog.toDTO();
+            blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+            String ownerProfileId = profileIdService.getProfileIdByEntityId(blogDTO.getOwner().getId()).get();
+            blogDTO.getOwner().setProfileId(ownerProfileId);
+
+            blogDTOs.add(blogDTO);
+        }
+        return blogDTOs;
     }
 
     @Override
@@ -173,7 +180,13 @@ public class BlogServiceImpl implements BlogService {
         }
         Optional<Blog> blog = blogRepository.findByIdAndPublishedAtProfileId(blogId, profileId);
         if(blog.isEmpty()) {
-            return Optional.empty();
+            // If the user wants to see his own blog with his profileId
+            // But Not getting userId from profileDTO because it will lead to anyone can
+            // access the blog with a user's profileId.
+            blog = blogRepository.findByOwnerIdAndId(userId, blogId);
+            if(blog.isEmpty()) {
+                return Optional.empty();
+            }
         }
         BlogDTO blogDTO = blog.get().toDTO();
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
