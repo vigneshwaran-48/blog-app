@@ -54,8 +54,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<CommentsResponse> getCommentsOfBlog(@PathVariable Long blogId, Principal principal, HttpServletRequest request)
-        throws AppException {
+    public ResponseEntity<CommentsResponse> getCommentsOfBlog(@PathVariable Long blogId, Principal principal, 
+        HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         List<CommentDTO> comments = commentService.getCommentsOfBlog(userId, blogId);
