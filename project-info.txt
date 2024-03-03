@@ -20,6 +20,13 @@ Services:
 
     Provides a unified entry point for client applications to interact with your microservices. This centralizes API management, simplifying the client-side integration and ensuring consistency.
 
+Development:
+
+    * After restarting the services, If we need to restart a particular service run this command.
+        docker-compose restart <service-name>
+    
+    * If we need rebuild the docker image and restart a particular service then run this command.
+        docker-compose up --build -d <service-name>
 
 
 
@@ -111,3 +118,12 @@ Feature: IAM
 Responsibilities:
 Manage user identities, tokens, and authentication
 Provide OAuth2 or other authentication services
+
+
+comment
+
+id: Long,
+content: String,
+comment_by: User,
+parent_comment: comment,
+blog_id: Blog

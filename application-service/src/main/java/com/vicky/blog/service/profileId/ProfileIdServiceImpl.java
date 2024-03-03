@@ -1,5 +1,7 @@
 package com.vicky.blog.service.profileId;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.hc.core5.http.HttpStatus;
@@ -8,9 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.annotation.UserIdValidator;
+import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.ProfileIdRepository;
@@ -24,6 +29,9 @@ public class ProfileIdServiceImpl implements ProfileIdService {
 
     @Autowired
     private ProfileIdRepository profileIdRepository;
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Autowired
     private I18NMessages i18NMessages;
@@ -108,5 +116,26 @@ public class ProfileIdServiceImpl implements ProfileIdService {
             Object[] args = { "Profile Id" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18NMessages.getMessage(I18NMessage.REQUIRED, args));
         }
+    }
+
+    @Override
+    public void deleteProfileId(String entityId, String profileId) throws AppException {
+        profileIdRepository.deleteByProfileIdAndEntityId(profileId, entityId);
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<ProfileIdDTO> getAllProfilesOfUser(String userId) throws AppException {
+        Optional<ProfileId> profileId = profileIdRepository.findByEntityId(userId);
+        List<OrganizationDTO> organizations = organizationService.getOrganizationsOfUser(userId);
+
+        List<ProfileIdDTO> profiles = new ArrayList<>();
+        profiles.add(profileId.get().toDTO());
+
+        for(OrganizationDTO organization : organizations) {
+            Optional<ProfileId> orgProfileId = profileIdRepository.findByEntityId(String.valueOf(organization.getId()));
+            profiles.add(orgProfileId.get().toDTO());
+        }
+        return profiles;
     }
 }

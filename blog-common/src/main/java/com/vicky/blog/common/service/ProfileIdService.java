@@ -1,5 +1,6 @@
 package com.vicky.blog.common.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
@@ -13,4 +14,6 @@ public interface ProfileIdService {
     Optional<String> getProfileIdByEntityId(String entityId) throws AppException;
     Optional<ProfileIdDTO> getProfileId(String profileId) throws AppException;
     Optional<ProfileIdDTO> updateProfileId(String entityId, String profileId, ProfileType type) throws AppException;
+    void deleteProfileId(String entityId, String profileId) throws AppException;
+    List<ProfileIdDTO> getAllProfilesOfUser(String userId) throws AppException;
 }

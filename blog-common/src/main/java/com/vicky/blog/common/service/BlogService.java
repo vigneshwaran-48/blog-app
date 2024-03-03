@@ -20,6 +20,8 @@ public interface BlogService {
 
     void publishBlog(String userId, Long blogId, String publishAt) throws AppException;
 
+    void unPublishBlog(String userId, Long blogId) throws AppException;
+
     Optional<BlogDTO> getBlogOfProfile(String userId, Long blogId, String profileId) throws AppException;
 
     List<BlogDTO> getAllBlogsOfProfile(String userId, String profileId) throws AppException;

@@ -59,7 +59,10 @@ public class Blog {
         blog.setDescription(blogDTO.getDescription());
         blog.setPostedTime(blogDTO.getPostedTime());
         blog.setPublised(blogDTO.isPublised());
-        blog.setPublishedAt(ProfileId.build(blogDTO.getPublishedAt()));
+        if(blogDTO.isPublised()) {
+            // Not doing null check because if the blog is published then there should be publishedAt value.
+            blog.setPublishedAt(ProfileId.build(blogDTO.getPublishedAt()));
+        }
 
         return blog;
     }

@@ -1,6 +1,7 @@
 package com.vicky.blog.service.blog;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
-import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
@@ -71,14 +71,23 @@ public class BlogServiceImpl implements BlogService {
     @UserIdValidator(positions = 0)
     public Optional<BlogDTO> getBlog(String userId, Long id) throws AppException {
         
-        Optional<Blog> blog = blogRepository.findByOwnerIdAndId(userId, id);
+        Optional<Blog> blog = blogRepository.findById(id);
 
         if(blog.isEmpty()) {
             return Optional.empty();
         }
         BlogDTO blogDTO = blog.get().toDTO();
-        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
 
+        boolean isBlogOwnerNotTheUserAndBlogNotPublished = 
+                                    !blogDTO.getOwner().getId().equals(userId) && !blogDTO.isPublised();
+        if(isBlogOwnerNotTheUserAndBlogNotPublished) {
+            LOGGER.info("Blog {} owner is not the user {} and it is not published!", id, userId);
+            return Optional.empty();
+        }
+        String ownerProfileId = profileIdService.getProfileIdByEntityId(blogDTO.getOwner().getId()).get();
+        blogDTO.getOwner().setProfileId(ownerProfileId);
+
+        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
         return Optional.of(blogDTO);
     }
 
@@ -120,13 +129,16 @@ public class BlogServiceImpl implements BlogService {
         if(blogs.isEmpty()) {
             return List.of();
         }
-        return blogs.stream()
-                    .map(blog -> {
-                        BlogDTO blogDTO = blog.toDTO();
-                        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
-                        return blogDTO;
-                    })
-                    .collect(Collectors.toList());
+        List<BlogDTO> blogDTOs = new ArrayList<>();
+        for(Blog blog : blogs) {
+            BlogDTO blogDTO = blog.toDTO();
+            blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+            String ownerProfileId = profileIdService.getProfileIdByEntityId(blogDTO.getOwner().getId()).get();
+            blogDTO.getOwner().setProfileId(ownerProfileId);
+
+            blogDTOs.add(blogDTO);
+        }
+        return blogDTOs;
     }
 
     @Override
@@ -168,9 +180,17 @@ public class BlogServiceImpl implements BlogService {
         }
         Optional<Blog> blog = blogRepository.findByIdAndPublishedAtProfileId(blogId, profileId);
         if(blog.isEmpty()) {
-            return Optional.empty();
+            // If the user wants to see his own blog with his profileId
+            // But Not getting userId from profileDTO because it will lead to anyone can
+            // access the blog with a user's profileId.
+            blog = blogRepository.findByOwnerIdAndId(userId, blogId);
+            if(blog.isEmpty()) {
+                return Optional.empty();
+            }
         }
-        return Optional.of(blog.get().toDTO());
+        BlogDTO blogDTO = blog.get().toDTO();
+        blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+        return Optional.of(blogDTO);
     }
 
 	@Override
@@ -185,5 +205,21 @@ public class BlogServiceImpl implements BlogService {
         }
         List<Blog> blogs = blogRepository.findByPublishedAtProfileId(profileId);
         return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
+	}
+
+	@Override
+    @UserIdValidator(positions = 0)
+    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
+	public void unPublishBlog(String userId, Long blogId) throws AppException {
+        BlogDTO blogDTO = getAllBlogsOfUser(userId)
+                                .stream()
+                                .filter(blog -> blog.getId().equals(blogId))
+                                .findFirst()
+                                .get();
+        
+        blogDTO.setPublised(false);
+        blogDTO.setPublishedAt(null);
+        updateBlog(userId, blogDTO);
+        LOGGER.info("UnPublished blog {}", blogId);
 	}
 }

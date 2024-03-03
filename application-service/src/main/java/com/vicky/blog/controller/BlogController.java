@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import com.vicky.blog.common.dto.blog.BlogsResponse;
 import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
 import com.vicky.blog.common.dto.bloglike.BlogLikesCountResponse;
 import com.vicky.blog.common.dto.bloglike.BlogLikesResponse;
-import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogLikeService;
 import com.vicky.blog.common.service.BlogService;
@@ -209,6 +207,21 @@ public class BlogController {
         blogService.publishBlog(userId, blogId, publishAt);
         EmptyResponse response = new EmptyResponse();
         response.setMessage("Published blog!");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/{blogId}/unpublish")
+    public ResponseEntity<EmptyResponse> unPublishBlog(@PathVariable Long blogId, Principal principal, 
+        HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        blogService.unPublishBlog(userId, blogId);
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("UnPublished blog!");
         response.setPath(request.getServletPath());
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());

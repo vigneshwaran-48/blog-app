@@ -3,15 +3,20 @@ spring:
     application:
         name: application-service
     config:
-        import: "configserver:http://localhost:8099"
+        import: "configserver:http://config-service:8099"
+    main:
+        allow-circular-references: true
 
     jpa:
         hibernate:
             ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQLDialect
     datasource:
-        url: jdbc:mysql://localhost:3306/blog_application
+        url: jdbc:mysql://application-service-mysql:3306/blog_application
         username: root
-        password: 
+        password: root@123
         driver-class-name: com.mysql.cj.jdbc.Driver
 
     profiles:

@@ -42,7 +42,7 @@ public class Organization {
     private JoinType joinType = JoinType.ANYONE;
 
     @Column(nullable = false)
-    private String image = "http://localhost:8083/static/resource/179rjncje98498983";
+    private String image = "http://localhost:7000/static/1";
 
     public Long getId() {
         return id;
@@ -130,14 +130,15 @@ public class Organization {
         organization.setCreatedTime(organizationDTO.getCreatedTime());
         organization.setDescription(organizationDTO.getDescription());
         organization.setId(organizationDTO.getId());
-        organization.setImage(organizationDTO.getImage());
         organization.setName(organizationDTO.getName());
         organization.setOwner(User.build(organizationDTO.getOwner()));
 
+        if(organizationDTO.getImage() != null) {
+            organization.setImage(organizationDTO.getImage());
+        }
         if(organizationDTO.getJoinType() != null) {
             organization.setJoinType(organizationDTO.getJoinType());
         }
-
         if(organizationDTO.getVisibility() != null) {
             organization.setVisibility(organizationDTO.getVisibility());
         }
