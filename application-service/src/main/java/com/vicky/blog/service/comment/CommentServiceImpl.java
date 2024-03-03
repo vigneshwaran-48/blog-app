@@ -39,22 +39,29 @@ public class CommentServiceImpl implements CommentService {
     private BlogService blogService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
+    private static final int MAXIMUM_DEPTH_LEVEL = 2;
 
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public CommentDTO addComment(String userId, Long blogId, Long parentCommentId, String commentContent) 
+    public CommentDTO addComment(String userId, Long blogId, Long parentCommentId, String commentContent)
         throws AppException {
         
         UserDTO user = userService.getUser(userId).get();
         BlogDTO blog = blogService.getBlog(userId, blogId).get();
+        
         Optional<CommentDTO> parentComment = getComment(userId, blogId, parentCommentId);
-
+        
         Comment comment = new Comment();
         comment.setBlog(Blog.build(blog));
         comment.setCommentBy(User.build(user));
         comment.setContent(commentContent);
         if(parentComment.isPresent()) {
+            int depthLevel = getDepthLevelOfComment(userId, blogId, parentCommentId);
+            if(depthLevel > MAXIMUM_DEPTH_LEVEL) {
+                throw new AppException(HttpStatus.SC_BAD_REQUEST, 
+                    "Can't reply to the comment, Depth level reached!");
+            }
             comment.setParentComment(Comment.build(parentComment.get()));
         }
 
@@ -160,4 +167,17 @@ public class CommentServiceImpl implements CommentService {
         return comments;
     }
     
+    private int getDepthLevelOfComment(String userId, Long blogId, Long commentId) throws AppException {
+        int depthLevel = 0;
+        Optional<CommentDTO> comment = getComment(userId, blogId, commentId);
+        while (comment.isPresent()) {
+            depthLevel ++;
+            CommentDTO parentComment = comment.get().getParentComment();
+            if(parentComment == null) {
+                break;
+            }
+            comment = getComment(userId, blogId, parentComment.getId());
+        }
+        return depthLevel;
+    }
 }
