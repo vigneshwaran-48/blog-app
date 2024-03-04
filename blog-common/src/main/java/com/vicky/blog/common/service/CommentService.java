@@ -24,4 +24,6 @@ public interface CommentService {
 
     List<CommentDTO> getImmediateNextChildThreadsOfComment(String userId, Long blogId, Long commentId) 
         throws AppException;
+
+    void likeComment(String userId, Long blogId, Long commentId) throws AppException;
 }
