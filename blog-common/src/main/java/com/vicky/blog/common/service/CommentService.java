@@ -26,4 +26,6 @@ public interface CommentService {
         throws AppException;
 
     void likeComment(String userId, Long blogId, Long commentId) throws AppException;
+
+    void removeLike(String userId, Long blogId, Long commentId) throws AppException;
 }

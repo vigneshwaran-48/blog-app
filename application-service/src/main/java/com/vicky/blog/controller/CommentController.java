@@ -104,4 +104,35 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
     
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<EmptyResponse> likeComment(@PathVariable Long blogId, @PathVariable Long commentId, 
+    Principal principal, HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        commentService.likeComment(userId, blogId, commentId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Liked Comment!");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{commentId}/like")
+    public ResponseEntity<EmptyResponse> unLikeComment(@PathVariable Long blogId, @PathVariable Long commentId, 
+    Principal principal, HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        commentService.removeLike(userId, blogId, commentId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("UnLiked Comment!");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok(response);
+    }
 }

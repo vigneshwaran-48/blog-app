@@ -102,7 +102,7 @@ public class CommentServiceImpl implements CommentService {
         if(comment.isEmpty()) {
             return Optional.empty();
         }
-        int likesCount = commentLikeRepository.getLikesCountOfComment(commentId);
+        int likesCount = commentLikeRepository.findByCommentId(commentId).size();
         CommentDTO commentDTO = comment.get().toDTO();
         commentDTO.setCommentLikesCount(likesCount);
         return Optional.of(commentDTO);
@@ -139,6 +139,8 @@ public class CommentServiceImpl implements CommentService {
         for(Comment comment : comments) {
             List<CommentDTO> threadsOfComment = getThreadsOfComment(userId, blogId, comment.getId());
             CommentDTO commentDTO = comment.toDTO();
+            int likesCount = commentLikeRepository.findByCommentId(comment.getId()).size();
+            commentDTO.setCommentLikesCount(likesCount);
             commentDTO.setThreads(threadsOfComment);
             commentDTOs.add(commentDTO);
         }
@@ -170,6 +172,8 @@ public class CommentServiceImpl implements CommentService {
         for(Comment rootComment : rootComments) {
             List<CommentDTO> threads = getThreadsOfComment(userId, blogId, rootComment.getId());
             CommentDTO rootCommentDTO = rootComment.toDTO();
+            int likesCount = commentLikeRepository.findByCommentId(rootComment.getId()).size();
+            rootCommentDTO.setCommentLikesCount(likesCount);
             rootCommentDTO.setThreads(threads);
             comments.add(rootCommentDTO);
         }
@@ -180,14 +184,30 @@ public class CommentServiceImpl implements CommentService {
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public void likeComment(String userId, Long blogId, Long commentId) throws AppException {
-        CommentLike commentLike = new CommentLike();
         CommentDTO commentDTO = getComment(userId, blogId, commentId).get();
+        UserDTO user = userService.getUser(userId).get();
+
+        Optional<CommentLike> existingCommentLike = commentLikeRepository.findByCommentIdAndLikedById(commentId, userId);
+        if(existingCommentLike.isPresent()) {
+            LOGGER.info("User {} already liked the comment {}", userId, commentId);
+            return;
+        }
+
+        CommentLike commentLike = new CommentLike();
         commentLike.setComment(Comment.build(commentDTO));
+        commentLike.setLikedBy(User.build(user));
         CommentLike savedCommentLike = commentLikeRepository.save(commentLike);
         if(savedCommentLike == null) {
             LOGGER.error("Error saving commentLike");
             throw new AppException("Error while liking the comment");
         }
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
+    public void removeLike(String userId, Long blogId, Long commentId) throws AppException {
+        commentLikeRepository.deleteByCommentIdAndLikedById(commentId, userId);
     }
     
     private int getDepthLevelOfComment(String userId, Long blogId, Long commentId) throws AppException {
