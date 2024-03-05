@@ -103,8 +103,10 @@ public class CommentServiceImpl implements CommentService {
             return Optional.empty();
         }
         int likesCount = commentLikeRepository.findByCommentId(commentId).size();
+        boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(commentId, userId);
         CommentDTO commentDTO = comment.get().toDTO();
         commentDTO.setCommentLikesCount(likesCount);
+        commentDTO.setCurrentUserLikedComment(isLiked);
         return Optional.of(commentDTO);
     }
 
@@ -140,8 +142,10 @@ public class CommentServiceImpl implements CommentService {
             List<CommentDTO> threadsOfComment = getThreadsOfComment(userId, blogId, comment.getId());
             CommentDTO commentDTO = comment.toDTO();
             int likesCount = commentLikeRepository.findByCommentId(comment.getId()).size();
+            boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(commentId, userId);
             commentDTO.setCommentLikesCount(likesCount);
             commentDTO.setThreads(threadsOfComment);
+            commentDTO.setCurrentUserLikedComment(isLiked);
             commentDTOs.add(commentDTO);
         }
         return commentDTOs;
@@ -173,8 +177,10 @@ public class CommentServiceImpl implements CommentService {
             List<CommentDTO> threads = getThreadsOfComment(userId, blogId, rootComment.getId());
             CommentDTO rootCommentDTO = rootComment.toDTO();
             int likesCount = commentLikeRepository.findByCommentId(rootComment.getId()).size();
+            boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(blogId, userId);
             rootCommentDTO.setCommentLikesCount(likesCount);
             rootCommentDTO.setThreads(threads);
+            rootCommentDTO.setCurrentUserLikedComment(isLiked);
             comments.add(rootCommentDTO);
         }
         return comments;
