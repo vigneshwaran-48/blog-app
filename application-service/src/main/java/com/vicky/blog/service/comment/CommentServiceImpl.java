@@ -142,7 +142,7 @@ public class CommentServiceImpl implements CommentService {
             List<CommentDTO> threadsOfComment = getThreadsOfComment(userId, blogId, comment.getId());
             CommentDTO commentDTO = comment.toDTO();
             int likesCount = commentLikeRepository.findByCommentId(comment.getId()).size();
-            boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(commentId, userId);
+            boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(comment.getId(), userId);
             commentDTO.setCommentLikesCount(likesCount);
             commentDTO.setThreads(threadsOfComment);
             commentDTO.setCurrentUserLikedComment(isLiked);
@@ -177,7 +177,7 @@ public class CommentServiceImpl implements CommentService {
             List<CommentDTO> threads = getThreadsOfComment(userId, blogId, rootComment.getId());
             CommentDTO rootCommentDTO = rootComment.toDTO();
             int likesCount = commentLikeRepository.findByCommentId(rootComment.getId()).size();
-            boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(blogId, userId);
+            boolean isLiked = commentLikeRepository.existsByCommentIdAndLikedById(rootComment.getId(), userId);
             rootCommentDTO.setCommentLikesCount(likesCount);
             rootCommentDTO.setThreads(threads);
             rootCommentDTO.setCurrentUserLikedComment(isLiked);
