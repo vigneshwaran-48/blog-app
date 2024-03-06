@@ -1,0 +1,17 @@
+
+server:
+  port: 8086
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-registry:9000/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+services:
+  api-gateway:
+    base: http://localhost:7000

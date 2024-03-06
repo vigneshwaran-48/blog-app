@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.vicky.blog.common.dto.AppErrorResponse;
 import com.vicky.blog.common.exception.AppException;
@@ -51,5 +52,13 @@ public class RestControllerAdviceHandler {
         AppErrorResponse response = new AppErrorResponse(HttpStatus.BAD_REQUEST.value(), "Upload size is larger", 
                 LocalDateTime.now(), request.getServletPath());
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(WebClientResponseException.class)
+    public ResponseEntity<?> handleException(WebClientResponseException ex) {
+        LOGGER.error(ex.getMessage(), ex);
+        AppErrorResponse response = ex.getResponseBodyAs(AppErrorResponse.class);
+        return ResponseEntity.status(response != null ? response.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .body(response);
     }
 }

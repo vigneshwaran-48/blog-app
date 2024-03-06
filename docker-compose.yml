@@ -33,6 +33,22 @@ services:
     volumes:
       - static-service-mysql-data:/var/lib/mysql
 
+  notification-service-mysql:
+    container_name: notification-service-mysql
+    image: mysql:8.0
+    restart: always
+    environment:
+      - 'MYSQL_DATABASE=notification'
+      - 'MYSQL_PASSWORD=root@123'
+      - 'MYSQL_USER=vicky'
+      - 'MYSQL_ROOT_PASSWORD=root@123'
+    ports:
+      - '3309:3306'
+    networks:
+      - blog-network
+    volumes:
+      - notification-service-mysql-data:/var/lib/mysql
+
   service-registry:
     container_name: service-registry
     build:
@@ -87,6 +103,22 @@ services:
     networks:
       - blog-network
 
+  notification-service:
+    container_name: notification-service
+    build:
+      context: notification-service
+      dockerfile: Dockerfile
+    image: notification-service:latest
+    restart: on-failure
+    depends_on:
+      - service-registry
+      - config-service
+      - notification-service-mysql
+    ports:
+      - 8086:8086
+    networks:
+      - blog-network
+
   api-gateway:
     container_name: api-gateway
     build:
@@ -108,3 +140,4 @@ networks:
 volumes:
   application-service-mysql-data:
   static-service-mysql-data:
+  notification-service-mysql-data:
