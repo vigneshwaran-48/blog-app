@@ -18,7 +18,7 @@ spring:
             hibernate:
                 dialect: org.hibernate.dialect.MySQLDialect
     datasource:
-        url: jdbc:mysql://notification-service-mysql:3306/static_server
+        url: jdbc:mysql://notification-service-mysql:3306/notification
         username: root
         password: root@123
         driver-class-name: com.mysql.cj.jdbc.Driver

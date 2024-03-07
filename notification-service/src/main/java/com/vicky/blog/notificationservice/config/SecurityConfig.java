@@ -33,7 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
-	JwtDecoder jwtDecoder() {
+	JwtDecoder oauthJwtDecoder() {
 	    return JwtDecoders.fromIssuerLocation("https://accounts.google.com");
 	}
     
