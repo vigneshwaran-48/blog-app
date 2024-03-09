@@ -16,3 +16,7 @@ spring:
               uri: lb://static-service
               predicates:
                 - Path=/static/**
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/v1/notification/**

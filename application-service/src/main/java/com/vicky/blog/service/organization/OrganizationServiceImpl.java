@@ -120,7 +120,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid organization id");
         }
 
-        if(organization.get().getVisibility() == Visibility.PRIVATE && !organization.get().getOwner().getId().equals(userId)) {
+        if(organization.get().getVisibility() == Visibility.PRIVATE 
+                && !organization.get().getOwner().getId().equals(userId)) {
 
             List<OrganizationUser> orgUsers = organizationUserRepository.findByOrganizationId(id);
             boolean isPresent = orgUsers.stream().anyMatch(orgUser -> orgUser.getUser().getId().equals(userId));
@@ -167,13 +168,15 @@ public class OrganizationServiceImpl implements OrganizationService {
         UserDTO userToAddDto = getUser(userToAdd);
         Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
         
-        Optional<OrganizationUser> orgUser = organizationUserRepository.findByOrganizationIdAndUserId(organizationId, userId);
+        Optional<OrganizationUser> orgUser = organizationUserRepository
+                                                .findByOrganizationIdAndUserId(organizationId, userId);
         if(orgUser.isEmpty()) {
             LOGGER.error("User {} is not part of the organization {}", userId, organizationId);
             throw new AppException(HttpStatus.SC_FORBIDDEN, "You are not part of the organization!");
         }
 
-        Optional<OrganizationUser> user = organizationUserRepository.findByOrganizationIdAndUserId(organizationId, userToAdd);
+        Optional<OrganizationUser> user = organizationUserRepository
+                                                .findByOrganizationIdAndUserId(organizationId, userToAdd);
         if(user.isPresent()) {
             return Optional.of(getOrganizationUserDTO(user.get()));
         }
@@ -277,7 +280,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization does not exists");
         }
 
-        Optional<OrganizationUser> orgUser = organizationUserRepository.findByOrganizationIdAndUserId(organizationId, userId);
+        Optional<OrganizationUser> orgUser = organizationUserRepository
+                                                .findByOrganizationIdAndUserId(organizationId, userId);
 
         if(orgUser.isEmpty()) {
             LOGGER.error("User {} is not part of the organization {}", userId, organizationId);
@@ -341,7 +345,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) throws AppException {
+    public List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) 
+        throws AppException {
         List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
 
         List<OrganizationDTO> organizations = new ArrayList<>();
@@ -354,6 +359,18 @@ public class OrganizationServiceImpl implements OrganizationService {
             }
         }
         return organizations;
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public boolean isUserHasAccessToNotification(String userId, Long organizationId) throws AppException {
+        Optional<OrganizationUser> orgUser = organizationUserRepository
+                                                .findByOrganizationIdAndUserId(organizationId, userId);
+        if(orgUser.isEmpty()) {
+            return false;
+        }
+        return orgUser.get().getRole() == UserOrganizationRole.ADMIN 
+                    || orgUser.get().getRole() == UserOrganizationRole.MODERATOR;
     }
 
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {

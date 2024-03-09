@@ -28,9 +28,12 @@ public interface OrganizationService {
 
     void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove) throws AppException;
 
-    void changePermissionForUser(String userId, Long organizationId, String userToChangePermission, UserOrganizationRole role) throws AppException;
+    void changePermissionForUser(String userId, Long organizationId, String userToChangePermission, 
+        UserOrganizationRole role) throws AppException;
 
     List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException;
 
     List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) throws AppException;
+
+    boolean isUserHasAccessToNotification(String userId, Long organizationId) throws AppException;
 }

@@ -1,4 +1,4 @@
-package com.vicky.blog.staticservice.config;
+package com.vicky.blog.notificationservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
-	JwtDecoder jwtDecoder() {
+	JwtDecoder oauthJwtDecoder() {
 	    return JwtDecoders.fromIssuerLocation("https://accounts.google.com");
 	}
     

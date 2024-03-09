@@ -1,5 +1,7 @@
 package com.vicky.blog.model;
 
+import java.time.LocalDateTime;
+
 import com.vicky.blog.common.dto.comment.CommentDTO;
 
 import jakarta.persistence.Column;
@@ -34,6 +36,9 @@ public class Comment {
     @JoinColumn(name = "blog_id", nullable = false)
     private Blog blog;
 
+    @Column(name = "commented_time", nullable = false)
+    private LocalDateTime commentedTime;
+
     public static Comment build(CommentDTO commentDTO) {
         Comment comment = new Comment();
         comment.setId(commentDTO.getId());
@@ -43,6 +48,7 @@ public class Comment {
 
         comment.setCommentBy(User.build(commentDTO.getCommentBy()));
         comment.setContent(commentDTO.getContent());
+        comment.setCommentedTime(commentDTO.getCommentedTime());
         if(commentDTO.getParentComment() != null) {
             comment.setParentComment(Comment.build(commentDTO.getParentComment()));
         }
@@ -56,6 +62,7 @@ public class Comment {
         commentDTO.setCommentBy(commentBy.toDTO());
         commentDTO.setBlogId(blog.getId());
         commentDTO.setContent(content);
+        commentDTO.setCommentedTime(commentedTime);
         if(parentComment != null) {
             commentDTO.setParentComment(parentComment.toDTO());
         }

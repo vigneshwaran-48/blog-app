@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
+import com.vicky.blog.common.dto.organization.OrganizationPermissionResponse;
 import com.vicky.blog.common.dto.organization.OrganizationResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO;
 import com.vicky.blog.common.dto.organization.OrganizationUserResponseData;
@@ -48,11 +49,6 @@ public class OrganizationController {
             HttpServletRequest request, Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-
-        System.out.println("Locale is => " + LocaleContextHolder.getLocale());
-
-        System.out.println("Request Locale => " + request.getLocale());
-
         Optional<OrganizationDTO> organization = organizationService.addOrganization(userId, organizationDTO);
         if(organization.isEmpty()) {
             throw new AppException("Error while adding organization user");
@@ -216,6 +212,23 @@ public class OrganizationController {
         response.setStatus(HttpStatus.SC_OK);
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{organizationId}/notification/access")
+    public ResponseEntity<?> isUserHasNotificationAccess(@PathVariable Long organizationId, HttpServletRequest request, 
+        Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        boolean permission = organizationService.isUserHasAccessToNotification(userId, organizationId);
+
+        OrganizationPermissionResponse response = new OrganizationPermissionResponse();
+        response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setHasPermission(permission);
 
         return ResponseEntity.ok().body(response);
     }
