@@ -8,11 +8,13 @@ import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.notification.NotificationDTO;
 import com.vicky.blog.common.dto.notification.NotificationResponse;
 import com.vicky.blog.common.dto.notification.NotificationsResponse;
@@ -62,6 +64,22 @@ public class NotificationController {
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
         response.setNotifications(notificationDTOs);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/{notificationId}/seen")
+    public ResponseEntity<EmptyResponse> markAsSeen(@PathVariable Long notificationId, Principal principal, 
+        HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        notificationService.markAsRead(userId, notificationId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Marked as seen!");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
 
         return ResponseEntity.ok().body(response);
     }

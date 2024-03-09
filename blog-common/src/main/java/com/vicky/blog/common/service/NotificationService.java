@@ -10,4 +10,6 @@ public interface NotificationService {
     NotificationDTO addNotification(String userId, NotificationDTO notification) throws AppException;
 
     List<NotificationDTO> getNotificationsOfUser(String userId) throws AppException;
+
+    void markAsRead(String userId, Long notificationId) throws AppException;
 }

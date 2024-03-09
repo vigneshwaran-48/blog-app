@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private OrganizationService organizationService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     @Override
     public NotificationDTO addNotification(String userId, NotificationDTO notification) throws AppException {
@@ -90,6 +94,24 @@ public class NotificationServiceImpl implements NotificationService {
         }
         List<Notification> notifications = notificationRepository.findByUserId(userId);
         return notifications.stream().map(notification -> notification.toDTO()).collect(Collectors.toList());
+    }
+
+    @Override
+    public void markAsRead(String userId, Long notificationId) throws AppException {
+        Optional<UserDTO> user = userService.getUser(userId);
+        if(user.isEmpty()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "User" + userId + " not exists!");
+        }
+        Optional<Notification> notification = notificationRepository.findByIdAndUserId(notificationId, userId);
+        if(notification.isEmpty()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Notification not exists!");
+        }
+        notification.get().setSeen(true);
+        Notification savedNotification = notificationRepository.save(notification.get());
+        if(savedNotification == null) {
+            LOGGER.info("Error while marking as read the notification {}", notificationId);
+            throw new AppException("Error while marking as read the notification");
+        }
     }
     
 }
