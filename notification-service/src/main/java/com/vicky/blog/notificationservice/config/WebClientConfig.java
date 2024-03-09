@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import com.vicky.blog.notificationservice.client.OrganizationServiceClient;
 import com.vicky.blog.notificationservice.client.UserServiceClient;
 import com.vicky.blog.notificationservice.filter.HTTPClientExchangeFilter;
 
@@ -34,5 +35,13 @@ public class WebClientConfig {
             HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient()))
                 .build();
         return httpServiceProxyFactory.createClient(UserServiceClient.class);
+    }
+
+    @Bean
+    OrganizationServiceClient organizationServiceClient() {
+        HttpServiceProxyFactory httpServiceProxyFactory =
+            HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient()))
+                .build();
+        return httpServiceProxyFactory.createClient(OrganizationServiceClient.class);
     }
 }

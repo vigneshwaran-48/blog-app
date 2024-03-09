@@ -6,12 +6,21 @@ import lombok.Data;
 
 @Data
 public class NotificationDTO {
+
+    public enum NotificationSenderType {
+        USER,
+        ORGANIZATION
+    }
     
     private Long id;
     private String userId;
     private String message;
-    private String notificationSenderName;
-    private String notificationSenderImage;
+    private String senderId;
+    private String senderName;
+    private String senderImage;
     private LocalDateTime time;
+    private boolean isSeen;
+    private NotificationSenderType senderType;
+    private Long organizationId;
     
 }
