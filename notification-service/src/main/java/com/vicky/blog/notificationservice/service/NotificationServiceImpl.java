@@ -1,5 +1,7 @@
 package com.vicky.blog.notificationservice.service;
 
+import java.time.LocalDateTime;
+
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ public class NotificationServiceImpl implements NotificationService {
             throw new AppException(userResponse.getStatus(), userResponse.getMessage());
         }
         Notification notificationModel = Notification.build(notification);
+        notificationModel.setTime(LocalDateTime.now());
+        
         Notification savedNotification = notificationRepository.save(notificationModel);
         if(savedNotification == null) {
             throw new AppException("Error while adding notification");

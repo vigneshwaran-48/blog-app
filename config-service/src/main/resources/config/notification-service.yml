@@ -14,4 +14,4 @@ management:
 
 services:
   api-gateway:
-    base: http://localhost:7000
+    base: http://api-gateway:7000

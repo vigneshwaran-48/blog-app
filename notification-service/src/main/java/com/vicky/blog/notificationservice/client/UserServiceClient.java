@@ -6,7 +6,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 
 import com.vicky.blog.common.dto.user.UserResponseData;
 
-@HttpExchange("/api/v1/app")
+@HttpExchange("/api/v1/app/user")
 public interface UserServiceClient {
     
     @GetExchange("/{userId}")
