@@ -1,0 +1,38 @@
+
+spring:
+    application:
+        name: application-service
+    config:
+        import: "configserver:http://config-service:8099"
+    main:
+        allow-circular-references: true
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQLDialect
+    datasource:
+        url: jdbc:mysql://application-service-mysql:3306/blog_application
+        username: root
+        password: root@123
+        driver-class-name: com.mysql.cj.jdbc.Driver
+
+    profiles:
+        active: production
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://accounts.google.com
+                    jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+
+logging:
+    level:
+        org:
+            springframework:
+                security: trace
+            web:
+                servlet:
+                    i18n: DEBUG
