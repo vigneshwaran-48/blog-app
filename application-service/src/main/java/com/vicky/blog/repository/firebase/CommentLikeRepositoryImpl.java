@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import com.vicky.blog.model.CommentLike;
 import com.vicky.blog.repository.CommentLikeRepository;
 
 @Repository
+@Profile("prod")
 public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     @Override

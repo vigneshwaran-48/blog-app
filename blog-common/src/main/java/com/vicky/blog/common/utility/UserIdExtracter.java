@@ -13,7 +13,7 @@ public class UserIdExtracter {
 
     public String getUserId(Principal principal) {
 
-        if(mode.equals("production")) {
+        if(!mode.equals("single-user")) {
             return principal == null ? null : principal.getName();
         }
         
