@@ -2,8 +2,11 @@ package com.vicky.blog.repository.firebase;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -12,12 +15,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.stereotype.Repository;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.common.dto.organization.OrganizationDTO.JoinType;
+import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
+import com.vicky.blog.common.dto.user.UserDTO.Theme;
 import com.vicky.blog.model.Organization;
+import com.vicky.blog.model.User;
 import com.vicky.blog.repository.OrganizationRepository;
 
 @Repository
 @Profile("prod")
 public class OrganizationRepositoryImpl implements OrganizationRepository {
+
+    private static final String COLLECTION_NAME = "organization";
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationRepositoryImpl.class);
 
     @Override
     public void flush() {
@@ -105,14 +120,44 @@ public class OrganizationRepositoryImpl implements OrganizationRepository {
 
     @Override
     public <S extends Organization> S save(S entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        long id = FirebaseUtil.getUniqueLong();
+        entity.setId(id);
+        try {
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            return entity;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     @Override
     public Optional<Organization> findById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<DocumentSnapshot> result = firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).get();
+        if (result.isDone()) {
+            return Optional.empty();
+        }
+        try {
+            DocumentSnapshot snapshot = result.get();
+            Organization organization = snapshot.toObject(Organization.class);
+            if(organization == null) {
+                return Optional.empty();
+            }
+            String visibility = (String) snapshot.get("visibility");
+            String joinType = (String) snapshot.get("join_type");
+            organization.setVisibility(Visibility.valueOf(visibility));
+            organization.setJoinType(JoinType.valueOf(joinType));
+            return Optional.of(organization);
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -129,8 +174,16 @@ public class OrganizationRepositoryImpl implements OrganizationRepository {
 
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<DocumentSnapshot> result = firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).get();
+                                                
+        try {
+            result.get().getReference().delete().get();
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -199,5 +252,5 @@ public class OrganizationRepositoryImpl implements OrganizationRepository {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findBy'");
     }
-    
+
 }

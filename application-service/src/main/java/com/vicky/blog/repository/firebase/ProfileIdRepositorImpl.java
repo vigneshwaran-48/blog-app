@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
@@ -119,9 +120,9 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     public <S extends ProfileId> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
         long id = FirebaseUtil.getUniqueLong();
+        entity.setId(id);
         try {
             firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
-            entity.setId(id);
             return entity;
         } 
         catch (InterruptedException e) {
@@ -296,9 +297,9 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         ApiFuture<QuerySnapshot> result =
                 firestore.collection(COLLECTION_NAME).where(filter).limit(1).get();
         try {
-            result.get().forEach(doc -> {
-                doc.getReference().delete();
-            });
+            for(QueryDocumentSnapshot doc : result.get()) {
+                doc.getReference().delete().get();
+            }
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (ExecutionException e) {
