@@ -2,8 +2,11 @@ package com.vicky.blog.repository.firebase;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -12,12 +15,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.stereotype.Repository;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.Filter;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.model.CommentLike;
+import com.vicky.blog.model.Follow;
+import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.repository.CommentLikeRepository;
 
 @Repository
 @Profile("prod")
 public class CommentLikeRepositoryImpl implements CommentLikeRepository {
+
+    private static final String COLLECTION_NAME = "comment_like";
+    private static Logger LOGGER = LoggerFactory.getLogger(CommentLikeRepositoryImpl.class);
 
     @Override
     public void flush() {
@@ -105,8 +120,18 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     @Override
     public <S extends CommentLike> S save(S entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        long id = FirebaseUtil.getUniqueLong();
+        entity.setId(id);
+        try {
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            return entity;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     @Override
@@ -201,26 +226,83 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     @Override
     public List<CommentLike> findByCommentId(Long commentId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByCommentId'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
+                                                .whereEqualTo("comment_id", commentId).get();
+        try {
+            QuerySnapshot snapshot = result.get();
+            List<CommentLike> commentLikes = snapshot.toObjects(CommentLike.class);
+            if (commentLikes.isEmpty()) {
+                return commentLikes;
+            }
+            return commentLikes;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return List.of();
     }
 
     @Override
     public Optional<CommentLike> findByCommentIdAndLikedById(Long commentId, String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByCommentIdAndLikedById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        Filter commentFilter = Filter.equalTo("comment_id", commentId);
+        Filter userFilter = Filter.equalTo("liked_user_id", userId);
+        Filter filter = Filter.and(commentFilter, userFilter);
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
+
+        try {
+            QuerySnapshot snapshot = result.get();
+            List<CommentLike> commentLikes = snapshot.toObjects(CommentLike.class);
+            if (commentLikes.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(commentLikes.get(0));
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return Optional.empty();
     }
 
     @Override
     public void deleteByCommentIdAndLikedById(Long commentId, String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByCommentIdAndLikedById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        Filter commentProfileFilter = Filter.equalTo("comment_id", commentId);
+        Filter likedUserFilter = Filter.equalTo("liked_user_id", userId);
+        Filter filter = Filter.and(commentProfileFilter, likedUserFilter);
+        ApiFuture<QuerySnapshot> result =
+                firestore.collection(COLLECTION_NAME).where(filter).get();
+        try {
+            for(QueryDocumentSnapshot doc : result.get()) {
+                doc.getReference().delete().get();
+            }
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Override
     public boolean existsByCommentIdAndLikedById(Long commentId, String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'existsByCommentIdAndLikedById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        Filter commentProfileFilter = Filter.equalTo("comment_id", commentId);
+        Filter likedUserFilter = Filter.equalTo("liked_user_id", userId);
+        Filter filter = Filter.and(commentProfileFilter, likedUserFilter);
+        ApiFuture<QuerySnapshot> result =
+                firestore.collection(COLLECTION_NAME).where(filter).get();
+
+        try {
+            return !result.get().isEmpty();
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return false;
     }
     
 }

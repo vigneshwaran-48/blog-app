@@ -295,7 +295,7 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         Filter entityProfile = Filter.equalTo("entity_id", entityId);
         Filter filter = Filter.and(profileFilter, entityProfile);
         ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).where(filter).limit(1).get();
+                firestore.collection(COLLECTION_NAME).where(filter).get();
         try {
             for(QueryDocumentSnapshot doc : result.get()) {
                 doc.getReference().delete().get();
