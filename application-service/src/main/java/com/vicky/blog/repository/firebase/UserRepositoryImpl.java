@@ -154,8 +154,10 @@ public class UserRepositoryImpl implements UserRepository {
             return Optional.empty();
         }
         try {
-            User user = result.get().toObject(User.class);
-
+            DocumentSnapshot snapshot = result.get();
+            User user = snapshot.toObject(User.class);
+            String theme = (String) snapshot.get("theme");
+            user.setTheme(Theme.valueOf(theme));
             return Optional.of(user);
         } 
         catch (InterruptedException e) {

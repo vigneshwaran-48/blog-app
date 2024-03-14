@@ -20,6 +20,7 @@ import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.ProfileIdRepository;
 
@@ -116,8 +117,20 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
 
     @Override
     public <S extends ProfileId> S save(S entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        long id = FirebaseUtil.getUniqueLong();
+        try {
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            entity.setId(id);
+            return entity;
+        } 
+        catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } 
+        catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     @Override
@@ -216,11 +229,15 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         ApiFuture<QuerySnapshot> result =
                 firestore.collection(COLLECTION_NAME).whereEqualTo("entity_id", entityId).limit(1).get();
         try {
-            List<ProfileId> profileIds = result.get().toObjects(ProfileId.class);
+            QuerySnapshot snapshot = result.get();
+            List<ProfileId> profileIds = snapshot.toObjects(ProfileId.class);
             if (profileIds.isEmpty()) {
                 return Optional.empty();
             }
-            return Optional.of(profileIds.get(0));
+            String type = (String) snapshot.getDocuments().get(0).get("type");
+            ProfileId profileId = profileIds.get(0);
+            profileId.setType(ProfileType.valueOf(type));
+            return Optional.of(profileId);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (ExecutionException e) {
@@ -253,11 +270,15 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         ApiFuture<QuerySnapshot> result =
                 firestore.collection(COLLECTION_NAME).whereEqualTo("profile_id", profileId).limit(1).get();
         try {
-            List<ProfileId> profileIds = result.get().toObjects(ProfileId.class);
+            QuerySnapshot snapshot = result.get();
+            List<ProfileId> profileIds = snapshot.toObjects(ProfileId.class);
             if (profileIds.isEmpty()) {
                 return Optional.empty();
             }
-            return Optional.of(profileIds.get(0));
+            String type = (String) snapshot.getDocuments().get(0).get("type");
+            ProfileId profileIdModel = profileIds.get(0);
+            profileIdModel.setType(ProfileType.valueOf(type));
+            return Optional.of(profileIdModel);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (ExecutionException e) {
@@ -284,5 +305,4 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
             LOGGER.error(e.getMessage(), e);
         }
     }
-
 }
