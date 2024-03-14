@@ -2,8 +2,11 @@ package com.vicky.blog.repository.firebase;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -12,12 +15,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.stereotype.Repository;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.Filter;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.model.Follow;
+import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.repository.FollowRepository;
 
 @Repository
 @Profile("prod")
 public class FollowRepositoryImpl implements FollowRepository {
+
+    private static final String COLLECTION_NAME = "follow";
+    private static final Logger LOGGER = LoggerFactory.getLogger(FollowRepositoryImpl.class);
 
     @Override
     public void flush() {
@@ -105,8 +119,18 @@ public class FollowRepositoryImpl implements FollowRepository {
 
     @Override
     public <S extends Follow> S save(S entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        long id = FirebaseUtil.getUniqueLong();
+        entity.setId(id);
+        try {
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            return entity;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     @Override
@@ -201,14 +225,41 @@ public class FollowRepositoryImpl implements FollowRepository {
 
     @Override
     public List<Follow> findByUserProfileProfileId(String profileId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByUserProfileProfileId'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
+                                                .whereEqualTo("user_profile_id", profileId).get();
+        try {
+            QuerySnapshot snapshot = result.get();
+            List<Follow> followers = snapshot.toObjects(Follow.class);
+            if (followers.isEmpty()) {
+                return followers;
+            }
+            return followers;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return List.of();
     }
 
     @Override
     public void deleteByUserProfileProfileIdAndFollowerProfileId(String profileId, String followerProfileId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteByUserProfileProfileIdAndFollowerProfileId'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        Filter profileFilter = Filter.equalTo("user_profile_id", profileId);
+        Filter follwerProfileFilter = Filter.equalTo("follower_id", followerProfileId);
+        Filter filter = Filter.and(profileFilter, follwerProfileFilter);
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
+
+        try {
+            for(QueryDocumentSnapshot doc : result.get()) {
+                doc.getReference().delete().get();
+            }
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
     
 }

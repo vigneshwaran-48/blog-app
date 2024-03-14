@@ -302,7 +302,7 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
         Filter organizationFilter = Filter.equalTo("organization_id", organizationId);
         Filter roleFilter = Filter.equalTo("role", role.toString());
         Filter filter = Filter.and(organizationFilter, roleFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).limit(1).get();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
 
         try {
             QuerySnapshot snapshot = result.get();
@@ -329,7 +329,7 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
         Filter organizationFilter = Filter.equalTo("organization_id", organizationId);
         Filter userFilter = Filter.equalTo("user_id", userId);
         Filter filter = Filter.and(organizationFilter, userFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).limit(1).get();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
 
         try {
             for(QueryDocumentSnapshot doc : result.get()) {
