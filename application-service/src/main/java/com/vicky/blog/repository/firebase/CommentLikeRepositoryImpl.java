@@ -21,10 +21,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
-import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.model.CommentLike;
-import com.vicky.blog.model.Follow;
-import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.repository.CommentLikeRepository;
 
 @Repository
