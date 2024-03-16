@@ -1,5 +1,6 @@
 package com.vicky.blog.repository.firebase;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -7,6 +8,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -24,7 +26,10 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.model.Follow;
 import com.vicky.blog.model.OrganizationUser;
+import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.FollowRepository;
+import com.vicky.blog.repository.ProfileIdRepository;
+import com.vicky.blog.repository.firebase.model.FollowModal;
 
 @Repository
 @Profile("prod")
@@ -32,6 +37,9 @@ public class FollowRepositoryImpl implements FollowRepository {
 
     private static final String COLLECTION_NAME = "follow";
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowRepositoryImpl.class);
+
+    @Autowired
+    private ProfileIdRepository profileIdRepository;
 
     @Override
     public void flush() {
@@ -122,8 +130,9 @@ public class FollowRepositoryImpl implements FollowRepository {
         Firestore firestore = FirestoreClient.getFirestore();
         long id = FirebaseUtil.getUniqueLong();
         entity.setId(id);
+        FollowModal followModal = FollowModal.build(entity);
         try {
-            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(followModal).get();
             return entity;
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
@@ -225,14 +234,23 @@ public class FollowRepositoryImpl implements FollowRepository {
 
     @Override
     public List<Follow> findByUserProfileProfileId(String profileId) {
+        Optional<ProfileId> userProfile = profileIdRepository.findByProfileId(profileId);
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
                                                 .whereEqualTo("user_profile_id", profileId).get();
         try {
             QuerySnapshot snapshot = result.get();
-            List<Follow> followers = snapshot.toObjects(Follow.class);
-            if (followers.isEmpty()) {
-                return followers;
+            List<FollowModal> followerModals = snapshot.toObjects(FollowModal.class);
+            if (followerModals.isEmpty()) {
+                return List.of();
+            }
+            List<Follow> followers = new ArrayList<>();
+            for(FollowModal followerModal : followerModals) {
+                Follow follow = followerModal.toEntity();
+                ProfileId followerProfile = profileIdRepository.findById(followerModal.getFollower_id()).get();
+                follow.setFollower(followerProfile);
+                follow.setUserProfile(userProfile.get());
+                followers.add(follow);
             }
             return followers;
         } catch (InterruptedException e) {

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.vicky.blog.common.dto.organization.OrganizationDTO.JoinType;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
+import com.vicky.blog.model.Organization;
 
 import lombok.Data;
 
@@ -37,5 +38,18 @@ public class OrganizationModal {
         organizationModal.setOwner_id(organization.getOwner().getId());
         organizationModal.setVisibility(organization.getVisibility());
         return organizationModal;
+    }
+
+    public Organization toEntity() {
+        Organization organization = new Organization();
+        organization.setCreatedTime(created_time);
+        organization.setDescription(description);
+        organization.setId(id);
+        organization.setImage(image);
+        organization.setJoinType(join_type);
+        organization.setName(name);
+        organization.setVisibility(visibility);
+
+        return organization;
     }
 }

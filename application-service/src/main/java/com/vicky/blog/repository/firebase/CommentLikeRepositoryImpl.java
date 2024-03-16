@@ -1,5 +1,6 @@
 package com.vicky.blog.repository.firebase;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -7,6 +8,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -21,8 +23,13 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.model.Comment;
 import com.vicky.blog.model.CommentLike;
+import com.vicky.blog.model.User;
 import com.vicky.blog.repository.CommentLikeRepository;
+import com.vicky.blog.repository.CommentRepository;
+import com.vicky.blog.repository.UserRepository;
+import com.vicky.blog.repository.firebase.model.CommentLikeModal;
 
 @Repository
 @Profile("prod")
@@ -30,6 +37,11 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     private static final String COLLECTION_NAME = "comment_like";
     private static Logger LOGGER = LoggerFactory.getLogger(CommentLikeRepositoryImpl.class);
+
+    @Autowired
+    private CommentRepository commentRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void flush() {
@@ -120,8 +132,9 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
         Firestore firestore = FirestoreClient.getFirestore();
         long id = FirebaseUtil.getUniqueLong();
         entity.setId(id);
+        CommentLikeModal commentLikeModal = CommentLikeModal.build(entity);
         try {
-            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(commentLikeModal).get();
             return entity;
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
@@ -223,14 +236,26 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     @Override
     public List<CommentLike> findByCommentId(Long commentId) {
+        Optional<Comment> comment = commentRepository.findById(commentId);
+        if(comment.isEmpty()) {
+            return List.of();
+        }
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
                                                 .whereEqualTo("comment_id", commentId).get();
         try {
             QuerySnapshot snapshot = result.get();
-            List<CommentLike> commentLikes = snapshot.toObjects(CommentLike.class);
-            if (commentLikes.isEmpty()) {
-                return commentLikes;
+            List<CommentLikeModal> commentLikeModals = snapshot.toObjects(CommentLikeModal.class);
+            if (commentLikeModals.isEmpty()) {
+                return List.of();
+            }
+            List<CommentLike> commentLikes = new ArrayList<>();
+            for(CommentLikeModal commentLikeModal : commentLikeModals) {
+                CommentLike commentLike = commentLikeModal.toEntity();
+                User user = userRepository.findById(commentLikeModal.getLiked_user_id()).get();
+                commentLike.setLikedBy(user);
+                commentLike.setComment(comment.get());
+                commentLikes.add(commentLike);
             }
             return commentLikes;
         } catch (InterruptedException e) {
@@ -251,11 +276,16 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
         try {
             QuerySnapshot snapshot = result.get();
-            List<CommentLike> commentLikes = snapshot.toObjects(CommentLike.class);
-            if (commentLikes.isEmpty()) {
+            List<CommentLikeModal> commentLikeModals = snapshot.toObjects(CommentLikeModal.class);
+            if (commentLikeModals.isEmpty()) {
                 return Optional.empty();
             }
-            return Optional.of(commentLikes.get(0));
+            CommentLike commentLike = commentLikeModals.get(0).toEntity();
+            Comment comment = commentRepository.findById(commentId).get();
+            User likedByUser = userRepository.findById(userId).get();
+            commentLike.setComment(comment);
+            commentLike.setLikedBy(likedByUser);
+            return Optional.of(commentLike);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (ExecutionException e) {

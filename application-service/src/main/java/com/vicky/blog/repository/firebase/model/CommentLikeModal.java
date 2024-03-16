@@ -21,4 +21,10 @@ public class CommentLikeModal {
         return commentLikeModal;
     }
 
+    public CommentLike toEntity() {
+        CommentLike commentLike = new CommentLike();
+        commentLike.setId(id);
+        return commentLike;
+    }
+
 }

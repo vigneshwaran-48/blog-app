@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -18,14 +19,14 @@ import org.springframework.stereotype.Repository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.JoinType;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
-import com.vicky.blog.common.dto.user.UserDTO.Theme;
 import com.vicky.blog.model.Organization;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.OrganizationRepository;
+import com.vicky.blog.repository.UserRepository;
+import com.vicky.blog.repository.firebase.model.OrganizationModal;
 
 @Repository
 @Profile("prod")
@@ -33,6 +34,9 @@ public class OrganizationRepositoryImpl implements OrganizationRepository {
 
     private static final String COLLECTION_NAME = "organization";
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationRepositoryImpl.class);
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void flush() {
@@ -123,8 +127,9 @@ public class OrganizationRepositoryImpl implements OrganizationRepository {
         Firestore firestore = FirestoreClient.getFirestore();
         long id = FirebaseUtil.getUniqueLong();
         entity.setId(id);
+        OrganizationModal organizationModal = OrganizationModal.build(entity);
         try {
-            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(organizationModal).get();
             return entity;
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
@@ -143,14 +148,18 @@ public class OrganizationRepositoryImpl implements OrganizationRepository {
         }
         try {
             DocumentSnapshot snapshot = result.get();
-            Organization organization = snapshot.toObject(Organization.class);
-            if(organization == null) {
+            OrganizationModal organizationModal = snapshot.toObject(OrganizationModal.class);
+            if(organizationModal == null) {
                 return Optional.empty();
             }
             String visibility = (String) snapshot.get("visibility");
             String joinType = (String) snapshot.get("join_type");
-            organization.setVisibility(Visibility.valueOf(visibility));
-            organization.setJoinType(JoinType.valueOf(joinType));
+            organizationModal.setVisibility(Visibility.valueOf(visibility));
+            organizationModal.setJoin_type(JoinType.valueOf(joinType));
+
+            Organization organization = organizationModal.toEntity();
+            User owner = userRepository.findById(organizationModal.getOwner_id()).get();
+            organization.setOwner(owner);
             return Optional.of(organization);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);

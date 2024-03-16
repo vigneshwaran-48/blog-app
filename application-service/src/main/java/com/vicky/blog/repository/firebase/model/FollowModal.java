@@ -1,5 +1,7 @@
 package com.vicky.blog.repository.firebase.model;
 
+import com.vicky.blog.model.Follow;
+
 import lombok.Data;
 
 @Data
@@ -18,5 +20,11 @@ public class FollowModal {
         followModel.setUser_profile_id(follow.getUserProfile().getId());
 
         return followModel;
+    }
+
+    public Follow toEntity() {
+        Follow follow = new Follow();
+        follow.setId(id);
+        return follow;
     }
 }
