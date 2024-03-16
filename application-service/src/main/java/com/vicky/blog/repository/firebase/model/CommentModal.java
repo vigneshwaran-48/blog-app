@@ -23,7 +23,9 @@ public class CommentModal {
         commentModal.setComment_by(comment.getCommentBy().getId());
         commentModal.setCommented_time(comment.getCommentedTime());
         commentModal.setContent(comment.getContent());
-        commentModal.setParent_comment_id(comment.getParentComment().getId());
+        if(comment.getParentComment() != null) {
+            commentModal.setParent_comment_id(comment.getParentComment().getId());
+        }
         return commentModal;
     }
 

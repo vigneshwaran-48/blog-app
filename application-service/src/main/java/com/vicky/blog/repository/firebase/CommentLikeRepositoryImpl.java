@@ -130,8 +130,14 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
     @Override
     public <S extends CommentLike> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
-        long id = FirebaseUtil.getUniqueLong();
-        entity.setId(id);
+        Long id = entity.getId();
+        if(id == null) {
+            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
+            if(id < 0) {
+                return null;
+            }
+            entity.setId(id);
+        }
         CommentLikeModal commentLikeModal = CommentLikeModal.build(entity);
         try {
             firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(commentLikeModal).get();

@@ -132,8 +132,14 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     @Override
     public <S extends OrganizationUser> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
-        long id = FirebaseUtil.getUniqueLong();
-        entity.setId(id);
+        Long id = entity.getId();
+        if(id == null) {
+            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
+            if(id < 0) {
+                return null;
+            }
+            entity.setId(id);
+        }
         OrganizationUserModal organizationUserModal = OrganizationUserModal.build(entity);
         try {
             firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(organizationUserModal).get();

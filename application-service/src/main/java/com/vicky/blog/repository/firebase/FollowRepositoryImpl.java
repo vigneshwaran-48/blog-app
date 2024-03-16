@@ -128,8 +128,14 @@ public class FollowRepositoryImpl implements FollowRepository {
     @Override
     public <S extends Follow> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
-        long id = FirebaseUtil.getUniqueLong();
-        entity.setId(id);
+        Long id = entity.getId();
+        if(id == null) {
+            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
+            if(id < 0) {
+                return null;
+            }
+            entity.setId(id);
+        }
         FollowModal followModal = FollowModal.build(entity);
         try {
             firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(followModal).get();

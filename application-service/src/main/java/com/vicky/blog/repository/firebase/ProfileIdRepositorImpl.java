@@ -119,8 +119,14 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     @Override
     public <S extends ProfileId> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
-        long id = FirebaseUtil.getUniqueLong();
-        entity.setId(id);
+        Long id = entity.getId();
+        if(id == null) {
+            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
+            if(id < 0) {
+                return null;
+            }
+            entity.setId(id);
+        }
         try {
             firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
             return entity;
@@ -228,14 +234,15 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     public Optional<ProfileId> findByEntityId(String entityId) {
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).whereEqualTo("entity_id", entityId).limit(1).get();
+                firestore.collection(COLLECTION_NAME).whereEqualTo("entityId", entityId).limit(1).get();
         try {
             QuerySnapshot snapshot = result.get();
             List<ProfileId> profileIds = snapshot.toObjects(ProfileId.class);
+            LOGGER.info("Profiles got => {}", profileIds.isEmpty());
             if (profileIds.isEmpty()) {
                 return Optional.empty();
             }
-            String type = (String) snapshot.getDocuments().get(0).get("type");
+            String type = (String) snapshot.getDocuments().get(0).get("profile_type");
             ProfileId profileId = profileIds.get(0);
             profileId.setType(ProfileType.valueOf(type));
             return Optional.of(profileId);
@@ -251,7 +258,7 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     public boolean existsByProfileId(String profileId) {
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).whereEqualTo("profile_id", profileId).limit(1).get();
+                firestore.collection(COLLECTION_NAME).whereEqualTo("profileId", profileId).limit(1).get();
         try {
             List<ProfileId> profileIds = result.get().toObjects(ProfileId.class);
             return !profileIds.isEmpty();
@@ -269,14 +276,14 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     public Optional<ProfileId> findByProfileId(String profileId) {
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).whereEqualTo("profile_id", profileId).limit(1).get();
+                firestore.collection(COLLECTION_NAME).whereEqualTo("profileId", profileId).limit(1).get();
         try {
             QuerySnapshot snapshot = result.get();
             List<ProfileId> profileIds = snapshot.toObjects(ProfileId.class);
             if (profileIds.isEmpty()) {
                 return Optional.empty();
             }
-            String type = (String) snapshot.getDocuments().get(0).get("type");
+            String type = (String) snapshot.getDocuments().get(0).get("profile_type");
             ProfileId profileIdModel = profileIds.get(0);
             profileIdModel.setType(ProfileType.valueOf(type));
             return Optional.of(profileIdModel);
@@ -291,8 +298,8 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     @Override
     public void deleteByProfileIdAndEntityId(String profileId, String entityId) {
         Firestore firestore = FirestoreClient.getFirestore();
-        Filter profileFilter = Filter.equalTo("profile_id", profileId);
-        Filter entityProfile = Filter.equalTo("entity_id", entityId);
+        Filter profileFilter = Filter.equalTo("profileId", profileId);
+        Filter entityProfile = Filter.equalTo("entityId", entityId);
         Filter filter = Filter.and(profileFilter, entityProfile);
         ApiFuture<QuerySnapshot> result =
                 firestore.collection(COLLECTION_NAME).where(filter).get();
