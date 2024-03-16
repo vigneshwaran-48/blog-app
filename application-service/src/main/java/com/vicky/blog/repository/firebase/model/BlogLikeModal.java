@@ -21,4 +21,10 @@ public class BlogLikeModal {
         return blogLikeModal;
     }
 
+    public BlogLike toEntity() {
+        BlogLike blogLike = new BlogLike();
+        blogLike.setId(id);
+        return blogLike;
+    }
+
 }
