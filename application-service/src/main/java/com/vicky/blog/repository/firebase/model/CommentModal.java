@@ -26,4 +26,12 @@ public class CommentModal {
         commentModal.setParent_comment_id(comment.getParentComment().getId());
         return commentModal;
     }
+
+    public Comment toEntity() {
+        Comment comment = new Comment();
+        comment.setId(id);
+        comment.setCommentedTime(commented_time);
+        comment.setContent(content);
+        return comment;
+    }
 }

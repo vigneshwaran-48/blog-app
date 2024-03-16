@@ -1,9 +1,14 @@
 package com.vicky.blog.repository.firebase;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -12,12 +17,37 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.stereotype.Repository;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Filter;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
+import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.Comment;
+import com.vicky.blog.model.Organization;
+import com.vicky.blog.model.OrganizationUser;
+import com.vicky.blog.model.User;
+import com.vicky.blog.repository.BlogRepository;
 import com.vicky.blog.repository.CommentRepository;
+import com.vicky.blog.repository.UserRepository;
+import com.vicky.blog.repository.firebase.model.CommentLikeModal;
+import com.vicky.blog.repository.firebase.model.CommentModal;
+import com.vicky.blog.repository.firebase.model.OrganizationUserModal;
 
 @Repository
 @Profile("prod")
 public class CommentRepositoryImpl implements CommentRepository {
+
+    private static final String COLLECTION_NAME = "comment";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentRepositoryImpl.class);
+
+    @Autowired
+    private BlogRepository blogRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void flush() {
@@ -105,8 +135,19 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public <S extends Comment> S save(S entity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        long id = FirebaseUtil.getUniqueLong();
+        entity.setId(id);
+        CommentModal commentModal = CommentModal.build(entity);
+        try {
+            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(commentModal).get();
+            return entity;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return null;
     }
 
     @Override
@@ -129,8 +170,16 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<DocumentSnapshot> result = firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).get();
+                                                
+        try {
+            result.get().getReference().delete().get();
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -201,20 +250,111 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public List<Comment> findByParentCommentId(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByParentCommentId'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
+                                                .whereEqualTo("parent_comment_id", id).get();
+        try {
+            QuerySnapshot snapshot = result.get();
+            List<CommentModal> commentModals = snapshot.toObjects(CommentModal.class);
+            if (commentModals.isEmpty()) {
+                return List.of();
+            }
+            List<Comment> comments = new ArrayList<>();
+            Blog blog = null;
+            for(CommentModal commentModal : commentModals) {
+                Comment comment = commentModal.toEntity();
+                User commentedUser = userRepository.findById(commentModal.getComment_by()).get();
+                if(blog == null) {
+                    // Because when finding with parent comment Id all the child blogs must be in the same blog.
+                    // Therefore, reducing the firebase call for getting blog.
+                    blog = blogRepository.findById(id).get();
+                }
+                comment.setBlog(blog);
+                comment.setCommentBy(commentedUser);
+                /**
+                 * Not adding the parent comment because it will cause a recursive firebase call.
+                 * So will be adding it in future if needed but that's not a great idea.
+                 */
+                comments.add(comment);
+            }
+            return comments;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return List.of();
     }
 
     @Override
     public Optional<Comment> findByIdAndBlogId(Long id, Long blogId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByIdAndBlogId'");
+        Optional<Blog> blog = blogRepository.findById(blogId);
+        if (blog.isEmpty()) {
+            return Optional.empty();
+        }
+        Firestore firestore = FirestoreClient.getFirestore();
+        Filter blogFilter = Filter.equalTo("blog_id", blogId);
+        Filter commentIdFilter = Filter.equalTo("id", id);
+        Filter filter = Filter.and(commentIdFilter, blogFilter);
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
+
+        try {
+            QuerySnapshot snapshot = result.get();
+            List<CommentModal> commentModals = snapshot.toObjects(CommentModal.class);
+            if (commentModals.isEmpty()) {
+                return Optional.empty();
+            }
+            Comment comment = commentModals.get(0).toEntity();
+            User commentedUser = userRepository.findById(commentModals.get(0).getComment_by()).get();
+            comment.setBlog(blog.get());
+            comment.setCommentBy(commentedUser);
+            
+            return Optional.of(comment);
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return Optional.empty();
     }
 
     @Override
     public List<Comment> findByBlogIdAndParentCommentIdIsNull(Long blogId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findByBlogIdAndParentCommentIdIsNull'");
+        Optional<Blog> blog = blogRepository.findById(blogId);
+        if (blog.isEmpty()) {
+            return List.of();
+        }
+        Firestore firestore = FirestoreClient.getFirestore();
+        Filter blogFilter = Filter.equalTo("blog_id", blogId);
+        Filter commentIdFilter = Filter.equalTo("parent_comment_id", null);
+        Filter filter = Filter.and(commentIdFilter, blogFilter);
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
+
+        try {
+            QuerySnapshot snapshot = result.get();
+            List<CommentModal> commentModals = snapshot.toObjects(CommentModal.class);
+            if (commentModals.isEmpty()) {
+                return List.of();
+            }
+            List<Comment> comments = new ArrayList<>();
+            for(CommentModal commentModal : commentModals) {
+                Comment comment = commentModal.toEntity();
+                User commentedUser = userRepository.findById(commentModal.getComment_by()).get();
+                comment.setBlog(blog.get());
+                comment.setCommentBy(commentedUser);
+                /**
+                 * Not adding the parent comment because it will cause a recursive firebase call.
+                 * So will be adding it in future if needed but that's not a great idea.
+                 */
+                comments.add(comment);
+            }
+            return comments;
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return List.of();
     }
     
 }
