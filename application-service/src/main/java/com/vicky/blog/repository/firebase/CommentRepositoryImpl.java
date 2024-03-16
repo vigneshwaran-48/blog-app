@@ -23,18 +23,13 @@ import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
-import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.Comment;
-import com.vicky.blog.model.Organization;
-import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.BlogRepository;
 import com.vicky.blog.repository.CommentRepository;
 import com.vicky.blog.repository.UserRepository;
-import com.vicky.blog.repository.firebase.model.CommentLikeModal;
 import com.vicky.blog.repository.firebase.model.CommentModal;
-import com.vicky.blog.repository.firebase.model.OrganizationUserModal;
 
 @Repository
 @Profile("prod")

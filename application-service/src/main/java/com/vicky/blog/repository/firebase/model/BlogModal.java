@@ -42,4 +42,16 @@ public class BlogModal {
         return blogModal;
 
     }
+
+    public Blog toEntity() {
+        Blog blog = new Blog();
+        blog.setId(id);
+        blog.setContent(content);
+        blog.setDescription(description);
+        blog.setImage(image);
+        blog.setPostedTime(posted_time);
+        blog.setPublised(is_published);
+        blog.setTitle(title);
+        return blog;
+    }
 }
