@@ -1,5 +1,7 @@
 package com.vicky.blog.repository.firebase.model;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import com.vicky.blog.model.Blog;
@@ -21,7 +23,7 @@ public class BlogModal {
 
     private String description;
 
-    private LocalDateTime posted_time;
+    private long posted_time;
 
     private boolean is_published;
 
@@ -35,8 +37,10 @@ public class BlogModal {
         blogModal.setId(blog.getId());
         blogModal.setImage(blog.getImage());
         blogModal.setOwner_id(blog.getOwner().getId());
-        blogModal.setPosted_time(blog.getPostedTime());
-        blogModal.setPublished_at(blog.getPublishedAt().getId());
+        if(blog.isPublised()) {
+            blogModal.setPosted_time(Timestamp.valueOf(blog.getPostedTime()).getTime());
+            blogModal.setPublished_at(blog.getPublishedAt().getId());
+        }
         blogModal.setTitle(blog.getTitle());
         blogModal.set_published(blog.isPublised());
         return blogModal;
@@ -49,7 +53,7 @@ public class BlogModal {
         blog.setContent(content);
         blog.setDescription(description);
         blog.setImage(image);
-        blog.setPostedTime(posted_time);
+        blog.setPostedTime(Timestamp.from(Instant.ofEpochMilli(posted_time)).toLocalDateTime());
         blog.setPublised(is_published);
         blog.setTitle(title);
         return blog;

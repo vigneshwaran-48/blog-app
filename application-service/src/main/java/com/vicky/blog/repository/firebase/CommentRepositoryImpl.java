@@ -23,8 +23,10 @@ import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.Comment;
+import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.BlogRepository;
 import com.vicky.blog.repository.CommentRepository;
@@ -153,8 +155,28 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public Optional<Comment> findById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<DocumentSnapshot> result = firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).get();
+        try {
+            DocumentSnapshot snapshot = result.get();
+            CommentModal commentModal = snapshot.toObject(CommentModal.class);
+            if (commentModal == null) {
+                return Optional.empty();
+            }
+            Comment comment = commentModal.toEntity();
+            User commentedUser = userRepository.findById(commentModal.getComment_by()).get();
+            /**
+             * Not adding blog here if needed in future will be adding.
+             */
+            comment.setCommentBy(commentedUser);
+            
+            return Optional.of(comment);
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -268,7 +290,7 @@ public class CommentRepositoryImpl implements CommentRepository {
                 if(blog == null) {
                     // Because when finding with parent comment Id all the child blogs must be in the same blog.
                     // Therefore, reducing the firebase call for getting blog.
-                    blog = blogRepository.findById(id).get();
+                    blog = blogRepository.findById(commentModal.getBlog_id()).get();
                 }
                 comment.setBlog(blog);
                 comment.setCommentBy(commentedUser);

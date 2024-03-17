@@ -330,9 +330,13 @@ public class BlogRepositoryImpl implements BlogRepository {
 
     @Override
     public Optional<Blog> findByIdAndPublishedAtProfileId(Long id, String profileId) {
+        Optional<ProfileId> profile = profileIdRepository.findByProfileId(profileId);
+        if(profile.isEmpty()) {
+            return Optional.empty();
+        }
         Firestore firestore = FirestoreClient.getFirestore();
         Filter blogFilter = Filter.equalTo("id", id);
-        Filter profileFilter = Filter.equalTo("published_at", profileId);
+        Filter profileFilter = Filter.equalTo("published_at", profile.get().getId());
         Filter filter = Filter.and(blogFilter, profileFilter);
         ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
 
@@ -366,7 +370,7 @@ public class BlogRepositoryImpl implements BlogRepository {
         }
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
-                                                    .whereEqualTo("published_at", profileId).get();
+                                                    .whereEqualTo("published_at", profile.get().getId()).get();
         try {
             QuerySnapshot snapshot = result.get();
             List<BlogModal> blogModals = snapshot.toObjects(BlogModal.class);

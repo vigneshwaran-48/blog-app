@@ -15,7 +15,7 @@ public class BlogLikeModal {
 
     public static BlogLikeModal build(BlogLike blogLike) {
         BlogLikeModal blogLikeModal = new BlogLikeModal();
-        blogLikeModal.setBlog_id(blogLike.getId());
+        blogLikeModal.setBlog_id(blogLike.getBlog().getId());
         blogLikeModal.setId(blogLike.getId());
         blogLikeModal.setLiked_user_id(blogLike.getLikedBy().getId());
         return blogLikeModal;

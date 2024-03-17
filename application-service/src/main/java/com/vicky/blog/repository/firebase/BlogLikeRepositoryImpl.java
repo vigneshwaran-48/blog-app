@@ -132,9 +132,9 @@ public class BlogLikeRepositoryImpl implements BlogLikeRepository {
     public <S extends BlogLike> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
         Long id = entity.getId();
-        if(id == null) {
+        if (id == null) {
             id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
-            if(id < 0) {
+            if (id < 0) {
                 return null;
             }
             entity.setId(id);
@@ -267,8 +267,7 @@ public class BlogLikeRepositoryImpl implements BlogLikeRepository {
             return List.of();
         }
         Firestore firestore = FirestoreClient.getFirestore();
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
-                                                    .whereEqualTo("blog_id", blogId).get();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).whereEqualTo("blog_id", blogId).get();
         try {
             QuerySnapshot snapshot = result.get();
             List<BlogLikeModal> blogLikeModals = snapshot.toObjects(BlogLikeModal.class);
@@ -319,5 +318,5 @@ public class BlogLikeRepositoryImpl implements BlogLikeRepository {
         }
         return Optional.empty();
     }
-    
+
 }

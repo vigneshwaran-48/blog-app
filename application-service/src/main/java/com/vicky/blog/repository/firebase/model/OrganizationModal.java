@@ -53,9 +53,7 @@ public class OrganizationModal {
     join_type = JoinType.valueOf(joinTypeString);
   }
 
-  public static OrganizationModal build(
-    com.vicky.blog.model.Organization organization
-  ) {
+  public static OrganizationModal build(com.vicky.blog.model.Organization organization) {
     OrganizationModal organizationModal = new OrganizationModal();
     organizationModal.setId(organization.getId());
     organizationModal.setCreated_time(Timestamp.valueOf(organization.getCreatedTime()).getTime());

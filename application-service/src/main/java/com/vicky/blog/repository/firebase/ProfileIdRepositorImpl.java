@@ -16,6 +16,7 @@ import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuer
 import org.springframework.stereotype.Repository;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Filter;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -120,9 +121,9 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
     public <S extends ProfileId> S save(S entity) {
         Firestore firestore = FirestoreClient.getFirestore();
         Long id = entity.getId();
-        if(id == null) {
+        if (id == null) {
             id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
-            if(id < 0) {
+            if (id < 0) {
                 return null;
             }
             entity.setId(id);
@@ -130,11 +131,9 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         try {
             firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(entity).get();
             return entity;
-        } 
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
-        } 
-        catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
         }
         return null;
@@ -142,8 +141,23 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
 
     @Override
     public Optional<ProfileId> findById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        Firestore firestore = FirestoreClient.getFirestore();
+        ApiFuture<DocumentSnapshot> result = firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).get();
+        try {
+            DocumentSnapshot snapshot = result.get();
+            ProfileId profileId = snapshot.toObject(ProfileId.class);
+            if (profileId == null) {
+                return Optional.empty();
+            }
+            String type = (String) snapshot.get("profile_type");
+            profileId.setType(ProfileType.valueOf(type));
+            return Optional.of(profileId);
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -238,7 +252,6 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         try {
             QuerySnapshot snapshot = result.get();
             List<ProfileId> profileIds = snapshot.toObjects(ProfileId.class);
-            LOGGER.info("Profiles got => {}", profileIds.isEmpty());
             if (profileIds.isEmpty()) {
                 return Optional.empty();
             }
@@ -262,11 +275,9 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         try {
             List<ProfileId> profileIds = result.get().toObjects(ProfileId.class);
             return !profileIds.isEmpty();
-        } 
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
-        } 
-        catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
         }
         return false;
@@ -301,10 +312,9 @@ public class ProfileIdRepositorImpl implements ProfileIdRepository {
         Filter profileFilter = Filter.equalTo("profileId", profileId);
         Filter entityProfile = Filter.equalTo("entityId", entityId);
         Filter filter = Filter.and(profileFilter, entityProfile);
-        ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).where(filter).get();
+        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
         try {
-            for(QueryDocumentSnapshot doc : result.get()) {
+            for (QueryDocumentSnapshot doc : result.get()) {
                 doc.getReference().delete().get();
             }
         } catch (InterruptedException e) {

@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class OrganizationUserModal {
-    
+
     private Long id;
     private Long organization_id;
     private String user_id;
