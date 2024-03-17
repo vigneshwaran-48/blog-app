@@ -15,11 +15,17 @@ import org.springframework.stereotype.Service;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.follower.FollowDTO;
+import com.vicky.blog.common.dto.notification.NotificationDTO;
+import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSenderType;
+import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogService;
+import com.vicky.blog.common.service.FollowService;
+import com.vicky.blog.common.service.NotificationService;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
@@ -45,6 +51,12 @@ public class BlogServiceImpl implements BlogService {
 
     @Autowired
     private BlogUtil blogUtil;
+
+    @Autowired
+    private FollowService followService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     @UserIdValidator(positions = 0)
@@ -149,6 +161,7 @@ public class BlogServiceImpl implements BlogService {
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(publishAt).orElseThrow(
                                 () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
         BlogDTO blogDTO = getBlog(userId, blogId).get();
+        OrganizationDTO organizationDTO = null;
 
         if(profileIdDTO.getType() == ProfileType.USER) {
             if(!user.getId().equals(profileIdDTO.getEntityId())) {
@@ -158,13 +171,30 @@ public class BlogServiceImpl implements BlogService {
         }
         else {
             // Validating does user can access organization.
-            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId()));
+            organizationDTO = organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId())).get();
         }
 
         blogDTO.setPublised(true);
         blogDTO.setPublishedAt(profileIdDTO);
         updateBlog(userId, blogDTO);
+
         LOGGER.info("Published blog at {}", profileIdDTO.getProfileId());
+
+        List<FollowDTO> followers = followService.getFollowersOfProfile(userId, profileIdDTO.getProfileId());
+        NotificationDTO notification = new NotificationDTO();
+        notification.setSenderType(NotificationSenderType.USER);
+        notification.setMessage(user.getName() + " has published a blog");
+        
+        if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
+            notification.setSenderType(NotificationSenderType.ORGANIZATION);
+            notification.setOrganizationId(organizationDTO.getId());
+            notification.setMessage(organizationDTO.getName() + " has published a blog");
+        }
+        for(FollowDTO follower : followers) {
+            notification.setUserId(follower.getFollower().getEntityId());
+            notificationService.addNotification(userId, notification);
+        }
+        LOGGER.info("Notified the profile {} followers", profileIdDTO.getProfileId());
     }
     
     @Override

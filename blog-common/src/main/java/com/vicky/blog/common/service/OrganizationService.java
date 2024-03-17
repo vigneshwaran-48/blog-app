@@ -13,27 +13,29 @@ public interface OrganizationService {
     Optional<OrganizationDTO> addOrganization(String userId, OrganizationDTO organizationDTO) throws AppException;
 
     Optional<OrganizationDTO> updateOrganization(String userId, OrganizationDTO organizationDTO) throws AppException;
-    
+
     Optional<OrganizationDTO> getOrganization(String userId, Long id) throws AppException;
 
     boolean deleteOrganization(String userId, Long id) throws AppException;
 
-    Optional<OrganizationUserDTO> addUserToOrganization(String userId, Long organizationId, String userToAdd) 
-        throws AppException;
+    Optional<OrganizationUserDTO> addUserToOrganization(String userId, Long organizationId, String userToAdd)
+            throws AppException;
 
-    Optional<OrganizationUserDTO> addUsersToOrganization(String userId, Long organizationId, List<String> usersToAdd) 
-        throws AppException;
+    Optional<OrganizationUserDTO> addUsersToOrganization(String userId, Long organizationId, List<String> usersToAdd)
+            throws AppException;
 
     Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId) throws AppException;
 
-    void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove) throws AppException;
+    void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove)
+            throws AppException;
 
-    void changePermissionForUser(String userId, Long organizationId, String userToChangePermission, 
-        UserOrganizationRole role) throws AppException;
+    void changePermissionForUser(String userId, Long organizationId, String userToChangePermission,
+            UserOrganizationRole role) throws AppException;
 
     List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException;
 
-    List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role) throws AppException;
+    List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role)
+            throws AppException;
 
     boolean isUserHasAccessToNotification(String userId, Long organizationId) throws AppException;
 }

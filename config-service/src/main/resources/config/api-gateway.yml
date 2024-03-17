@@ -4,7 +4,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://service-registry:9000/eureka/
+      defaultZone: https://service-registry-50018270010.development.catalystappsail.in/eureka/
 
 management:
   tracing:

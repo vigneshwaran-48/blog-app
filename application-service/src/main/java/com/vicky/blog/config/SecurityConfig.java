@@ -14,11 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${oauth2.server.url}")
-    private String oauth2ServerURL;
-
-    private static final Long MAX_AGE = 3600L;
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 

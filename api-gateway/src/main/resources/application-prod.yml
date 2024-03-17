@@ -1,0 +1,12 @@
+
+spring:
+    application:
+        name: api-gateway
+    config:
+        import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
+
+logging:
+    level:
+        org:
+            springframework:
+                security: trace

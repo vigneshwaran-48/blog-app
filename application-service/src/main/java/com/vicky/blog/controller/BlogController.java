@@ -44,10 +44,10 @@ public class BlogController {
     private BlogLikeService blogLikeService;
 
     // private ProfileIdSer
-    
+
     @PostMapping
-    public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, 
-        Principal principal) throws AppException {
+    public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, Principal principal)
+            throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
 
@@ -66,7 +66,7 @@ public class BlogController {
 
     @GetMapping("/user")
     public ResponseEntity<?> getBlogsOfUser(Principal principal, HttpServletRequest request) throws AppException {
-        
+
         String userId = userIdExtracter.getUserId(principal);
         List<BlogDTO> blogs = blogService.getAllBlogsOfUser(userId);
 
@@ -81,9 +81,9 @@ public class BlogController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBlog(@PathVariable Long id, HttpServletRequest request, 
-        Principal principal) throws AppException {
-        
+    public ResponseEntity<?> getBlog(@PathVariable Long id, HttpServletRequest request, Principal principal)
+            throws AppException {
+
         String userId = userIdExtracter.getUserId(principal);
 
         Optional<BlogDTO> blog = blogService.getBlog(userId, id);
@@ -99,8 +99,8 @@ public class BlogController {
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, Principal principal) 
-        throws AppException {
+    public ResponseEntity<?> updateBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, Principal principal)
+            throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
 
@@ -117,8 +117,8 @@ public class BlogController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBlog(@PathVariable Long id, Principal principal, 
-        HttpServletRequest request) throws AppException {
+    public ResponseEntity<?> deleteBlog(@PathVariable Long id, Principal principal, HttpServletRequest request)
+            throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
 
@@ -135,7 +135,7 @@ public class BlogController {
 
     @GetMapping("/{blogId}/like")
     public ResponseEntity<?> getLikesOfBlog(@PathVariable Long blogId, @RequestParam String profileId,
-        Principal principal, HttpServletRequest request) throws AppException {
+            Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId, profileId);
@@ -151,8 +151,8 @@ public class BlogController {
     }
 
     @PostMapping("/{blogId}/like")
-    public ResponseEntity<?> likeBlog(@PathVariable Long blogId, @RequestParam String profileId,
-        Principal principal, HttpServletRequest request) throws AppException {
+    public ResponseEntity<?> likeBlog(@PathVariable Long blogId, @RequestParam String profileId, Principal principal,
+            HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         blogLikeService.addLike(blogId, userId, profileId);
@@ -162,13 +162,13 @@ public class BlogController {
         response.setMessage("Liked Blog!");
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
-        
+
         return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping("/{blogId}/like")
-    public ResponseEntity<?> unLikeBlog(@PathVariable Long blogId, @RequestParam String profileId,
-        Principal principal, HttpServletRequest request) throws AppException {
+    public ResponseEntity<?> unLikeBlog(@PathVariable Long blogId, @RequestParam String profileId, Principal principal,
+            HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         blogLikeService.removeLike(blogId, userId, profileId);
@@ -178,13 +178,13 @@ public class BlogController {
         response.setMessage("UnLiked Blog!");
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
-        
+
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/{blogId}/like/count")
     public ResponseEntity<?> getLikesCountOfBlog(@PathVariable Long blogId, @RequestParam String profileId,
-        Principal principal, HttpServletRequest request) throws AppException {
+            Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         List<BlogLikeDTO> blogLikes = blogLikeService.getLikesOfBlog(userId, blogId, profileId);
@@ -195,13 +195,13 @@ public class BlogController {
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
         response.setLikesCount(blogLikes.size());
-        
+
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/{blogId}/publish")
-    public ResponseEntity<EmptyResponse> publishBlog(@PathVariable Long blogId, @RequestParam String publishAt, 
-        Principal principal, HttpServletRequest request) throws AppException {
+    public ResponseEntity<EmptyResponse> publishBlog(@PathVariable Long blogId, @RequestParam String publishAt,
+            Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         blogService.publishBlog(userId, blogId, publishAt);
@@ -215,8 +215,8 @@ public class BlogController {
     }
 
     @PostMapping("/{blogId}/unpublish")
-    public ResponseEntity<EmptyResponse> unPublishBlog(@PathVariable Long blogId, Principal principal, 
-        HttpServletRequest request) throws AppException {
+    public ResponseEntity<EmptyResponse> unPublishBlog(@PathVariable Long blogId, Principal principal,
+            HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         blogService.unPublishBlog(userId, blogId);
@@ -230,12 +230,9 @@ public class BlogController {
     }
 
     @GetMapping("/{id}/profile/{profileId}")
-    public ResponseEntity<?> getBlogOfProfile(
-            @PathVariable Long id, @PathVariable String profileId,
-            HttpServletRequest request, 
-            Principal principal
-    ) throws AppException {
-        
+    public ResponseEntity<?> getBlogOfProfile(@PathVariable Long id, @PathVariable String profileId,
+            HttpServletRequest request, Principal principal) throws AppException {
+
         String userId = userIdExtracter.getUserId(principal);
 
         Optional<BlogDTO> blog = blogService.getBlogOfProfile(userId, id, profileId);
@@ -251,9 +248,9 @@ public class BlogController {
     }
 
     @GetMapping("/profile/{profileId}")
-    public ResponseEntity<?> getAllBlogsOfProfile(@PathVariable String profileId, HttpServletRequest request, 
-        Principal principal) throws AppException {
-        
+    public ResponseEntity<?> getAllBlogsOfProfile(@PathVariable String profileId, HttpServletRequest request,
+            Principal principal) throws AppException {
+
         String userId = userIdExtracter.getUserId(principal);
 
         List<BlogDTO> blogs = blogService.getAllBlogsOfProfile(userId, profileId);
