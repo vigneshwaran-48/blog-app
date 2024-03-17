@@ -1,6 +1,7 @@
+
 spring:
   config:
-    import: "optional:configserver:http://config-service:8099"
+    import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
 
   datasource:
     url:
@@ -23,4 +24,4 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:9000/eureka/
+      defaultZone: https://service-registry-50018270010.development.catalystappsail.in/eureka/
