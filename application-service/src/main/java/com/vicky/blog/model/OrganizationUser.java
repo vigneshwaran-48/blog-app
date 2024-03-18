@@ -1,31 +1,23 @@
 package com.vicky.blog.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-@Entity(name = "organization_user")
+@Document("organization_user")
 public class OrganizationUser {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "organization_id")
+    @DocumentReference
     private Organization organization;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "user_id")
+    @DocumentReference
     private User user;
 
-    @Column(nullable = false)
     private UserOrganizationRole role = UserOrganizationRole.MEMBER;
 
     public Long getId() {

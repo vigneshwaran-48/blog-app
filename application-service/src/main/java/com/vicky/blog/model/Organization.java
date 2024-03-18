@@ -2,46 +2,33 @@ package com.vicky.blog.model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.JoinType;
 import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
-import com.vicky.blog.service.organization.OrganizationConstants;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-@Entity
+@Document
 public class Organization {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false, length = OrganizationConstants.NAME_MAX_LENGTH)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
+    @DocumentReference
     private User owner;
 
-    @Column(length = OrganizationConstants.DESCRIPTION_MAX_LENGTH)
     private String description;
 
-    @Column(name = "created_time", nullable = false)
     private LocalDateTime createdTime;
 
-    @Column(nullable = false)
     private Visibility visibility = Visibility.PUBLIC;
 
-    @Column(name = "join_type", nullable = false)
     private JoinType joinType = JoinType.ANYONE;
 
-    @Column(nullable = false)
     private String image = "http://localhost:7000/static/1";
 
     public Long getId() {

@@ -3,22 +3,21 @@ spring:
     application:
         name: application-service
     config:
-        import: "configserver:http://config-service:8099"
+        import: "configserver:http://localhost:8099"
     main:
         allow-circular-references: true
 
-    jpa:
-        hibernate:
-            ddl-auto: update
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.MySQLDialect
     datasource:
-        url: jdbc:mysql://application-service-mysql:3306/blog_application
-        username: root
-        password: root@123
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        
+        url:
+        username:
+        password:
+        driver-class-name:
+
+    autoconfigure:
+        exclude:
+            - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+            - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+            
     security:
         oauth2:
             resourceserver:

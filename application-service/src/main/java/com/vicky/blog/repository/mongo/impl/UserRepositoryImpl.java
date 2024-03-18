@@ -1,4 +1,4 @@
-package com.vicky.blog.repository.firebase;
+package com.vicky.blog.repository.mongo.impl;
 
 import java.util.List;
 import java.util.Optional;
