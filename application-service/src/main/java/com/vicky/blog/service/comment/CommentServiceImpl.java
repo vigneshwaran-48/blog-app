@@ -28,15 +28,17 @@ import com.vicky.blog.model.CommentLike;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.CommentLikeRepository;
 import com.vicky.blog.repository.CommentRepository;
+import com.vicky.blog.repository.mongo.CommentLikeMongoRepository;
+import com.vicky.blog.repository.mongo.CommentMongoRepository;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentMongoRepository commentRepository;
 
     @Autowired
-    private CommentLikeRepository commentLikeRepository;
+    private CommentLikeMongoRepository commentLikeRepository;
 
     @Autowired
     private UserService userService;
@@ -50,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public CommentDTO addComment(String userId, Long blogId, Long parentCommentId, String commentContent)
+    public CommentDTO addComment(String userId, String blogId, String parentCommentId, String commentContent)
         throws AppException {
         
         UserDTO user = userService.getUser(userId).get();
@@ -83,7 +85,7 @@ public class CommentServiceImpl implements CommentService {
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     @CommentIdValidator(userIdPosition = 0, blogIdPosition = 1, commentIdPosition = 2)
-    public CommentDTO editComment(String userId, Long blogId, Long commentId, String commentContent) throws AppException {
+    public CommentDTO editComment(String userId, String blogId, String commentId, String commentContent) throws AppException {
         CommentDTO comment = getComment(userId, blogId, commentId).get();
         comment.setContent(commentContent);
         Comment savedComment = commentRepository.save(Comment.build(comment));
@@ -97,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public Optional<CommentDTO> getComment(String userId, Long blogId, Long commentId) throws AppException {
+    public Optional<CommentDTO> getComment(String userId, String blogId, String commentId) throws AppException {
         Optional<Comment> comment = commentRepository.findByIdAndBlogId(commentId, blogId);
         if(comment.isEmpty()) {
             return Optional.empty();
@@ -113,7 +115,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public void deleteComment(String userId, Long blogId, Long commentId) throws AppException {
+    public void deleteComment(String userId, String blogId, String commentId) throws AppException {
         if(!getThreadsOfComment(userId, blogId, commentId).isEmpty()) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Can't delete comment, Comment has threads!");
         }
@@ -123,7 +125,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public void deleteCommentWithItsThreads(String userId, Long blogId, Long commentId) throws AppException {
+    public void deleteCommentWithItsThreads(String userId, String blogId, String commentId) throws AppException {
         List<CommentDTO> threads = getImmediateNextChildThreadsOfComment(userId, blogId, commentId);
         for(CommentDTO thread : threads) {
             deleteCommentWithItsThreads(userId, blogId, thread.getId());
@@ -134,7 +136,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public List<CommentDTO> getThreadsOfComment(String userId, Long blogId, Long commentId) throws AppException {
+    public List<CommentDTO> getThreadsOfComment(String userId, String blogId, String commentId) throws AppException {
         List<Comment> comments = commentRepository.findByParentCommentId(commentId);
 
         List<CommentDTO> commentDTOs = new ArrayList<>();
@@ -155,7 +157,7 @@ public class CommentServiceImpl implements CommentService {
      * Retrieves only the next level of threads. If you need all threads recursively use getThreadsOfComment()
      */
     @Override
-	public List<CommentDTO> getImmediateNextChildThreadsOfComment(String userId, Long blogId, Long commentId)
+	public List<CommentDTO> getImmediateNextChildThreadsOfComment(String userId, String blogId, String commentId)
 			throws AppException {
         return commentRepository.findByParentCommentId(commentId)
                                 .stream()
@@ -166,7 +168,7 @@ public class CommentServiceImpl implements CommentService {
 	@Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-	public List<CommentDTO> getCommentsOfBlog(String userId, Long blogId) throws AppException {
+	public List<CommentDTO> getCommentsOfBlog(String userId, String blogId) throws AppException {
 		List<Comment> rootComments = commentRepository.findByBlogIdAndParentCommentIdIsNull(blogId);
 
         if(rootComments.isEmpty()) {
@@ -189,7 +191,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public void likeComment(String userId, Long blogId, Long commentId) throws AppException {
+    public void likeComment(String userId, String blogId, String commentId) throws AppException {
         CommentDTO commentDTO = getComment(userId, blogId, commentId).get();
         UserDTO user = userService.getUser(userId).get();
 
@@ -212,11 +214,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public void removeLike(String userId, Long blogId, Long commentId) throws AppException {
+    public void removeLike(String userId, String blogId, String commentId) throws AppException {
         commentLikeRepository.deleteByCommentIdAndLikedById(commentId, userId);
     }
     
-    private int getDepthLevelOfComment(String userId, Long blogId, Long commentId) throws AppException {
+    private int getDepthLevelOfComment(String userId, String blogId, String commentId) throws AppException {
         int depthLevel = 0;
         Optional<CommentDTO> comment = getComment(userId, blogId, commentId);
         while (comment.isPresent()) {

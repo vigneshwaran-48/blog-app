@@ -13,7 +13,7 @@ import lombok.Data;
 public class Follow {
     
     @Id
-    private Long id;
+    private String id;
 
     @DocumentReference
     private ProfileId userProfile;

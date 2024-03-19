@@ -48,7 +48,7 @@ public class FollowServiceImpl implements FollowService {
         ProfileIdDTO userProfile = profileIdService.getProfileId(userProfileId).get();
         if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             // Checking user has access to this organization...
-            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId()));
+            organizationService.getOrganization(userId, profileIdDTO.getEntityId());
         }
         else {
             if(userProfile.getProfileId().equals(profileId)) {

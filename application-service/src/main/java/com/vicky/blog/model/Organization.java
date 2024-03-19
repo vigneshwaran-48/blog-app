@@ -14,7 +14,7 @@ import com.vicky.blog.common.dto.organization.OrganizationDTO.Visibility;
 public class Organization {
     
     @Id
-    private Long id;
+    private String id;
 
     private String name;
 
@@ -31,11 +31,11 @@ public class Organization {
 
     private String image = "http://localhost:7000/static/1";
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

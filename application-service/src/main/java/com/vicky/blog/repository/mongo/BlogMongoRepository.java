@@ -1,9 +1,24 @@
 package com.vicky.blog.repository.mongo;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.vicky.blog.model.Blog;
 
-public interface BlogMongoRepository extends MongoRepository<Blog, Long> {
+import jakarta.transaction.Transactional;
+
+public interface BlogMongoRepository extends MongoRepository<Blog, String> {
     
+    Optional<Blog> findByOwnerIdAndId(String userId, String id);
+
+    List<Blog> findByOwnerId(String userId);
+
+    Optional<Blog> findByIdAndPublishedAtProfileId(String id, String profileId);
+
+    List<Blog> findByPublishedAtProfileId(String profileId);
+
+    @Transactional
+    void deleteByOwnerIdAndId(String userId, String id);
 }

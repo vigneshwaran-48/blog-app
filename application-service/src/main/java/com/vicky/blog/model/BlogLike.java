@@ -13,7 +13,7 @@ import lombok.Data;
 public class BlogLike {
     
     @Id
-    private Long id;
+    private String id;
 
     @DocumentReference
     private Blog blog;

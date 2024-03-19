@@ -1,4 +1,4 @@
-package com.vicky.blog.repository.firebase;
+package com.vicky.blog.repository.mongo.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,17 +29,12 @@ import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.FollowRepository;
 import com.vicky.blog.repository.ProfileIdRepository;
-import com.vicky.blog.repository.firebase.model.FollowModal;
 
 @Repository
-@Profile("prod")
 public class FollowRepositoryImpl implements FollowRepository {
 
     private static final String COLLECTION_NAME = "follow";
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowRepositoryImpl.class);
-
-    @Autowired
-    private ProfileIdRepository profileIdRepository;
 
     @Override
     public void flush() {
@@ -127,25 +122,7 @@ public class FollowRepositoryImpl implements FollowRepository {
 
     @Override
     public <S extends Follow> S save(S entity) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Long id = entity.getId();
-        if(id == null) {
-            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
-            if(id < 0) {
-                return null;
-            }
-            entity.setId(id);
-        }
-        FollowModal followModal = FollowModal.build(entity);
-        try {
-            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(followModal).get();
-            return entity;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
@@ -240,50 +217,12 @@ public class FollowRepositoryImpl implements FollowRepository {
 
     @Override
     public List<Follow> findByUserProfileProfileId(String profileId) {
-        Optional<ProfileId> userProfile = profileIdRepository.findByProfileId(profileId);
-        Firestore firestore = FirestoreClient.getFirestore();
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
-                                                .whereEqualTo("user_profile_id", profileId).get();
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<FollowModal> followerModals = snapshot.toObjects(FollowModal.class);
-            if (followerModals.isEmpty()) {
-                return List.of();
-            }
-            List<Follow> followers = new ArrayList<>();
-            for(FollowModal followerModal : followerModals) {
-                Follow follow = followerModal.toEntity();
-                ProfileId followerProfile = profileIdRepository.findById(followerModal.getFollower_id()).get();
-                follow.setFollower(followerProfile);
-                follow.setUserProfile(userProfile.get());
-                followers.add(follow);
-            }
-            return followers;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return List.of();
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
     public void deleteByUserProfileProfileIdAndFollowerProfileId(String profileId, String followerProfileId) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter profileFilter = Filter.equalTo("user_profile_id", profileId);
-        Filter follwerProfileFilter = Filter.equalTo("follower_id", followerProfileId);
-        Filter filter = Filter.and(profileFilter, follwerProfileFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
-
-        try {
-            for(QueryDocumentSnapshot doc : result.get()) {
-                doc.getReference().delete().get();
-            }
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
     
 }

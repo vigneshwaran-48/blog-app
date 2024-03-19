@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 public class Blog {
 
   @Id
-  private Long id;
+  private String id;
 
   private String title;
 

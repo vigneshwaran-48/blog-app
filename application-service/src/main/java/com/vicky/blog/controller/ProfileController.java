@@ -77,8 +77,7 @@ public class ProfileController {
             profileDTO.setBannerImage(user.get().getImage());
         }
         else {
-            Optional<OrganizationDTO> organization = organizationService.getOrganization(userId, 
-                                                            Long.parseLong(entityId));
+            Optional<OrganizationDTO> organization = organizationService.getOrganization(userId, entityId);
             profileDTO.setName(organization.get().getName());
             profileDTO.setDescription(organization.get().getDescription()); 
             profileDTO.setBannerImage(organization.get().getImage());

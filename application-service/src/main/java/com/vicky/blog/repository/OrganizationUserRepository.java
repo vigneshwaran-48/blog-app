@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
@@ -13,19 +12,19 @@ import com.vicky.blog.model.OrganizationUser;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface OrganizationUserRepository extends JpaRepository<OrganizationUser, Long> {
+public interface OrganizationUserRepository extends JpaRepository<OrganizationUser, String> {
 
-    Optional<OrganizationUser> findByOrganizationIdAndUserId(Long organizationId, String userId);
+    Optional<OrganizationUser> findByOrganizationIdAndUserId(String organizationId, String userId);
 
-    List<OrganizationUser> findByOrganizationId(Long organizationId);
+    List<OrganizationUser> findByOrganizationId(String organizationId);
 
     List<OrganizationUser> findByUserId(String userId);
 
-    List<OrganizationUser> findByOrganizationIdAndRole(Long organizationId, UserOrganizationRole role);
+    List<OrganizationUser> findByOrganizationIdAndRole(String organizationId, UserOrganizationRole role);
 
     @Transactional
-    void deleteByOrganizationIdAndUserId(Long organizationId, String userId);
+    void deleteByOrganizationIdAndUserId(String organizationId, String userId);
 
     @Transactional
-    void deleteByOrganizationId(Long organizationId);
+    void deleteByOrganizationId(String organizationId);
 }

@@ -19,7 +19,7 @@ public class OrganizationDTO {
         ANYONE
     }
     
-    private Long id;
+    private String id;
     private String name;
     private String profileId;
     private String description;

@@ -1,4 +1,4 @@
-package com.vicky.blog.repository.firebase;
+package com.vicky.blog.repository.mongo.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,33 +16,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.stereotype.Repository;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.Filter;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.cloud.FirestoreClient;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
-import com.vicky.blog.model.Organization;
 import com.vicky.blog.model.OrganizationUser;
-import com.vicky.blog.model.User;
-import com.vicky.blog.repository.OrganizationRepository;
 import com.vicky.blog.repository.OrganizationUserRepository;
-import com.vicky.blog.repository.UserRepository;
-import com.vicky.blog.repository.firebase.model.OrganizationUserModal;
+import com.vicky.blog.repository.mongo.OrganizationUserMongoRepository;
 
 @Repository
-@Profile("prod")
 public class OrganizationUserRepositoryImpl implements OrganizationUserRepository {
 
-    private static final String COLLECTION_NAME = "organization_user";
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationUserRepositoryImpl.class);
 
     @Autowired
-    private OrganizationRepository organizationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private OrganizationUserMongoRepository organizationUserMongoRepository;
 
     @Override
     public void flush() {
@@ -70,7 +54,7 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     }
 
     @Override
-    public void deleteAllByIdInBatch(Iterable<Long> ids) {
+    public void deleteAllByIdInBatch(Iterable<String> ids) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteAllByIdInBatch'");
     }
@@ -82,19 +66,19 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     }
 
     @Override
-    public OrganizationUser getOne(Long id) {
+    public OrganizationUser getOne(String id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getOne'");
     }
 
     @Override
-    public OrganizationUser getById(Long id) {
+    public OrganizationUser getById(String id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getById'");
     }
 
     @Override
-    public OrganizationUser getReferenceById(Long id) {
+    public OrganizationUser getReferenceById(String id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getReferenceById'");
     }
@@ -124,42 +108,24 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     }
 
     @Override
-    public List<OrganizationUser> findAllById(Iterable<Long> ids) {
+    public List<OrganizationUser> findAllById(Iterable<String> ids) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findAllById'");
     }
 
     @Override
     public <S extends OrganizationUser> S save(S entity) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Long id = entity.getId();
-        if(id == null) {
-            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
-            if(id < 0) {
-                return null;
-            }
-            entity.setId(id);
-        }
-        OrganizationUserModal organizationUserModal = OrganizationUserModal.build(entity);
-        try {
-            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(organizationUserModal).get();
-            return entity;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return null;
+        return organizationUserMongoRepository.save(entity);
     }
 
     @Override
-    public Optional<OrganizationUser> findById(Long id) {
+    public Optional<OrganizationUser> findById(String id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(String id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'existsById'");
     }
@@ -171,7 +137,7 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
     }
@@ -183,7 +149,7 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     }
 
     @Override
-    public void deleteAllById(Iterable<? extends Long> ids) {
+    public void deleteAllById(Iterable<? extends String> ids) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteAllById'");
     }
@@ -244,181 +210,32 @@ public class OrganizationUserRepositoryImpl implements OrganizationUserRepositor
     }
 
     @Override
-    public Optional<OrganizationUser> findByOrganizationIdAndUserId(Long organizationId, String userId) {
-        Optional<Organization> organization = organizationRepository.findById(organizationId);
-        Optional<User> user = userRepository.findById(userId);
-        if (organization.isEmpty() || user.isEmpty()) {
-            return Optional.empty();
-        }
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter organizationFilter = Filter.equalTo("organization_id", organizationId);
-        Filter userFilter = Filter.equalTo("user_id", userId);
-        Filter filter = Filter.and(organizationFilter, userFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).limit(1).get();
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<OrganizationUserModal> organizationUsers = snapshot.toObjects(OrganizationUserModal.class);
-            if (organizationUsers.isEmpty()) {
-                return Optional.empty();
-            }
-            String role = (String) snapshot.getDocuments().get(0).get("role");
-
-            OrganizationUserModal orgModal = organizationUsers.get(0);
-            OrganizationUser orgUser = orgModal.toEntity();
-            orgUser.setOrganization(organization.get());
-            orgUser.setUser(user.get());
-            orgUser.setRole(UserOrganizationRole.valueOf(role));
-
-            return Optional.of(orgUser);
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return Optional.empty();
+    public Optional<OrganizationUser> findByOrganizationIdAndUserId(String organizationId, String userId) {
+        return organizationUserMongoRepository.findByOrganizationIdAndUserId(organizationId, userId);
     }
 
     @Override
-    public List<OrganizationUser> findByOrganizationId(Long organizationId) {
-        Optional<Organization> organization = organizationRepository.findById(organizationId);
-        if (organization.isEmpty()) {
-            return List.of();
-        }
-        Firestore firestore = FirestoreClient.getFirestore();
-        ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).whereEqualTo("organization_id", organizationId).get();
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<OrganizationUserModal> organizationUsers = snapshot.toObjects(OrganizationUserModal.class);
-            if (organizationUsers.isEmpty()) {
-                return List.of();
-            }
-            List<OrganizationUser> orgUsers = new ArrayList<>();
-            for (int i = 0; i < snapshot.getDocuments().size(); i++) {
-                String role = (String) snapshot.getDocuments().get(i).get("role");
-
-                OrganizationUser organizationUser = organizationUsers.get(i).toEntity();
-                organizationUser.setRole(UserOrganizationRole.valueOf(role));
-                organizationUser.setOrganization(organization.get());
-                User user = userRepository.findById(organizationUsers.get(i).getUser_id()).get();
-                organizationUser.setUser(user);
-                orgUsers.add(organizationUser);
-            }
-            return orgUsers;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return List.of();
+    public List<OrganizationUser> findByOrganizationId(String organizationId) {
+        return organizationUserMongoRepository.findByOrganizationId(organizationId);
     }
 
     @Override
     public List<OrganizationUser> findByUserId(String userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            return List.of();
-        }
-        Firestore firestore = FirestoreClient.getFirestore();
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).whereEqualTo("user_id", userId).get();
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<OrganizationUserModal> organizationUsers = snapshot.toObjects(OrganizationUserModal.class);
-            if (organizationUsers.isEmpty()) {
-                return List.of();
-            }
-            List<OrganizationUser> orgUsers = new ArrayList<>();
-            for (int i = 0; i < snapshot.getDocuments().size(); i++) {
-                String role = (String) snapshot.getDocuments().get(i).get("role");
-
-                OrganizationUserModal organizationUserModal = organizationUsers.get(i);
-                Organization organization =
-                        organizationRepository.findById(organizationUserModal.getOrganization_id()).get();
-                OrganizationUser organizationUser = organizationUserModal.toEntity();
-                organizationUser.setOrganization(organization);
-                organizationUser.setRole(UserOrganizationRole.valueOf(role));
-                organizationUser.setUser(user.get());
-                orgUsers.add(organizationUser);
-            }
-            return orgUsers;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return List.of();
+        return organizationUserMongoRepository.findByUserId(userId);
     }
 
     @Override
-    public List<OrganizationUser> findByOrganizationIdAndRole(Long organizationId, UserOrganizationRole role) {
-        Optional<Organization> organization = organizationRepository.findById(organizationId);
-        if (organization.isEmpty()) {
-            return List.of();
-        }
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter organizationFilter = Filter.equalTo("organization_id", organizationId);
-        Filter roleFilter = Filter.equalTo("role", role.toString());
-        Filter filter = Filter.and(organizationFilter, roleFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
-
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<OrganizationUserModal> organizationUsers = snapshot.toObjects(OrganizationUserModal.class);
-            if (organizationUsers.isEmpty()) {
-                return List.of();
-            }
-            List<OrganizationUser> orgUsers = new ArrayList<>();
-            for (int i = 0; i < snapshot.getDocuments().size(); i++) {
-                String orgUserRole = (String) snapshot.getDocuments().get(i).get("role");
-
-                OrganizationUser organizationUser = organizationUsers.get(i).toEntity();
-                organizationUser.setRole(UserOrganizationRole.valueOf(orgUserRole));
-                organizationUser.setOrganization(organization.get());
-                User user = userRepository.findById(organizationUsers.get(i).getUser_id()).get();
-                organizationUser.setUser(user);
-                orgUsers.add(organizationUser);
-            }
-            return orgUsers;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return List.of();
+    public List<OrganizationUser> findByOrganizationIdAndRole(String organizationId, UserOrganizationRole role) {
+        return organizationUserMongoRepository.findByOrganizationIdAndRole(organizationId, role);
     }
 
     @Override
-    public void deleteByOrganizationIdAndUserId(Long organizationId, String userId) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter organizationFilter = Filter.equalTo("organization_id", organizationId);
-        Filter userFilter = Filter.equalTo("user_id", userId);
-        Filter filter = Filter.and(organizationFilter, userFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
-
-        try {
-            for (QueryDocumentSnapshot doc : result.get()) {
-                doc.getReference().delete().get();
-            }
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+    public void deleteByOrganizationIdAndUserId(String organizationId, String userId) {
+        organizationUserMongoRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
     }
 
     @Override
-    public void deleteByOrganizationId(Long organizationId) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).whereEqualTo("organization_id", organizationId).get();
-        try {
-            for (QueryDocumentSnapshot doc : result.get()) {
-                doc.getReference().delete().get();
-            }
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+    public void deleteByOrganizationId(String organizationId) {
+        organizationUserMongoRepository.deleteByOrganizationId(organizationId);
     }
 }

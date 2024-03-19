@@ -1,4 +1,4 @@
-package com.vicky.blog.repository.firebase;
+package com.vicky.blog.repository.mongo.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,19 +29,12 @@ import com.vicky.blog.model.User;
 import com.vicky.blog.repository.CommentLikeRepository;
 import com.vicky.blog.repository.CommentRepository;
 import com.vicky.blog.repository.UserRepository;
-import com.vicky.blog.repository.firebase.model.CommentLikeModal;
 
 @Repository
-@Profile("prod")
 public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     private static final String COLLECTION_NAME = "comment_like";
     private static Logger LOGGER = LoggerFactory.getLogger(CommentLikeRepositoryImpl.class);
-
-    @Autowired
-    private CommentRepository commentRepository;
-    @Autowired
-    private UserRepository userRepository;
 
     @Override
     public void flush() {
@@ -129,25 +122,7 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     @Override
     public <S extends CommentLike> S save(S entity) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Long id = entity.getId();
-        if(id == null) {
-            id = FirebaseUtil.getNextOrderedId(COLLECTION_NAME);
-            if(id < 0) {
-                return null;
-            }
-            entity.setId(id);
-        }
-        CommentLikeModal commentLikeModal = CommentLikeModal.build(entity);
-        try {
-            firestore.collection(COLLECTION_NAME).document(String.valueOf(id)).set(commentLikeModal).get();
-            return entity;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
@@ -242,100 +217,22 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepository {
 
     @Override
     public List<CommentLike> findByCommentId(Long commentId) {
-        Optional<Comment> comment = commentRepository.findById(commentId);
-        if(comment.isEmpty()) {
-            return List.of();
-        }
-        Firestore firestore = FirestoreClient.getFirestore();
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME)
-                                                .whereEqualTo("comment_id", commentId).get();
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<CommentLikeModal> commentLikeModals = snapshot.toObjects(CommentLikeModal.class);
-            if (commentLikeModals.isEmpty()) {
-                return List.of();
-            }
-            List<CommentLike> commentLikes = new ArrayList<>();
-            for(CommentLikeModal commentLikeModal : commentLikeModals) {
-                CommentLike commentLike = commentLikeModal.toEntity();
-                User user = userRepository.findById(commentLikeModal.getLiked_user_id()).get();
-                commentLike.setLikedBy(user);
-                commentLike.setComment(comment.get());
-                commentLikes.add(commentLike);
-            }
-            return commentLikes;
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return List.of();
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
     public Optional<CommentLike> findByCommentIdAndLikedById(Long commentId, String userId) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter commentFilter = Filter.equalTo("comment_id", commentId);
-        Filter userFilter = Filter.equalTo("liked_user_id", userId);
-        Filter filter = Filter.and(commentFilter, userFilter);
-        ApiFuture<QuerySnapshot> result = firestore.collection(COLLECTION_NAME).where(filter).get();
-
-        try {
-            QuerySnapshot snapshot = result.get();
-            List<CommentLikeModal> commentLikeModals = snapshot.toObjects(CommentLikeModal.class);
-            if (commentLikeModals.isEmpty()) {
-                return Optional.empty();
-            }
-            CommentLike commentLike = commentLikeModals.get(0).toEntity();
-            Comment comment = commentRepository.findById(commentId).get();
-            User likedByUser = userRepository.findById(userId).get();
-            commentLike.setComment(comment);
-            commentLike.setLikedBy(likedByUser);
-            return Optional.of(commentLike);
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return Optional.empty();
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
     public void deleteByCommentIdAndLikedById(Long commentId, String userId) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter commentProfileFilter = Filter.equalTo("comment_id", commentId);
-        Filter likedUserFilter = Filter.equalTo("liked_user_id", userId);
-        Filter filter = Filter.and(commentProfileFilter, likedUserFilter);
-        ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).where(filter).get();
-        try {
-            for(QueryDocumentSnapshot doc : result.get()) {
-                doc.getReference().delete().get();
-            }
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
 
     @Override
     public boolean existsByCommentIdAndLikedById(Long commentId, String userId) {
-        Firestore firestore = FirestoreClient.getFirestore();
-        Filter commentProfileFilter = Filter.equalTo("comment_id", commentId);
-        Filter likedUserFilter = Filter.equalTo("liked_user_id", userId);
-        Filter filter = Filter.and(commentProfileFilter, likedUserFilter);
-        ApiFuture<QuerySnapshot> result =
-                firestore.collection(COLLECTION_NAME).where(filter).get();
-
-        try {
-            return !result.get().isEmpty();
-        } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return false;
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
     
 }

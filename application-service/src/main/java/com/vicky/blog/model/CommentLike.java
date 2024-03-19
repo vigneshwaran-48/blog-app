@@ -11,7 +11,7 @@ import lombok.Data;
 public class CommentLike {
     
     @Id
-    private Long id;
+    private String id;
 
     @DocumentReference
     private Comment comment;
