@@ -26,8 +26,6 @@ import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.Comment;
 import com.vicky.blog.model.CommentLike;
 import com.vicky.blog.model.User;
-import com.vicky.blog.repository.CommentLikeRepository;
-import com.vicky.blog.repository.CommentRepository;
 import com.vicky.blog.repository.mongo.CommentLikeMongoRepository;
 import com.vicky.blog.repository.mongo.CommentMongoRepository;
 

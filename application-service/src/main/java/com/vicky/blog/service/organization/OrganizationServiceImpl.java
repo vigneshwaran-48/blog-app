@@ -28,8 +28,8 @@ import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Organization;
 import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.model.User;
-import com.vicky.blog.repository.OrganizationRepository;
-import com.vicky.blog.repository.OrganizationUserRepository;
+import com.vicky.blog.repository.mongo.OrganizationMongoRepository;
+import com.vicky.blog.repository.mongo.OrganizationUserMongoRepository;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
@@ -40,10 +40,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     private UserService userService;
 
     @Autowired
-    private OrganizationRepository organizationRepository;
+    private OrganizationMongoRepository organizationRepository;
 
     @Autowired
-    private OrganizationUserRepository organizationUserRepository;
+    private OrganizationUserMongoRepository organizationUserRepository;
 
     @Autowired
     private OrganizationUtil organizationUtil;

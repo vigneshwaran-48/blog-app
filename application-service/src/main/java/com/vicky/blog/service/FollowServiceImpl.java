@@ -21,7 +21,7 @@ import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.Follow;
 import com.vicky.blog.model.ProfileId;
-import com.vicky.blog.repository.FollowRepository;
+import com.vicky.blog.repository.mongo.FollowMongoRepository;
 
 @Service
 public class FollowServiceImpl implements FollowService {
@@ -33,7 +33,7 @@ public class FollowServiceImpl implements FollowService {
     private OrganizationService organizationService;
 
     @Autowired
-    private FollowRepository followRepository;
+    private FollowMongoRepository followRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowServiceImpl.class);
 
@@ -70,7 +70,8 @@ public class FollowServiceImpl implements FollowService {
     @ProfileIdValidator(positions = 1)
     @ProfileAccessValidator(userIdPosition = 0, profileIdPosition = 1)
     public List<FollowDTO> getFollowersOfProfile(String userId, String profileId) throws AppException {
-        List<Follow> followers = followRepository.findByUserProfileProfileId(profileId);
+        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).get();
+        List<Follow> followers = followRepository.findByUserProfileId(profileIdDTO.getId());
         return followers.stream().map(follow -> follow.toDTO()).collect(Collectors.toList());
     }
 
@@ -79,8 +80,10 @@ public class FollowServiceImpl implements FollowService {
     @ProfileIdValidator(positions = 1)
     @ProfileAccessValidator(userIdPosition = 0, profileIdPosition = 1)
     public void unFollowProfile(String userId, String profileId) throws AppException {
-        String userProfileId = profileIdService.getProfileIdByEntityId(userId).get();
-        followRepository.deleteByUserProfileProfileIdAndFollowerProfileId(profileId, userProfileId);
+        ProfileIdDTO userProfile = profileIdService.getProfileByEntityId(userId).get();
+        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).get();
+        
+        followRepository.deleteByUserProfileIdAndFollowerId(profileIdDTO.getId(), userProfile.getId());
     }
     
 }

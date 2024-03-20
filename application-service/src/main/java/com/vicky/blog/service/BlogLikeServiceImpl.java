@@ -21,7 +21,6 @@ import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.BlogLike;
 import com.vicky.blog.model.User;
-import com.vicky.blog.repository.BlogLikeRepository;
 import com.vicky.blog.repository.mongo.BlogLikeMongoRepository;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 

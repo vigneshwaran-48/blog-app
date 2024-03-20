@@ -16,4 +16,5 @@ public interface ProfileIdService {
     Optional<ProfileIdDTO> updateProfileId(String entityId, String profileId, ProfileType type) throws AppException;
     void deleteProfileId(String entityId, String profileId) throws AppException;
     List<ProfileIdDTO> getAllProfilesOfUser(String userId) throws AppException;
+    Optional<ProfileIdDTO> getProfileByEntityId(String entityId) throws AppException;
 }

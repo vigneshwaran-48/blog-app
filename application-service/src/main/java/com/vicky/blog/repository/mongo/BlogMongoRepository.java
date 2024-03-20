@@ -15,9 +15,9 @@ public interface BlogMongoRepository extends MongoRepository<Blog, String> {
 
     List<Blog> findByOwnerId(String userId);
 
-    Optional<Blog> findByIdAndPublishedAtProfileId(String id, String profileId);
+    Optional<Blog> findByIdAndPublishedAtId(String id, String profileId);
 
-    List<Blog> findByPublishedAtProfileId(String profileId);
+    List<Blog> findByPublishedAtId(String id);
 
     @Transactional
     void deleteByOwnerIdAndId(String userId, String id);

@@ -18,7 +18,7 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.ProfileId;
-import com.vicky.blog.repository.ProfileIdRepository;
+import com.vicky.blog.repository.mongo.ProfileIdMongoRepository;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 
@@ -28,7 +28,7 @@ public class ProfileIdServiceImpl implements ProfileIdService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfileIdServiceImpl.class);
 
     @Autowired
-    private ProfileIdRepository profileIdRepository;
+    private ProfileIdMongoRepository profileIdRepository;
 
     @Autowired
     private OrganizationService organizationService;
@@ -137,5 +137,14 @@ public class ProfileIdServiceImpl implements ProfileIdService {
             profiles.add(orgProfileId.get().toDTO());
         }
         return profiles;
+    }
+
+    @Override
+    public Optional<ProfileIdDTO> getProfileByEntityId(String entityId) throws AppException {
+        Optional<ProfileId> profileIdModel = profileIdRepository.findByEntityId(entityId);
+        if(profileIdModel.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(profileIdModel.get().toDTO());
     }
 }

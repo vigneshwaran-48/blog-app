@@ -38,7 +38,7 @@ public class CommentController {
     private UserIdExtracter userIdExtracter;
 
     @PostMapping
-    public ResponseEntity<CommentResponse> commentInBlog(@PathVariable Long blogId, 
+    public ResponseEntity<CommentResponse> commentInBlog(@PathVariable String blogId, 
         @RequestBody CommentCreationPayload payload, Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -54,7 +54,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<CommentsResponse> getCommentsOfBlog(@PathVariable Long blogId, Principal principal, 
+    public ResponseEntity<CommentsResponse> getCommentsOfBlog(@PathVariable String blogId, Principal principal, 
         HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -71,7 +71,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentResponse> getComment(@PathVariable Long blogId, @PathVariable Long commentId, 
+    public ResponseEntity<CommentResponse> getComment(@PathVariable String blogId, @PathVariable String commentId, 
         Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -89,7 +89,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<EmptyResponse> deleteComment(@PathVariable Long blogId, @PathVariable Long commentId, 
+    public ResponseEntity<EmptyResponse> deleteComment(@PathVariable String blogId, @PathVariable String commentId, 
         Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -105,7 +105,7 @@ public class CommentController {
     }
     
     @PostMapping("/{commentId}/like")
-    public ResponseEntity<EmptyResponse> likeComment(@PathVariable Long blogId, @PathVariable Long commentId, 
+    public ResponseEntity<EmptyResponse> likeComment(@PathVariable String blogId, @PathVariable String commentId, 
     Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -121,7 +121,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}/like")
-    public ResponseEntity<EmptyResponse> unLikeComment(@PathVariable Long blogId, @PathVariable Long commentId, 
+    public ResponseEntity<EmptyResponse> unLikeComment(@PathVariable String blogId, @PathVariable String commentId, 
     Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);

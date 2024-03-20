@@ -30,7 +30,6 @@ import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
-import com.vicky.blog.repository.BlogRepository;
 import com.vicky.blog.repository.mongo.BlogMongoRepository;
 
 @Service
@@ -209,7 +208,7 @@ public class BlogServiceImpl implements BlogService {
             // Validating does user can access organization.
             organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
-        Optional<Blog> blog = blogRepository.findByIdAndPublishedAtProfileId(blogId, profileId);
+        Optional<Blog> blog = blogRepository.findByIdAndPublishedAtId(blogId, profileIdDTO.getId());
         if(blog.isEmpty()) {
             // If the user wants to see his own blog with his profileId
             // But Not getting userId from profileDTO because it will lead to anyone can
@@ -234,7 +233,7 @@ public class BlogServiceImpl implements BlogService {
             // Validating does user can access organization.
             organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
-        List<Blog> blogs = blogRepository.findByPublishedAtProfileId(profileId);
+        List<Blog> blogs = blogRepository.findByPublishedAtId(profileIdDTO.getId());
         return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
 	}
 
