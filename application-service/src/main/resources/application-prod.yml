@@ -1,25 +1,21 @@
-
 spring:
   config:
     import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
 
-  datasource:
-    url:
-    username:
-    password:
-    driver-class-name:
+  data:
+    mongodb:
+      uri: mongodb+srv://<username>:<password>@applicationdb.j4suvxj.mongodb.net/ApplicationDB?retryWrites=true&w=majority&appName=ApplicationDB
 
   autoconfigure:
     exclude:
-        - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://accounts.google.com
           jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
-
 
 eureka:
   client:

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication
 @EnableAspectJAutoProxy
 @EnableDiscoveryClient
-@EnableMongoRepositories("com.vicky.blog.repository.mongo")
+@EnableMongoRepositories
 public class ApplicationServiceApplication {
 
 	public static void main(String[] args) {
