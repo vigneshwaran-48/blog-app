@@ -2,8 +2,6 @@
 spring:
   application:
     name: api-gateway
-  config:
-    import: configserver:http://localhost:8099
   cloud:
     gateway:
         routes:

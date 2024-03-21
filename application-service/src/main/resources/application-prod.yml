@@ -4,7 +4,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://<username>:<password>@applicationdb.j4suvxj.mongodb.net/ApplicationDB?retryWrites=true&w=majority&appName=ApplicationDB
+      uri: mongodb+srv://vigneshwaran4817:IAoPZ1ERHoVhFqLr@applicationdb.j4suvxj.mongodb.net/ApplicationDB?retryWrites=true&w=majority&appName=ApplicationDB
 
   autoconfigure:
     exclude:
