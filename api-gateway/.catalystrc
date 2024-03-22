@@ -10,11 +10,11 @@
   "projects": [
     {
       "idx": 1,
-      "id": "5640000000011001",
-      "name": "ApplicationService",
+      "id": "5640000000023001",
+      "name": "APIGateway",
       "domain": {
-        "id": "50018270010",
-        "name": "applicationservice-60026975723.development"
+        "id": "50018481888",
+        "name": "apigateway-60026975723.development"
       },
       "timezone": "Asia/Kolkata",
       "env": [

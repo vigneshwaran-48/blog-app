@@ -1,10 +1,11 @@
-spring:
-  config:
-    import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
 
+server:
+  port: 8082
+
+spring:
   data:
     mongodb:
-      uri: mongodb+srv://vigneshwaran4817:IAoPZ1ERHoVhFqLr@applicationdb.j4suvxj.mongodb.net/ApplicationDB?retryWrites=true&w=majority&appName=ApplicationDB
+      uri: mongodb+srv://vigneshwaran4817:hLKybDS12uC4F6Bj@applicationdb.j4suvxj.mongodb.net/ApplicationDB?retryWrites=true&w=majority&appName=ApplicationDB
 
   autoconfigure:
     exclude:
@@ -16,8 +17,3 @@ spring:
         jwt:
           issuer-uri: https://accounts.google.com
           jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: https://service-registry-50018270010.development.catalystappsail.in/eureka/

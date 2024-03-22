@@ -1,7 +1,6 @@
 package com.vicky.blog.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancedExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,9 +15,6 @@ import com.vicky.blog.filter.HTTPClientExchangeFilter;
 public class WebClientConfig {
     
     @Autowired
-    private LoadBalancedExchangeFilterFunction loadBalancedExchangeFilterFunction;
-
-    @Autowired
     private HTTPClientExchangeFilter httpClientExchangeFilter;
 
     @Bean
@@ -26,7 +22,6 @@ public class WebClientConfig {
         return WebClient.builder()
                         .baseUrl("http://static-service")
                         .filter(httpClientExchangeFilter)
-                        .filter(loadBalancedExchangeFilterFunction)
                         .build();
     }
 
@@ -35,7 +30,6 @@ public class WebClientConfig {
         return WebClient.builder()
                         .baseUrl("http://notification-service")
                         .filter(httpClientExchangeFilter)
-                        .filter(loadBalancedExchangeFilterFunction)
                         .build();
     }
 
