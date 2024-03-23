@@ -69,7 +69,7 @@ public class NotificationController {
     }
 
     @PostMapping("/{notificationId}/seen")
-    public ResponseEntity<EmptyResponse> markAsSeen(@PathVariable Long notificationId, Principal principal, 
+    public ResponseEntity<EmptyResponse> markAsSeen(@PathVariable String notificationId, Principal principal, 
         HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);

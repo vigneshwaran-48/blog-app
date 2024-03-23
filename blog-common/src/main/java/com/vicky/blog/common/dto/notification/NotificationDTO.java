@@ -12,7 +12,7 @@ public class NotificationDTO {
         ORGANIZATION
     }
     
-    private Long id;
+    private String id;
     private String userId;
     private String message;
     private String senderId;

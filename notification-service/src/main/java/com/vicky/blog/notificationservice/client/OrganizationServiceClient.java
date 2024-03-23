@@ -11,9 +11,9 @@ import com.vicky.blog.common.dto.organization.OrganizationResponseData;
 public interface OrganizationServiceClient {
     
     @GetExchange("/{organizationId}")
-    public OrganizationResponseData getOrganization(@PathVariable Long organizationId);
+    public OrganizationResponseData getOrganization(@PathVariable String organizationId);
 
     @GetExchange("/{organizationId}/notification/access")
-    public OrganizationPermissionResponse isUserHasNotificationAccess(@PathVariable Long organizationId);
+    public OrganizationPermissionResponse isUserHasNotificationAccess(@PathVariable String organizationId);
 
 }
