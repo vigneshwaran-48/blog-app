@@ -5,7 +5,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://vigneshwaran4817:hLKybDS12uC4F6Bj@applicationdb.j4suvxj.mongodb.net/ApplicationDB?retryWrites=true&w=majority&appName=ApplicationDB
+      uri: ${MONGODB_URI}
 
   autoconfigure:
     exclude:
