@@ -1,44 +1,33 @@
 package com.vicky.blog.staticservice.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO;
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO.ContentType;
 import com.vicky.blog.common.dto.staticservice.StaticResourceDTO.Visibility;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-
-@Entity
+@Document
 public class StaticResource {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private ContentType type = ContentType.TEXT_PLAIN;
 
-    @Lob
-    @Column(nullable = false, length = 100000)
     private byte[] data;
 
-    @Column(nullable = false)
     private Visibility visibility = Visibility.PUBLIC;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

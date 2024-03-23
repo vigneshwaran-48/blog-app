@@ -71,7 +71,7 @@ public class StaticResourceController {
             throw new AppException(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Error while parsing the resource");
         }
 
-        Long resourceId = staticService.addResource(userId, staticResource);
+        String resourceId = staticService.addResource(userId, staticResource);
 
         StaticResourceResponse response = new StaticResourceResponse();
         response.setId(resourceId);
@@ -84,7 +84,7 @@ public class StaticResourceController {
     }
 
     @GetMapping("/{resourceId}")
-    public ResponseEntity<?> getResource(@PathVariable("resourceId") Long resourceId, HttpServletRequest request, 
+    public ResponseEntity<?> getResource(@PathVariable("resourceId") String resourceId, HttpServletRequest request, 
         Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
@@ -101,7 +101,7 @@ public class StaticResourceController {
     }
 
     @DeleteMapping("/{resourceId}")
-    public ResponseEntity<?> deleteResource(@PathVariable("resourceId") Long resourceId, HttpServletRequest request, 
+    public ResponseEntity<?> deleteResource(@PathVariable("resourceId") String resourceId, HttpServletRequest request, 
         Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);

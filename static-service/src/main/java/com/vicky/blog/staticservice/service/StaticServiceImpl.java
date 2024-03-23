@@ -24,7 +24,7 @@ public class StaticServiceImpl implements StaticService {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaticServiceImpl.class);
 
     @Override
-    public Long addResource(String userId, StaticResourceDTO resource) throws AppException {
+    public String addResource(String userId, StaticResourceDTO resource) throws AppException {
 
         StaticResource staticResource = StaticResource.build(resource);
         staticResource.setUserId(userId);
@@ -36,7 +36,7 @@ public class StaticServiceImpl implements StaticService {
     }
 
     @Override
-    public Optional<StaticResourceDTO> getResource(String userId, Long resourceId) throws AppException {
+    public Optional<StaticResourceDTO> getResource(String userId, String resourceId) throws AppException {
         Optional<StaticResource> resource = staticResourceRepository.findById(resourceId);
         if(resource.isEmpty()) {
             return Optional.empty();
@@ -49,7 +49,7 @@ public class StaticServiceImpl implements StaticService {
     }
 
     @Override
-    public void deleteResource(String userId, Long resourceId) throws AppException {
+    public void deleteResource(String userId, String resourceId) throws AppException {
         Optional<StaticResource> resource = staticResourceRepository.findById(resourceId);
         if(resource.isEmpty()) {
             return;

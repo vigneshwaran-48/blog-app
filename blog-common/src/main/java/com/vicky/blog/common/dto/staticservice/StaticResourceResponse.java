@@ -8,11 +8,11 @@ public class StaticResourceResponse {
     private String message;
     private String path;
     private LocalDateTime time;
-    private Long id;
+    private String id;
 
     public StaticResourceResponse() {}
 
-    public StaticResourceResponse(int status, String message, String path, LocalDateTime time, Long id) {
+    public StaticResourceResponse(int status, String message, String path, LocalDateTime time, String id) {
         this.status = status;
         this.message = message;
         this.path = path;
@@ -44,10 +44,10 @@ public class StaticResourceResponse {
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
-    public Long getId() {
+    public String getId() {
         return id;
     }
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
