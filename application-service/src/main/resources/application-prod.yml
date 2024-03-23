@@ -1,7 +1,4 @@
 
-server:
-  port: 8082
-
 spring:
   data:
     mongodb:
@@ -17,3 +14,12 @@ spring:
         jwt:
           issuer-uri: https://accounts.google.com
           jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+
+logging:
+    level:
+        org:
+            springframework:
+                security: trace
+            web:
+                servlet:
+                    i18n: DEBUG
