@@ -1,15 +1,38 @@
+server:
+  port: 8082
 
 spring:
-    application:
-        name: application-service
-    main:
-        allow-circular-references: true
-    
+  application:
+    name: application-service
+  main:
+    allow-circular-references: true
+
+  profiles:
+    active: development
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+          jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+
 logging:
-    level:
-        org:
-            springframework:
-                security: trace
-            web:
-                servlet:
-                    i18n: DEBUG
+  level:
+    org:
+      springframework:
+        security: trace
+      web:
+        servlet:
+          i18n: DEBUG

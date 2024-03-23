@@ -14,7 +14,7 @@ public class ServerPortCustomizer implements WebServerFactoryCustomizer<Configur
         String port = System.getenv("X_ZOHO_CATALYST_LISTEN_PORT");
         int listenPort;
         if(port != null && !port.isEmpty()) {
-            listenPort = Integer.parseInt(System.getenv("X_ZOHO_CATALYST_LISTEN_PORT"));
+            listenPort = Integer.parseInt(port);
         } else {
             listenPort = 9000;
         }

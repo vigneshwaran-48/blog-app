@@ -1,17 +1,7 @@
 
-server:
-  port: 7000
-
 spring:
     application:
         name: api-gateway
-    config:
-        import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: https://service-registry-50018270010.development.catalystappsail.in/eureka/
 
 logging:
     level:
