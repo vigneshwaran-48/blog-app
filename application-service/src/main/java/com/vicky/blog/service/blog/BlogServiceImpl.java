@@ -2,6 +2,7 @@ package com.vicky.blog.service.blog;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.NotificationService;
@@ -30,6 +32,7 @@ import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
+import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.mongo.BlogMongoRepository;
 
 @Service
@@ -252,4 +255,28 @@ public class BlogServiceImpl implements BlogService {
         updateBlog(userId, blogDTO);
         LOGGER.info("UnPublished blog {}", blogId);
 	}
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
+    public List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException {
+        List<Blog> blogs = blogRepository.findAll();
+        List<BlogDTO> blogsUserHasAcces = new LinkedList<>();
+        for (Blog blog : blogs) {
+            ProfileId publishedProfile = blog.getPublishedAt();
+            if (publishedProfile.getType() == ProfileType.ORGANIZATION) {
+                try {
+                    organizationService.getOrganization(userId, publishedProfile.getEntityId());
+                } catch (OrganizationNotAccessible e) {
+                    // Ignoring
+                    // If this happens then the user not have access to the organization
+                    // publishin blogs.
+                    LOGGER.info("User {} not have access to the blog {}", userId, blog.getId());
+                    continue;
+                }
+            }
+            blogsUserHasAcces.add(blog.toDTO());
+        }
+        return blogsUserHasAcces;
+    }
 }

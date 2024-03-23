@@ -123,10 +123,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         if(organization.get().getVisibility() == Visibility.PRIVATE 
                 && !organization.get().getOwner().getId().equals(userId)) {
 
-            List<OrganizationUser> orgUsers = organizationUserRepository.findByOrganizationId(id);
-            boolean isPresent = orgUsers.stream().anyMatch(orgUser -> orgUser.getUser().getId().equals(userId));
-
-            if(!isPresent) {
+            if(!organizationUserRepository.existsByOrganizationIdAndUserId(id, userId)) {
                 LOGGER.warn("Illegal access on organization {} by user {}", id, userId);
                 throw new OrganizationNotAccessible();
             }
@@ -371,6 +368,21 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         return orgUser.get().getRole() == UserOrganizationRole.ADMIN 
                     || orgUser.get().getRole() == UserOrganizationRole.MODERATOR;
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<OrganizationDTO> getOrganizationsVisibleToUser(String userId) throws AppException {
+        List<Organization> organizations = organizationRepository.findAll();
+        return organizations.stream()
+                    .filter(organization -> 
+                                    organizationUserRepository
+                                                .existsByOrganizationIdAndUserId(organization.getId(), userId)
+                                    ||
+                                    organization.getVisibility() == Visibility.PUBLIC
+                           )
+                    .map(organization -> organization.toDTO(null))
+                    .collect(Collectors.toList());
     }
 
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {

@@ -38,4 +38,6 @@ public interface OrganizationService {
             throws AppException;
 
     boolean isUserHasAccessToNotification(String userId, String organizationId) throws AppException;
+
+    List<OrganizationDTO> getOrganizationsVisibleToUser(String userId) throws AppException;
 }

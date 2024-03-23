@@ -21,4 +21,6 @@ public interface OrganizationUserMongoRepository extends MongoRepository<Organiz
     void deleteByOrganizationIdAndUserId(String organizationId, String userId);
 
     void deleteByOrganizationId(String organizationId);
+
+    boolean existsByOrganizationIdAndUserId(String organizationId, String userId);
 }

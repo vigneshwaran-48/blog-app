@@ -25,4 +25,6 @@ public interface BlogService {
     Optional<BlogDTO> getBlogOfProfile(String userId, String blogId, String profileId) throws AppException;
 
     List<BlogDTO> getAllBlogsOfProfile(String userId, String profileId) throws AppException;
+
+    List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException;
 }
