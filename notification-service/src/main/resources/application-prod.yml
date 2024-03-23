@@ -3,6 +3,10 @@
 spring:
     application:
         name: notification-service
+
+    data:
+        mongodb:
+            uri: ${MONGODB_URI}
     
     autoconfigure:
         exclude:
@@ -19,7 +23,7 @@ spring:
 
 services:
     api-gateway:
-        base: http://api-gateway:7000
+        base: https://api-gateway-50018270010.development.catalystappsail.in
 
 logging:
     level:
