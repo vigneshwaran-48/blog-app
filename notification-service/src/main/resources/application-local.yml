@@ -1,3 +1,7 @@
+
+server:
+  port: 8086
+
 spring:
     application:
         name: notification-service
@@ -18,6 +22,12 @@ spring:
             - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
             - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
+            database: notification
+
     security:
         oauth2:
             resourceserver:

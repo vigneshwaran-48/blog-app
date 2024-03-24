@@ -108,5 +108,11 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         return response.isHasPermission();
     }
+
+    @Override
+    public List<OrganizationDTO> getOrganizationsVisibleToUser(String userId) throws AppException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getOrganizationsVisibleToUser'");
+    }
     
 }
