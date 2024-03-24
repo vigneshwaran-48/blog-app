@@ -1,29 +1,24 @@
 package com.vicky.blog.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+
 import com.vicky.blog.common.dto.follower.FollowDTO;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
+@Document
 @Data
-@Entity
 public class Follow {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @JoinColumn(name = "user_profile_id", nullable = false)
-    @ManyToOne
+    @DocumentReference
     private ProfileId userProfile;
 
-    @JoinColumn(name = "follower_id", nullable = false)
-    @ManyToOne
+    @DocumentReference
     private ProfileId follower;
 
     public FollowDTO toDTO() {

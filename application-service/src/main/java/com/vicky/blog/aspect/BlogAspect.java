@@ -30,7 +30,7 @@ public class BlogAspect {
     public void validateBlogId(JoinPoint joinPoint, BlogIdValidator blogIdValidator) throws AppException {
 
         Object[] args = joinPoint.getArgs();
-        Long blogId = (Long) args[blogIdValidator.blogIdPosition()];
+        String blogId = (String) args[blogIdValidator.blogIdPosition()];
         String userId = (String) args[blogIdValidator.userIdPosition()];
 
         if(userId == null) {

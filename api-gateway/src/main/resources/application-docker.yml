@@ -1,0 +1,19 @@
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+        routes:
+            - id: application-service
+              uri: http://application-service:8082
+              predicates:
+                - Path=/api/v1/app/**
+            - id: static-service
+              uri: http://static-service:8083
+              predicates:
+                - Path=/static/**
+            - id: notification-service
+              uri: http://notification-service:8086
+              predicates:
+                - Path=/api/v1/notification/**

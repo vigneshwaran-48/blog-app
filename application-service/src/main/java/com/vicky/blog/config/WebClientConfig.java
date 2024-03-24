@@ -1,7 +1,7 @@
 package com.vicky.blog.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.loadbalancer.reactive.LoadBalancedExchangeFilterFunction;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,33 +16,23 @@ import com.vicky.blog.filter.HTTPClientExchangeFilter;
 public class WebClientConfig {
     
     @Autowired
-    private LoadBalancedExchangeFilterFunction loadBalancedExchangeFilterFunction;
-
-    @Autowired
     private HTTPClientExchangeFilter httpClientExchangeFilter;
 
-    @Bean
-    WebClient staticServiceWebClient() {
-        return WebClient.builder()
-                        .baseUrl("http://static-service")
-                        .filter(httpClientExchangeFilter)
-                        .filter(loadBalancedExchangeFilterFunction)
-                        .build();
-    }
+    @Value("${services.api-gateway.base}")
+    private String apiGatewayBase;
 
     @Bean
-    WebClient notificationServiceWebClient() {
+    WebClient apiGatewayWebClient() {
         return WebClient.builder()
-                        .baseUrl("http://notification-service")
+                        .baseUrl(apiGatewayBase)
                         .filter(httpClientExchangeFilter)
-                        .filter(loadBalancedExchangeFilterFunction)
                         .build();
     }
 
     @Bean
     StaticServiceClient staticServiceClient() {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                                                            .builder(WebClientAdapter.forClient(staticServiceWebClient()))
+                                                            .builder(WebClientAdapter.forClient(apiGatewayWebClient()))
                                                             .build();
         return factory.createClient(StaticServiceClient.class);                
     }
@@ -50,7 +40,7 @@ public class WebClientConfig {
     @Bean
     NotificationServiceClient notificationServiceClient() {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                                                        .builder(WebClientAdapter.forClient(notificationServiceWebClient()))
+                                                        .builder(WebClientAdapter.forClient(apiGatewayWebClient()))
                                                         .build();
         return factory.createClient(NotificationServiceClient.class);
     }

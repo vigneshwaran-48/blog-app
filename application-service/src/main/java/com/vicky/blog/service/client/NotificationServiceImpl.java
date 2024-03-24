@@ -34,7 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void markAsRead(String userId, Long notificationId) throws AppException {
+    public void markAsRead(String userId, String notificationId) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'markAsRead'");
     }

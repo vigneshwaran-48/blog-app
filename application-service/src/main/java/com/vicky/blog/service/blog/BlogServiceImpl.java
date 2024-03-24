@@ -2,6 +2,7 @@ package com.vicky.blog.service.blog;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.NotificationService;
@@ -30,7 +32,8 @@ import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
-import com.vicky.blog.repository.BlogRepository;
+import com.vicky.blog.model.ProfileId;
+import com.vicky.blog.repository.mongo.BlogMongoRepository;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -38,7 +41,7 @@ public class BlogServiceImpl implements BlogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlogServiceImpl.class);
 
     @Autowired
-    private BlogRepository blogRepository;
+    private BlogMongoRepository blogRepository;
 
     @Autowired
     private UserService userService;
@@ -60,7 +63,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public Long addBlog(String userId, BlogDTO blogDTO) throws AppException {
+    public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
 
         UserDTO user = userService.getUser(userId).get();
         blogDTO.setOwner(user);
@@ -81,7 +84,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public Optional<BlogDTO> getBlog(String userId, Long id) throws AppException {
+    public Optional<BlogDTO> getBlog(String userId, String id) throws AppException {
         
         Optional<Blog> blog = blogRepository.findById(id);
 
@@ -129,7 +132,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public void deleteBlog(String userId, Long id) throws AppException {
+    public void deleteBlog(String userId, String id) throws AppException {
         blogRepository.deleteByOwnerIdAndId(userId, id);
     }
 
@@ -156,7 +159,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    public void publishBlog(String userId, Long blogId, String publishAt) throws AppException {
+    public void publishBlog(String userId, String blogId, String publishAt) throws AppException {
         UserDTO user = userService.getUser(userId).get();
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(publishAt).orElseThrow(
                                 () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
@@ -171,7 +174,7 @@ public class BlogServiceImpl implements BlogService {
         }
         else {
             // Validating does user can access organization.
-            organizationDTO = organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId())).get();
+            organizationDTO = organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
 
         blogDTO.setPublised(true);
@@ -199,16 +202,16 @@ public class BlogServiceImpl implements BlogService {
     
     @Override
     @UserIdValidator(positions = 0)
-    public Optional<BlogDTO> getBlogOfProfile(String userId, Long blogId, String profileId) throws AppException {
+    public Optional<BlogDTO> getBlogOfProfile(String userId, String blogId, String profileId) throws AppException {
 
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
                                 () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
 
         if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             // Validating does user can access organization.
-            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId())).get();
+            organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
-        Optional<Blog> blog = blogRepository.findByIdAndPublishedAtProfileId(blogId, profileId);
+        Optional<Blog> blog = blogRepository.findByIdAndPublishedAtId(blogId, profileIdDTO.getId());
         if(blog.isEmpty()) {
             // If the user wants to see his own blog with his profileId
             // But Not getting userId from profileDTO because it will lead to anyone can
@@ -231,16 +234,16 @@ public class BlogServiceImpl implements BlogService {
 
         if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             // Validating does user can access organization.
-            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId())).get();
+            organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
-        List<Blog> blogs = blogRepository.findByPublishedAtProfileId(profileId);
+        List<Blog> blogs = blogRepository.findByPublishedAtId(profileIdDTO.getId());
         return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
 	}
 
 	@Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-	public void unPublishBlog(String userId, Long blogId) throws AppException {
+	public void unPublishBlog(String userId, String blogId) throws AppException {
         BlogDTO blogDTO = getAllBlogsOfUser(userId)
                                 .stream()
                                 .filter(blog -> blog.getId().equals(blogId))
@@ -252,4 +255,28 @@ public class BlogServiceImpl implements BlogService {
         updateBlog(userId, blogDTO);
         LOGGER.info("UnPublished blog {}", blogId);
 	}
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
+    public List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException {
+        List<Blog> blogs = blogRepository.findAll();
+        List<BlogDTO> blogsUserHasAcces = new LinkedList<>();
+        for (Blog blog : blogs) {
+            ProfileId publishedProfile = blog.getPublishedAt();
+            if (publishedProfile.getType() == ProfileType.ORGANIZATION) {
+                try {
+                    organizationService.getOrganization(userId, publishedProfile.getEntityId());
+                } catch (OrganizationNotAccessible e) {
+                    // Ignoring
+                    // If this happens then the user not have access to the organization
+                    // publishin blogs.
+                    LOGGER.info("User {} not have access to the blog {}", userId, blog.getId());
+                    continue;
+                }
+            }
+            blogsUserHasAcces.add(blog.toDTO());
+        }
+        return blogsUserHasAcces;
+    }
 }

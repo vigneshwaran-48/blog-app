@@ -29,9 +29,9 @@ public class CommentAspect {
     @Before("@annotation(commentIdValidator)")
     public void validateBlogId(JoinPoint joinPoint, CommentIdValidator commentIdValidator) throws AppException {
         Object[] args = joinPoint.getArgs();
-        Long blogId = (Long) args[commentIdValidator.blogIdPosition()];
+        String blogId = (String) args[commentIdValidator.blogIdPosition()];
         String userId = (String) args[commentIdValidator.userIdPosition()];
-        Long commentId = (Long) args[commentIdValidator.commentIdPosition()];
+        String commentId = (String) args[commentIdValidator.commentIdPosition()];
 
         if(userId == null) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, 

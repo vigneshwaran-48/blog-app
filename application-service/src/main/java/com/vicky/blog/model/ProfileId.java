@@ -1,48 +1,25 @@
 package com.vicky.blog.model;
 
-import com.google.cloud.firestore.annotation.PropertyName;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import lombok.Data;
 
-@Entity
+@Document
 @Data
 public class ProfileId {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(name = "profile_id", unique = true)
     private String profileId;
 
-    @PropertyName("entity_id")
-    @Column(name = "entity_id", unique = true)
     private String entityId;
 
-    @Column(nullable = false)
     private ProfileType type;
-
-    @Transient
-    private ProfileType profileType;
-
-    @PropertyName("profile_type")
-    public String getProfileType() {
-        return type.name();
-    }
-
-    @PropertyName("profile_type")
-    public void setProfileType(String typeName) {
-        profileType = ProfileType.valueOf(typeName);
-        type = ProfileType.valueOf(typeName);
-    }
 
     public ProfileIdDTO toDTO() {
         ProfileIdDTO profileIdDTO = new ProfileIdDTO();

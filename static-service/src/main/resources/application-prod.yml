@@ -2,14 +2,10 @@
 spring:
     application:
         name: static-service
-    config:
-        import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
 
-    datasource:
-        url:
-        username:
-        password:
-        driver-class-name:
+    data:
+        mongodb:
+            uri: ${MONGODB_URI}
 
     autoconfigure:
         exclude:
@@ -22,6 +18,11 @@ spring:
                 jwt:
                     issuer-uri: https://accounts.google.com
                     jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+
+
+services:
+    api-gateway:
+        base: https://api-gateway-50018270010.development.catalystappsail.in
 
 logging:
     level:

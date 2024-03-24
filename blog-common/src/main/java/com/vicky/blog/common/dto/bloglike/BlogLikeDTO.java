@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class BlogLikeDTO {
     
-    private Long id;
+    private String id;
     private BlogDTO blog;
     private UserDTO user;
     

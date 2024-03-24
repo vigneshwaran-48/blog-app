@@ -28,8 +28,8 @@ import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Organization;
 import com.vicky.blog.model.OrganizationUser;
 import com.vicky.blog.model.User;
-import com.vicky.blog.repository.OrganizationRepository;
-import com.vicky.blog.repository.OrganizationUserRepository;
+import com.vicky.blog.repository.mongo.OrganizationMongoRepository;
+import com.vicky.blog.repository.mongo.OrganizationUserMongoRepository;
 
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
@@ -40,10 +40,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     private UserService userService;
 
     @Autowired
-    private OrganizationRepository organizationRepository;
+    private OrganizationMongoRepository organizationRepository;
 
     @Autowired
-    private OrganizationUserRepository organizationUserRepository;
+    private OrganizationUserMongoRepository organizationUserRepository;
 
     @Autowired
     private OrganizationUtil organizationUtil;
@@ -111,7 +111,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public Optional<OrganizationDTO> getOrganization(String userId, Long id) throws AppException {
+    public Optional<OrganizationDTO> getOrganization(String userId, String id) throws AppException {
         
         Optional<Organization> organization = organizationRepository.findById(id);
 
@@ -123,10 +123,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         if(organization.get().getVisibility() == Visibility.PRIVATE 
                 && !organization.get().getOwner().getId().equals(userId)) {
 
-            List<OrganizationUser> orgUsers = organizationUserRepository.findByOrganizationId(id);
-            boolean isPresent = orgUsers.stream().anyMatch(orgUser -> orgUser.getUser().getId().equals(userId));
-
-            if(!isPresent) {
+            if(!organizationUserRepository.existsByOrganizationIdAndUserId(id, userId)) {
                 LOGGER.warn("Illegal access on organization {} by user {}", id, userId);
                 throw new OrganizationNotAccessible();
             }
@@ -137,7 +134,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public boolean deleteOrganization(String userId, Long id) throws AppException {
+    public boolean deleteOrganization(String userId, String id) throws AppException {
         Optional<Organization> organization = organizationRepository.findById(id);
         if(organization.isEmpty()) {
             LOGGER.error("Organization {} does not exists", id);
@@ -162,7 +159,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public Optional<OrganizationUserDTO> addUserToOrganization(String userId, Long organizationId, String userToAdd)
+    public Optional<OrganizationUserDTO> addUserToOrganization(String userId, String organizationId, String userToAdd)
             throws AppException {
         
         UserDTO userToAddDto = getUser(userToAdd);
@@ -194,7 +191,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public Optional<OrganizationUserDTO> addUsersToOrganization(String userId, Long organizationId,
+    public Optional<OrganizationUserDTO> addUsersToOrganization(String userId, String organizationId,
             List<String> usersToAdd) throws AppException {
         OrganizationUserDTO organizationUserDTO = new OrganizationUserDTO();
         organizationUserDTO.setOrganization(getOrganization(userId, organizationId).get());
@@ -209,7 +206,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId)
+    public Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, String organizationId)
             throws AppException {
         Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
 
@@ -228,7 +225,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove)
+    public void removeUsersFromOrganization(String userId, String organizationId, List<String> usersToRemove)
             throws AppException {
         
         getOrganization(userId, organizationId); // Validating organization
@@ -270,7 +267,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public void changePermissionForUser(String userId, Long organizationId, String userToChangePermission,
+    public void changePermissionForUser(String userId, String organizationId, String userToChangePermission,
             UserOrganizationRole role) throws AppException {
         
         Optional<OrganizationDTO> organization = getOrganization(userId, organizationId);
@@ -363,7 +360,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public boolean isUserHasAccessToNotification(String userId, Long organizationId) throws AppException {
+    public boolean isUserHasAccessToNotification(String userId, String organizationId) throws AppException {
         Optional<OrganizationUser> orgUser = organizationUserRepository
                                                 .findByOrganizationIdAndUserId(organizationId, userId);
         if(orgUser.isEmpty()) {
@@ -371,6 +368,21 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         return orgUser.get().getRole() == UserOrganizationRole.ADMIN 
                     || orgUser.get().getRole() == UserOrganizationRole.MODERATOR;
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<OrganizationDTO> getOrganizationsVisibleToUser(String userId) throws AppException {
+        List<Organization> organizations = organizationRepository.findAll();
+        return organizations.stream()
+                    .filter(organization -> 
+                                    organizationUserRepository
+                                                .existsByOrganizationIdAndUserId(organization.getId(), userId)
+                                    ||
+                                    organization.getVisibility() == Visibility.PUBLIC
+                           )
+                    .map(organization -> organization.toDTO(null))
+                    .collect(Collectors.toList());
     }
 
     private OrganizationUser addUserToOrg(Organization organization, User user, UserOrganizationRole role) {
@@ -404,7 +416,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         return dto;
     }
 
-    private OrganizationUser getNextAdmin(String currentAdmin, Long organizationId) throws AppException {
+    private OrganizationUser getNextAdmin(String currentAdmin, String organizationId) throws AppException {
 
         List<OrganizationUser> moderators = organizationUserRepository
                     .findByOrganizationIdAndRole(organizationId, UserOrganizationRole.MODERATOR);

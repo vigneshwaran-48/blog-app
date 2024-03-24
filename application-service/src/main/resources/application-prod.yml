@@ -1,18 +1,13 @@
 
 spring:
-  config:
-    import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
-
-  datasource:
-    url:
-    username:
-    password:
-    driver-class-name:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
 
   autoconfigure:
     exclude:
-        - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   security:
     oauth2:
       resourceserver:
@@ -20,8 +15,15 @@ spring:
           issuer-uri: https://accounts.google.com
           jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 
+services:
+  api-gateway:
+    base: https://api-gateway-50018270010.development.catalystappsail.in
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: https://service-registry-50018270010.development.catalystappsail.in/eureka/
+logging:
+    level:
+        org:
+            springframework:
+                security: trace
+            web:
+                servlet:
+                    i18n: DEBUG

@@ -10,11 +10,11 @@ import lombok.Data;
 @Data
 public class CommentDTO {
     
-    private Long id;
+    private String id;
     private String content;
     private UserDTO commentBy;
     private CommentDTO parentComment;
-    private Long blogId;
+    private String blogId;
     private List<CommentDTO> threads;
     private LocalDateTime commentedTime;
     private int commentLikesCount;

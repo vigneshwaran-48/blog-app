@@ -37,7 +37,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<OrganizationDTO> getOrganization(String userId, Long id) throws AppException {
+    public Optional<OrganizationDTO> getOrganization(String userId, String id) throws AppException {
         
         OrganizationResponseData response = organizationServiceClient.getOrganization(id);
         if(response.getStatus() != HttpStatus.SC_OK) {
@@ -47,41 +47,41 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public boolean deleteOrganization(String userId, Long id) throws AppException {
+    public boolean deleteOrganization(String userId, String id) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteOrganization'");
     }
 
     @Override
-    public Optional<OrganizationUserDTO> addUserToOrganization(String userId, Long organizationId, String userToAdd)
+    public Optional<OrganizationUserDTO> addUserToOrganization(String userId, String organizationId, String userToAdd)
             throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addUserToOrganization'");
     }
 
     @Override
-    public Optional<OrganizationUserDTO> addUsersToOrganization(String userId, Long organizationId,
+    public Optional<OrganizationUserDTO> addUsersToOrganization(String userId, String organizationId,
             List<String> usersToAdd) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addUsersToOrganization'");
     }
 
     @Override
-    public Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, Long organizationId)
+    public Optional<OrganizationUserDTO> getUsersOfOrganization(String userId, String organizationId)
             throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getUsersOfOrganization'");
     }
 
     @Override
-    public void removeUsersFromOrganization(String userId, Long organizationId, List<String> usersToRemove)
+    public void removeUsersFromOrganization(String userId, String organizationId, List<String> usersToRemove)
             throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'removeUsersFromOrganization'");
     }
 
     @Override
-    public void changePermissionForUser(String userId, Long organizationId, String userToChangePermission,
+    public void changePermissionForUser(String userId, String organizationId, String userToChangePermission,
             UserOrganizationRole role) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'changePermissionForUser'");
@@ -101,12 +101,18 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public boolean isUserHasAccessToNotification(String userId, Long organizationId) throws AppException {
+    public boolean isUserHasAccessToNotification(String userId, String organizationId) throws AppException {
         OrganizationPermissionResponse response = organizationServiceClient.isUserHasNotificationAccess(organizationId);
         if(response.getStatus() != HttpStatus.SC_OK) {
             throw new AppException(response.getStatus(), response.getMessage());
         }
         return response.isHasPermission();
+    }
+
+    @Override
+    public List<OrganizationDTO> getOrganizationsVisibleToUser(String userId) throws AppException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getOrganizationsVisibleToUser'");
     }
     
 }

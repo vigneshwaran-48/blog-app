@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class BlogDTO {
     
-    private Long id;
+    private String id;
     private String title;
     private String content;
     private String image;

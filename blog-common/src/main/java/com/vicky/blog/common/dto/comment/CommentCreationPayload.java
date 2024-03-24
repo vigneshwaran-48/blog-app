@@ -6,6 +6,6 @@ import lombok.Data;
 public class CommentCreationPayload {
     
     private String content;
-    private Long parentCommentId;
+    private String parentCommentId;
 
 }

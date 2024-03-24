@@ -65,15 +65,6 @@ Responsibilities:
 Users can add tags to their posts and also give the tags in which they are interested.
 
 
-Group Management:
-
-Feature: Group
-Responsibilities:
-Create, update, and delete groups
-Manage roles and permissions within groups
-Facilitate group-specific interactions and discussions
-
-
 Public Content Management:
 
 Feature: Public
@@ -119,11 +110,3 @@ Responsibilities:
 Manage user identities, tokens, and authentication
 Provide OAuth2 or other authentication services
 
-
-comment
-
-id: Long,
-content: String,
-comment_by: User,
-parent_comment: comment,
-blog_id: Blog

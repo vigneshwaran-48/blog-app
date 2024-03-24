@@ -2,46 +2,35 @@ package com.vicky.blog.notificationservice.model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.vicky.blog.common.dto.notification.NotificationDTO;
 import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSenderType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
-@Entity
+@Document
 public class Notification {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
     private String message;
     
-    @Column(nullable = false)
     private String userId;
 
-    @Column(nullable = false)
     private LocalDateTime time;
     
-    @Column(nullable = false, name = "sender_id")
     private String senderId;
 
-    @Column(nullable = false, name = "sender_name")
     private String senderName;
 
-    @Column(nullable = false, name = "sender_image")
     private String senderImage;
 
-    @Column(nullable = false, name = "sender_type")
     private NotificationSenderType senderType;
 
-    @Column(nullable = false, name = "isSeen")
     private boolean isSeen;
 
     public static Notification build(NotificationDTO notificationDTO) {
@@ -71,7 +60,7 @@ public class Notification {
         notificationDTO.setSenderName(senderName);
 
         if(senderType == NotificationSenderType.ORGANIZATION) {
-            notificationDTO.setOrganizationId(Long.parseLong(senderId));
+            notificationDTO.setOrganizationId(senderId);
         }
         return notificationDTO;
     }

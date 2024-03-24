@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class FollowDTO {
     
-    private Long id;
+    private String id;
     private ProfileIdDTO profile;
     private ProfileIdDTO follower;
 }

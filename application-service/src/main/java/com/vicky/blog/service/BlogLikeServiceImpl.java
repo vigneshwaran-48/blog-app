@@ -21,14 +21,14 @@ import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.BlogLike;
 import com.vicky.blog.model.User;
-import com.vicky.blog.repository.BlogLikeRepository;
+import com.vicky.blog.repository.mongo.BlogLikeMongoRepository;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 
 @Service
 public class BlogLikeServiceImpl implements BlogLikeService {
 
     @Autowired
-    private BlogLikeRepository blogLikeRepository;
+    private BlogLikeMongoRepository blogLikeRepository;
 
     @Autowired
     private BlogService blogService;
@@ -43,7 +43,7 @@ public class BlogLikeServiceImpl implements BlogLikeService {
 
     @Override
     @UserIdValidator(positions = 1)
-    public Optional<BlogLikeDTO> addLike(Long blogId, String userId, String profileId) throws AppException {
+    public Optional<BlogLikeDTO> addLike(String blogId, String userId, String profileId) throws AppException {
         UserDTO user = userService.getUser(userId).get();
         BlogDTO blog = getBlog(userId, profileId, blogId);
 
@@ -65,7 +65,7 @@ public class BlogLikeServiceImpl implements BlogLikeService {
     }
 
     @Override
-    public void removeLike(Long blogId, String userId, String profileId) throws AppException {
+    public void removeLike(String blogId, String userId, String profileId) throws AppException {
         // Just validating given details.
         getUser(userId);
         getBlog(userId, profileId, blogId);
@@ -74,7 +74,7 @@ public class BlogLikeServiceImpl implements BlogLikeService {
     }
 
     @Override
-    public List<BlogLikeDTO> getLikesOfBlog(String userId, Long blogId, String profileId) throws AppException {
+    public List<BlogLikeDTO> getLikesOfBlog(String userId, String blogId, String profileId) throws AppException {
         // Just validating given details.
         getUser(userId);
         getBlog(userId, profileId, blogId);
@@ -95,7 +95,7 @@ public class BlogLikeServiceImpl implements BlogLikeService {
         return user.get();
     }
 
-    private BlogDTO getBlog(String userId, String profileId, Long blogId) throws AppException {
+    private BlogDTO getBlog(String userId, String profileId, String blogId) throws AppException {
         Optional<BlogDTO> blog = blogService.getBlogOfProfile(userId, blogId, profileId);
         if(blog.isEmpty()) {
             LOG.error("Blog {} not exists", userId);

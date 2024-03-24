@@ -53,7 +53,7 @@ public class NotificationServiceImpl implements NotificationService {
         String senderImage = user.get().getImage();
 
         if(notification.getSenderType() == NotificationSenderType.ORGANIZATION) {
-            Long organizationId = notification.getOrganizationId();
+            String organizationId = notification.getOrganizationId();
             if(organizationId == null) {
                 throw new AppException(HttpStatus.SC_BAD_REQUEST, "Organization Id is required!");
             }
@@ -97,7 +97,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void markAsRead(String userId, Long notificationId) throws AppException {
+    public void markAsRead(String userId, String notificationId) throws AppException {
         Optional<UserDTO> user = userService.getUser(userId);
         if(user.isEmpty()) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "User" + userId + " not exists!");

@@ -16,7 +16,6 @@ import com.vicky.blog.annotation.ProfileIdValidator;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.exception.AppException;
-import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.service.I18NMessages;
@@ -83,7 +82,7 @@ public class ProfileIdAspect {
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).get();
         if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             // Checking user has access to this organization...
-            organizationService.getOrganization(userId, Long.parseLong(profileIdDTO.getEntityId()));
+            organizationService.getOrganization(userId, profileIdDTO.getEntityId());
         }
     }
 }

@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -92,7 +91,7 @@ public class OrganizationController {
     }
 
     @GetMapping("/{organizationId}")
-    public ResponseEntity<?> getOrganization(@PathVariable Long organizationId, HttpServletRequest request, 
+    public ResponseEntity<?> getOrganization(@PathVariable String organizationId, HttpServletRequest request, 
             Principal principal) throws AppException {
         
         String userId = userIdExtracter.getUserId(principal);
@@ -110,7 +109,7 @@ public class OrganizationController {
     }
 
     @DeleteMapping("/{organizationId}")
-    public ResponseEntity<?> deleteOrganization(@PathVariable Long organizationId, HttpServletRequest request, 
+    public ResponseEntity<?> deleteOrganization(@PathVariable String organizationId, HttpServletRequest request, 
             Principal principal) throws AppException {
         
         String userId = userIdExtracter.getUserId(principal);
@@ -149,7 +148,7 @@ public class OrganizationController {
     }
 
     @PostMapping("/{organizationId}/user")
-    public ResponseEntity<?> addUserToOrganization(@PathVariable Long organizationId, 
+    public ResponseEntity<?> addUserToOrganization(@PathVariable String organizationId, 
                         @RequestParam("usersToAdd") List<String> usersToAdd,
                         HttpServletRequest request, Principal principal) throws AppException {
 
@@ -167,7 +166,7 @@ public class OrganizationController {
     }
 
     @GetMapping("/{organizationId}/user")
-    public ResponseEntity<?> getUsersOfOrganization(@PathVariable Long organizationId, HttpServletRequest request, 
+    public ResponseEntity<?> getUsersOfOrganization(@PathVariable String organizationId, HttpServletRequest request, 
         Principal principal) throws AppException {
         
         String userId = userIdExtracter.getUserId(principal);
@@ -184,7 +183,7 @@ public class OrganizationController {
     }
 
     @DeleteMapping("/{organizationId}/user")
-    public ResponseEntity<?> removeUsersFromOrganization(@PathVariable Long organizationId,
+    public ResponseEntity<?> removeUsersFromOrganization(@PathVariable String organizationId,
                         @RequestParam List<String> usersToRemove,
                         HttpServletRequest request, Principal principal) throws AppException {
                         
@@ -201,7 +200,7 @@ public class OrganizationController {
     }
 
     @PutMapping("/{organizationId}/user/{userToChange}")
-    public ResponseEntity<?> changePermissionOfUser(@PathVariable Long organizationId, @PathVariable String userToChange, 
+    public ResponseEntity<?> changePermissionOfUser(@PathVariable String organizationId, @PathVariable String userToChange, 
             @RequestParam UserOrganizationRole role, HttpServletRequest request, Principal principal) throws AppException {
         
         String userId = userIdExtracter.getUserId(principal);
@@ -217,7 +216,7 @@ public class OrganizationController {
     }
 
     @GetMapping("/{organizationId}/notification/access")
-    public ResponseEntity<?> isUserHasNotificationAccess(@PathVariable Long organizationId, HttpServletRequest request, 
+    public ResponseEntity<?> isUserHasNotificationAccess(@PathVariable String organizationId, HttpServletRequest request, 
         Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);

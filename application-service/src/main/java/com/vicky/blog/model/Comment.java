@@ -2,41 +2,32 @@ package com.vicky.blog.model;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+
 import com.vicky.blog.common.dto.comment.CommentDTO;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
-@Entity
+@Document
 @Data
 public class Comment {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "comment_by", nullable = false)
+    @DocumentReference
     private User commentBy;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_comment_id")
+    @DocumentReference
     private Comment parentComment;
     
-    @ManyToOne
-    @JoinColumn(name = "blog_id", nullable = false)
+    @DocumentReference
     private Blog blog;
 
-    @Column(name = "commented_time", nullable = false)
     private LocalDateTime commentedTime;
 
     public static Comment build(CommentDTO commentDTO) {

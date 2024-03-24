@@ -12,7 +12,7 @@ public class NotificationDTO {
         ORGANIZATION
     }
     
-    private Long id;
+    private String id;
     private String userId;
     private String message;
     private String senderId;
@@ -21,6 +21,6 @@ public class NotificationDTO {
     private LocalDateTime time;
     private boolean isSeen;
     private NotificationSenderType senderType;
-    private Long organizationId;
+    private String organizationId;
     
 }

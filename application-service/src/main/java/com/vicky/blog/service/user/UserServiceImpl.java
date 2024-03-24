@@ -17,7 +17,7 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.User;
-import com.vicky.blog.repository.UserRepository;
+import com.vicky.blog.repository.mongo.UserMongoRepository;
 import com.vicky.blog.service.I18NMessages;
 import com.vicky.blog.service.I18NMessages.I18NMessage;
 import com.vicky.blog.service.profileId.ProfileIdUtil;
@@ -26,7 +26,7 @@ import com.vicky.blog.service.profileId.ProfileIdUtil;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserMongoRepository userRepository;
 
     @Autowired
     private I18NMessages i18nMessages;

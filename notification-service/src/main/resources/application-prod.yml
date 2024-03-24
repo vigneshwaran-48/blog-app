@@ -3,15 +3,11 @@
 spring:
     application:
         name: notification-service
-    config:
-        import: "optional:configserver:https://config-service-50018270010.development.catalystappsail.in"
 
-    datasource:
-        url:
-        username:
-        password:
-        driver-class-name:
-
+    data:
+        mongodb:
+            uri: ${MONGODB_URI}
+    
     autoconfigure:
         exclude:
             - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -27,7 +23,7 @@ spring:
 
 services:
     api-gateway:
-        base: http://api-gateway:7000
+        base: https://api-gateway-50018270010.development.catalystappsail.in
 
 logging:
     level:

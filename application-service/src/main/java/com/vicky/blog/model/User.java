@@ -1,12 +1,10 @@
 package com.vicky.blog.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserDTO.Theme;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
 
 /**
  * 
@@ -14,28 +12,22 @@ import jakarta.persistence.Id;
  * application level. Email id will be used to contact the user.
  * 
  */
-@Entity
-public class User {
+@Document
+ public class User {
     
     @Id
-    @Column(nullable = false, unique = true)
     private String id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private int age;
 
-    @Column(nullable = false, unique = true)
     private String email;
 
     private String description;
 
-    @Column(nullable = false)
     private Theme theme = Theme.LIGHT;
 
-    @Column(nullable = false)
     private String image = "http://localhost:8083/static/resource/179rjncje984934";
 
     public String getId() {

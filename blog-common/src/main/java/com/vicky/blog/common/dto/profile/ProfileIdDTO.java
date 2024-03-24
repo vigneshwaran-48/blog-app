@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class ProfileIdDTO {
-    private Long id;
+    private String id;
     private String profileId;
     private String entityId;
     private ProfileType type;
