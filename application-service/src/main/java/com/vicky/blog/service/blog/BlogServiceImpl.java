@@ -258,12 +258,14 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException {
         List<Blog> blogs = blogRepository.findAll();
         List<BlogDTO> blogsUserHasAcces = new LinkedList<>();
         for (Blog blog : blogs) {
             ProfileId publishedProfile = blog.getPublishedAt();
+            if (publishedProfile == null) {
+                continue;
+            }
             if (publishedProfile.getType() == ProfileType.ORGANIZATION) {
                 try {
                     organizationService.getOrganization(userId, publishedProfile.getEntityId());

@@ -3,9 +3,11 @@ package com.vicky.blog.common.dto.search;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class SearchDTO {
 
   public enum SearchType {
@@ -16,6 +18,7 @@ public class SearchDTO {
 
   public enum SearchBy {
     USER_NAME,
+    USER_EMAIL,
     BLOG_TITLE,
     BLOG_CONTENT,
     ORGANIZATION_NAME,
@@ -23,6 +26,13 @@ public class SearchDTO {
     ALL
   }
 
-  private SearchType type;
-  private List<String> entitieIds;
+  @Data
+  @AllArgsConstructor
+  public class Entity {
+    private String id;
+    private String profileId;
+    private SearchType type;
+  }
+
+  private List<Entity> entities;
 }
