@@ -32,6 +32,8 @@ public class SearchDTO {
     private String id;
     private String profileId;
     private SearchType type;
+    private String image;
+    private String name;
   }
 
   private List<Entity> entities;

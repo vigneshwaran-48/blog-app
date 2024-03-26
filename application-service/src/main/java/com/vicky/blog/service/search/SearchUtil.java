@@ -36,39 +36,36 @@ class SearchUtil {
             throws AppException {
         List<OrganizationDTO> organizations = organizationService.getOrganizationsVisibleToUser(userId);
         return organizations.stream().filter(organization -> {
-            if (searchBy.contains(SearchBy.ALL) || searchBy.contains(SearchBy.ORGANIZATION_NAME)) {
-                return organization.getName().toLowerCase().contains(query.toLowerCase());
-            }
-            return false;
+            boolean matchesName = searchBy.contains(SearchBy.ORGANIZATION_NAME) || searchBy.contains(SearchBy.ALL);
+            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID);
+
+            return (matchesName && organization.getName().toLowerCase().contains(query.toLowerCase())
+                    || (matchesProfileId && organization.getProfileId().toLowerCase().contains(query.toLowerCase())));
         }).collect(Collectors.toList());
     }
 
     List<UserDTO> searchUsers(String userId, String query, List<SearchBy> searchBy) throws AppException {
         List<UserDTO> users = userService.getUsers(userId);
         return users.stream().filter(user -> {
-            if (searchBy.contains(SearchBy.USER_NAME)) {
-                return user.getName().toLowerCase().contains(query.toLowerCase());
-            } else if (searchBy.contains(SearchBy.USER_EMAIL)) {
-                return user.getEmail().toLowerCase().contains(query.toLowerCase());
-            } else if (searchBy.contains(SearchBy.ALL)) {
-                return user.getName().toLowerCase().contains(query.toLowerCase())
-                        || user.getEmail().toLowerCase().contains(query.toLowerCase());
-            }
-            return false;
+            boolean matchesName = searchBy.contains(SearchBy.USER_NAME) || searchBy.contains(SearchBy.ALL);
+            boolean matchesEmail = searchBy.contains(SearchBy.USER_EMAIL) || searchBy.contains(SearchBy.ALL);
+            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID);
+
+            return (matchesName && user.getName().toLowerCase().contains(query.toLowerCase()))
+                    || (matchesEmail && user.getEmail().toLowerCase().contains(query.toLowerCase())
+                            || (matchesProfileId && user.getProfileId().toLowerCase().contains(query.toLowerCase())));
         }).collect(Collectors.toList());
     }
 
     List<BlogDTO> searchBlogs(String userId, String query, List<SearchBy> searchBy) throws AppException {
         return blogService.getAllBlogsVisibleToUser(userId).stream().filter(blog -> {
-            if (searchBy.contains(SearchBy.BLOG_TITLE)) {
-                return blog.getTitle().toLowerCase().contains(query.toLowerCase());
-            } else if (searchBy.contains(SearchBy.BLOG_CONTENT)) {
-                return blog.getContent().toLowerCase().contains(query.toLowerCase());
-            } else if (searchBy.contains(SearchBy.ALL)) {
-                return blog.getTitle().toLowerCase().contains(query.toLowerCase())
-                        || blog.getContent().toLowerCase().contains(query.toLowerCase());
-            }
-            return false;
+            boolean matchesTitle = searchBy.contains(SearchBy.BLOG_TITLE);
+            boolean matchesContent = searchBy.contains(SearchBy.BLOG_CONTENT);
+            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID);
+
+            return (matchesTitle && blog.getTitle().toLowerCase().contains(query.toLowerCase()))
+                    || (matchesContent && blog.getContent().toLowerCase().contains(query.toLowerCase()))
+                    || (matchesProfileId && blog.getPostedProfileId().toLowerCase().contains(query.toLowerCase()));
         }).collect(Collectors.toList());
     }
 
@@ -80,17 +77,18 @@ class SearchUtil {
         case ORGANIZATION:
             List<OrganizationDTO> organizations = searchOrganizations(userId, query, searchBy);
 
-            entities = organizations.stream()
-                    .map(organization -> searchDTO.new Entity(organization.getId(), organization.getProfileId(), type))
-                    .toList();
+            entities = organizations
+                    .stream().map(organization -> searchDTO.new Entity(organization.getId(),
+                            organization.getProfileId(), type, organization.getImage(), organization.getName()))
+                    .collect(Collectors.toList());
             break;
         case USER:
-            entities = searchUsers(userId, query, searchBy).stream()
-                    .map(user -> searchDTO.new Entity(user.getId(), user.getProfileId(), type)).toList();
+            entities = searchUsers(userId, query, searchBy).stream().map(user -> searchDTO.new Entity(user.getId(),
+                    user.getProfileId(), type, user.getImage(), user.getName())).collect(Collectors.toList());
             break;
         case BLOG:
-            entities = searchBlogs(userId, query, searchBy).stream()
-                    .map(blog -> searchDTO.new Entity(blog.getId(), blog.getPostedProfileId(), type)).toList();
+            entities = searchBlogs(userId, query, searchBy).stream().map(blog -> searchDTO.new Entity(blog.getId(),
+                    blog.getPostedProfileId(), type, blog.getImage(), blog.getTitle())).collect(Collectors.toList());
             break;
         default:
             return Optional.empty();

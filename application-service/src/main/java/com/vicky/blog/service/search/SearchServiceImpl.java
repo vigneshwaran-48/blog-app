@@ -35,9 +35,6 @@ public class SearchServiceImpl implements SearchService {
         SearchDTO searchDTO = new SearchDTO();
         for (SearchType searchType : type) {
             SearchDTO currentSearch = search(userId, query, searchType, searchBy);
-            if(currentSearch.getEntities() == null) {
-                continue;
-            }
             if (searchDTO.getEntities() != null) {
                 searchDTO.getEntities().addAll(currentSearch.getEntities());
             } else {

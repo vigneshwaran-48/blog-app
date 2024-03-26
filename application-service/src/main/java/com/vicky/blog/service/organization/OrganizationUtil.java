@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.model.Organization;
@@ -60,6 +61,11 @@ class OrganizationUtil {
             }
             else {
                 newData.setProfileId(String.valueOf(existingData.getId()));
+            }
+        } else {
+            Optional<ProfileIdDTO> profileIdDTO = profileIdService.getProfileId(newData.getProfileId());
+            if (!profileIdDTO.isEmpty() && !profileIdDTO.get().getEntityId().equals(newData.getId())) {
+                throw new AppException("That profile id already taken!");
             }
         }
     }
