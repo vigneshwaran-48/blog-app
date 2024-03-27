@@ -73,22 +73,30 @@ class SearchUtil {
             throws AppException {
         List<Entity> entities = new ArrayList<>();
         SearchDTO searchDTO = new SearchDTO();
+        boolean isAll = type == SearchType.ALL;
         switch (type) {
+        case ALL:
         case ORGANIZATION:
             List<OrganizationDTO> organizations = searchOrganizations(userId, query, searchBy);
 
-            entities = organizations
-                    .stream().map(organization -> searchDTO.new Entity(organization.getId(),
-                            organization.getProfileId(), type, organization.getImage(), organization.getName()))
-                    .collect(Collectors.toList());
-            break;
+            entities.addAll(organizations.stream()
+                    .map(organization -> searchDTO.new Entity(organization.getId(), organization.getProfileId(),
+                            SearchType.ORGANIZATION, organization.getImage(), organization.getName()))
+                    .collect(Collectors.toList()));
+            if (!isAll) {
+                break;
+            }
         case USER:
-            entities = searchUsers(userId, query, searchBy).stream().map(user -> searchDTO.new Entity(user.getId(),
-                    user.getProfileId(), type, user.getImage(), user.getName())).collect(Collectors.toList());
-            break;
+            entities.addAll(searchUsers(userId, query, searchBy).stream().map(user -> searchDTO.new Entity(user.getId(),
+                    user.getProfileId(), SearchType.USER, user.getImage(), user.getName()))
+                    .collect(Collectors.toList()));
+            if (!isAll) {
+                break;
+            }
         case BLOG:
-            entities = searchBlogs(userId, query, searchBy).stream().map(blog -> searchDTO.new Entity(blog.getId(),
-                    blog.getPostedProfileId(), type, blog.getImage(), blog.getTitle())).collect(Collectors.toList());
+            entities.addAll(searchBlogs(userId, query, searchBy).stream().map(blog -> searchDTO.new Entity(blog.getId(),
+                    blog.getPostedProfileId(), SearchType.BLOG, blog.getImage(), blog.getTitle()))
+                    .collect(Collectors.toList()));
             break;
         default:
             return Optional.empty();
