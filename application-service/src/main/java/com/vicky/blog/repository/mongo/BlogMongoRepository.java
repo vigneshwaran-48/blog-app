@@ -3,6 +3,8 @@ package com.vicky.blog.repository.mongo;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.vicky.blog.model.Blog;
@@ -21,4 +23,6 @@ public interface BlogMongoRepository extends MongoRepository<Blog, String> {
 
     @Transactional
     void deleteByOwnerIdAndId(String userId, String id);
+
+    Page<Blog> findByOwnerIdNotAndIsPublised(String userId, boolean isPublised, Pageable pageable);
 }

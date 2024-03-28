@@ -167,8 +167,8 @@ public class BlogController {
     }
 
     @DeleteMapping("/{blogId}/like")
-    public ResponseEntity<?> unLikeBlog(@PathVariable String blogId, @RequestParam String profileId, Principal principal,
-            HttpServletRequest request) throws AppException {
+    public ResponseEntity<?> unLikeBlog(@PathVariable String blogId, @RequestParam String profileId,
+            Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         blogLikeService.removeLike(blogId, userId, profileId);
@@ -254,6 +254,30 @@ public class BlogController {
         String userId = userIdExtracter.getUserId(principal);
 
         List<BlogDTO> blogs = blogService.getAllBlogsOfProfile(userId, profileId);
+
+        BlogsResponse response = new BlogsResponse();
+        response.setBlogs(blogs);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<BlogsResponse> getFeedsForUser(@RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size, HttpServletRequest request, Principal principal)
+            throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
+            size = 20;
+        }
+        List<BlogDTO> blogs = blogService.getBlogsForUserFeed(userId, page, size);
 
         BlogsResponse response = new BlogsResponse();
         response.setBlogs(blogs);

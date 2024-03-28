@@ -11,6 +11,9 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.BlogIdValidator;
@@ -280,5 +283,28 @@ public class BlogServiceImpl implements BlogService {
             blogsUserHasAcces.add(blog.toDTO());
         }
         return blogsUserHasAcces;
+    }
+
+    @Override
+    public List<BlogDTO> getBlogsForUserFeed(String userId, int page, int size) throws AppException {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Blog> blogs = blogRepository.findByOwnerIdNotAndIsPublised(userId, true, pageable);
+        List<BlogDTO> blogsForFeed = new ArrayList<>();
+        for (Blog blog : blogs) {
+            ProfileId profileId = blog.getPublishedAt();
+            if (profileId.getType() == ProfileType.ORGANIZATION) {
+                try {
+                    organizationService.getOrganization(userId, profileId.getEntityId());
+                } catch (OrganizationNotAccessible e) {
+                    // Ignoring
+                    // If this happens then the user not have access to the organization
+                    // publishin blogs.
+                    LOGGER.info("User {} not have access to the blog {}", userId, blog.getId());
+                    continue;
+                }
+            }
+            blogsForFeed.add(blog.toDTO());
+        }
+        return blogsForFeed;
     }
 }

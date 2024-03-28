@@ -37,7 +37,7 @@ class SearchUtil {
         List<OrganizationDTO> organizations = organizationService.getOrganizationsVisibleToUser(userId);
         return organizations.stream().filter(organization -> {
             boolean matchesName = searchBy.contains(SearchBy.ORGANIZATION_NAME) || searchBy.contains(SearchBy.ALL);
-            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID);
+            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID) || searchBy.contains(SearchBy.ALL);
 
             return (matchesName && organization.getName().toLowerCase().contains(query.toLowerCase())
                     || (matchesProfileId && organization.getProfileId().toLowerCase().contains(query.toLowerCase())));
@@ -49,7 +49,7 @@ class SearchUtil {
         return users.stream().filter(user -> {
             boolean matchesName = searchBy.contains(SearchBy.USER_NAME) || searchBy.contains(SearchBy.ALL);
             boolean matchesEmail = searchBy.contains(SearchBy.USER_EMAIL) || searchBy.contains(SearchBy.ALL);
-            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID);
+            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID) || searchBy.contains(SearchBy.ALL);
 
             return (matchesName && user.getName().toLowerCase().contains(query.toLowerCase()))
                     || (matchesEmail && user.getEmail().toLowerCase().contains(query.toLowerCase())
@@ -59,9 +59,9 @@ class SearchUtil {
 
     List<BlogDTO> searchBlogs(String userId, String query, List<SearchBy> searchBy) throws AppException {
         return blogService.getAllBlogsVisibleToUser(userId).stream().filter(blog -> {
-            boolean matchesTitle = searchBy.contains(SearchBy.BLOG_TITLE);
-            boolean matchesContent = searchBy.contains(SearchBy.BLOG_CONTENT);
-            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID);
+            boolean matchesTitle = searchBy.contains(SearchBy.BLOG_TITLE) || searchBy.contains(SearchBy.ALL);
+            boolean matchesContent = searchBy.contains(SearchBy.BLOG_CONTENT) || searchBy.contains(SearchBy.ALL);
+            boolean matchesProfileId = searchBy.contains(SearchBy.PROFILE_ID) || searchBy.contains(SearchBy.ALL);
 
             return (matchesTitle && blog.getTitle().toLowerCase().contains(query.toLowerCase()))
                     || (matchesContent && blog.getContent().toLowerCase().contains(query.toLowerCase()))
