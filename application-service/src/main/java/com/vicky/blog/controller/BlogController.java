@@ -265,7 +265,7 @@ public class BlogController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/feed")
+    @GetMapping("/feeds")
     public ResponseEntity<BlogsResponse> getFeedsForUser(@RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size, HttpServletRequest request, Principal principal)
             throws AppException {

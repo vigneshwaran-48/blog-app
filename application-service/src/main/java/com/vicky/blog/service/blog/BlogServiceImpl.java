@@ -303,7 +303,9 @@ public class BlogServiceImpl implements BlogService {
                     continue;
                 }
             }
-            blogsForFeed.add(blog.toDTO());
+            BlogDTO blogDTO = blog.toDTO();
+            blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+            blogsForFeed.add(blogDTO);
         }
         return blogsForFeed;
     }
