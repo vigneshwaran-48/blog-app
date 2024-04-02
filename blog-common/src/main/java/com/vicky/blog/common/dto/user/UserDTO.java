@@ -11,6 +11,12 @@ public class UserDTO implements Serializable {
         DARK,
         LIGHT
     }
+
+    public enum UserType {
+        GUEST,
+        NORMAL,
+        PREMIUM
+    }
     
     private String id;
     private String name;

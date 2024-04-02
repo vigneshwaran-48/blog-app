@@ -4,13 +4,19 @@ import java.util.Optional;
 
 import org.apache.http.HttpStatus;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 
+import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.redis.UserAccessDetails;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.service.I18NMessages;
@@ -25,6 +31,11 @@ public class BlogAspect {
 
     @Autowired
     private I18NMessages i18nMessages;
+
+    @Autowired
+    private RedisTemplate<String, UserAccessDetails> redisTemplate;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlogAspect.class);
     
     @Before("@annotation(blogIdValidator)")
     public void validateBlogId(JoinPoint joinPoint, BlogIdValidator blogIdValidator) throws AppException {
@@ -47,5 +58,22 @@ public class BlogAspect {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NOT_EXISTS, 
                 new Object[] { "Blog" }));
         }
+    }
+
+    @After("@annotation(blogAccessTracker)")
+    public void trackBlogAccess(JoinPoint joinPoint, BlogAccessTracker blogAccessTracker) {
+        Object[] args = joinPoint.getArgs();
+        String userId = (String) args[blogAccessTracker.userIdPosition()];
+        UserAccessDetails userAccessDetails = redisTemplate.opsForValue().get(userId);
+
+        if(userAccessDetails != null) {
+            userAccessDetails.setBlogAccessCount(userAccessDetails.getBlogAccessCount() + 1);
+        } else {
+            userAccessDetails = new UserAccessDetails();
+            userAccessDetails.setBlogAccessCount(1);
+            userAccessDetails.setUserId(userId);
+        }
+        LOGGER.info("User Access Details {}", userAccessDetails);
+        redisTemplate.opsForValue().set(userId, userAccessDetails);
     }
 }

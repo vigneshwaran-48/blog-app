@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
@@ -127,6 +128,16 @@ public class UserServiceImpl implements UserService {
                                 }).collect(Collectors.toList());
     }
 
+    @Override
+    public UserType getUserType(String userId) throws AppException {
+        if (userId == null) {
+            return UserType.GUEST;
+        } else {
+            // Need to add logic for premium users.
+            return UserType.NORMAL;
+        }
+    }
+
 
     private void checkAndFillMissingDataForPatchUpdate(UserDTO newData, User existingData) throws AppException {
         if(newData.getAge() == 0) {
@@ -199,7 +210,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
         }
     }
-
     
 
 }

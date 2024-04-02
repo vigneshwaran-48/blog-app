@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
@@ -25,7 +27,9 @@ import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSender
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
+import com.vicky.blog.common.dto.redis.UserAccessDetails;
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.BlogService;
@@ -64,6 +68,9 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private RedisTemplate<String, UserAccessDetails> redisTemplate;
+
     @Override
     @UserIdValidator(positions = 0)
     public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
@@ -86,7 +93,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @UserIdValidator(positions = 0)
+    @BlogAccessTracker(userIdPosition = 0)
     public Optional<BlogDTO> getBlog(String userId, String id) throws AppException {
         
         Optional<Blog> blog = blogRepository.findById(id);
@@ -106,6 +113,7 @@ public class BlogServiceImpl implements BlogService {
         blogDTO.getOwner().setProfileId(ownerProfileId);
 
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+
         return Optional.of(blogDTO);
     }
 
@@ -204,7 +212,7 @@ public class BlogServiceImpl implements BlogService {
     }
     
     @Override
-    @UserIdValidator(positions = 0)
+    @BlogAccessTracker(userIdPosition = 0)
     public Optional<BlogDTO> getBlogOfProfile(String userId, String blogId, String profileId) throws AppException {
 
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
@@ -226,6 +234,7 @@ public class BlogServiceImpl implements BlogService {
         }
         BlogDTO blogDTO = blog.get().toDTO();
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+
         return Optional.of(blogDTO);
     }
 
@@ -287,6 +296,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<BlogDTO> getBlogsForUserFeed(String userId, int page, int size) throws AppException {
+        UserType userType = userService.getUserType(userId);
         Pageable pageable = PageRequest.of(page, size);
         Page<Blog> blogs = blogRepository.findByOwnerIdNotAndIsPublised(userId, true, pageable);
         List<BlogDTO> blogsForFeed = new ArrayList<>();

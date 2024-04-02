@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsResponse;
 import com.vicky.blog.common.dto.blog.BlogResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
 import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
@@ -42,8 +43,6 @@ public class BlogController {
     private UserIdExtracter userIdExtracter;
     @Autowired
     private BlogLikeService blogLikeService;
-
-    // private ProfileIdSer
 
     @PostMapping
     public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, Principal principal)
@@ -266,7 +265,7 @@ public class BlogController {
     }
 
     @GetMapping("/feeds")
-    public ResponseEntity<BlogsResponse> getFeedsForUser(@RequestParam(required = false) Integer page,
+    public ResponseEntity<BlogFeedsResponse> getFeedsForUser(@RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size, HttpServletRequest request, Principal principal)
             throws AppException {
 
@@ -279,7 +278,7 @@ public class BlogController {
         }
         List<BlogDTO> blogs = blogService.getBlogsForUserFeed(userId, page, size);
 
-        BlogsResponse response = new BlogsResponse();
+        BlogFeedsResponse response = new BlogFeedsResponse();
         response.setBlogs(blogs);
         response.setMessage("success");
         response.setPath(request.getServletPath());

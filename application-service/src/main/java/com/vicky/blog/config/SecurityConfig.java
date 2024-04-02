@@ -23,7 +23,10 @@ public class SecurityConfig {
                     .csrf().disable()
                     .authorizeHttpRequests(http -> {
                         http
-                            .anyRequest().authenticated();
+                            .requestMatchers("/api/v1/app/blog/feeds")
+                                .permitAll()
+                            .anyRequest()
+                                .authenticated();
                     })
                     .oauth2ResourceServer(oauth2 -> oauth2.jwt())
                     .build();
