@@ -23,7 +23,7 @@ public class SecurityConfig {
                     .csrf().disable()
                     .authorizeHttpRequests(http -> {
                         http
-                            .requestMatchers("/api/v1/app/blog/feeds")
+                            .requestMatchers("/api/v1/app/blog/feeds", "/api/v1/app/user/profile")
                                 .permitAll()
                             .anyRequest()
                                 .authenticated();
