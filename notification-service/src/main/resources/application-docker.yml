@@ -1,0 +1,43 @@
+
+server:
+  port: 8086
+
+spring:
+    application:
+        name: notification-service
+
+    main:
+        allow-circular-references: true
+
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 10MB
+
+    autoconfigure:
+        exclude:
+            - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+            - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
+            database: notification
+
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://accounts.google.com
+                    jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+
+logging:
+    level:
+        org:
+            springframework:
+                security: trace
+
+services:
+    api-gateway:
+        base: http://api-gateway:7000

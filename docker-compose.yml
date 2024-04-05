@@ -1,75 +1,20 @@
 version: '3.8'
 
 services:
-  application-service-mysql:
-    container_name: application-service-mysql
-    image: mysql:8.0
-    restart: always
-    environment:
-      - 'MYSQL_DATABASE=blog_application'
-      - 'MYSQL_PASSWORD=root@123'
-      - 'MYSQL_USER=vicky'
-      - 'MYSQL_ROOT_PASSWORD=root@123'
-    ports:
-      - '3307:3306'
-    networks:
-      - blog-network
-    volumes:
-      - application-service-mysql-data:/var/lib/mysql
 
-  static-service-mysql:
-    container_name: static-service-mysql
-    image: mysql:8.0
-    restart: always
-    environment:
-      - 'MYSQL_DATABASE=static_server'
-      - 'MYSQL_PASSWORD=root@123'
-      - 'MYSQL_USER=vicky'
-      - 'MYSQL_ROOT_PASSWORD=root@123'
-    ports:
-      - '3308:3306'
-    networks:
-      - blog-network
-    volumes:
-      - static-service-mysql-data:/var/lib/mysql
+  application-mondodb:
+    image: mongo
+    ports: 
+      - "27017:27017"
+    volumes: 
+      - application-mongo:/data/db
 
-  notification-service-mysql:
-    container_name: notification-service-mysql
-    image: mysql:8.0
-    restart: always
-    environment:
-      - 'MYSQL_DATABASE=notification'
-      - 'MYSQL_PASSWORD=root@123'
-      - 'MYSQL_USER=vicky'
-      - 'MYSQL_ROOT_PASSWORD=root@123'
-    ports:
-      - '3309:3306'
-    networks:
-      - blog-network
-    volumes:
-      - notification-service-mysql-data:/var/lib/mysql
-
-  service-registry:
-    container_name: service-registry
-    build:
-      context: service-registry
-      dockerfile: Dockerfile
-    image: service-registry:latest
-    ports:
-      - 9000:9000
-    networks:
-      - blog-network
-
-  config-service:
-    container_name: config-service
-    build:
-      context: config-service
-      dockerfile: Dockerfile
-    image: config-service:latest
-    ports:
-      - 8099:8099
-    networks:
-      - blog-network
+  notification-mondodb:
+    image: mongo
+    ports: 
+      - "27018:27017"
+    volumes: 
+      - notification-mongo:/data/db
 
   application-service:
     container_name: application-service
@@ -78,10 +23,6 @@ services:
       dockerfile: Dockerfile
     image: application-service:latest
     restart: on-failure
-    depends_on:
-      - service-registry
-      - config-service
-      - application-service-mysql
     ports:
       - 8082:8082
     networks:
@@ -94,10 +35,6 @@ services:
       dockerfile: Dockerfile
     image: static-service:latest
     restart: on-failure
-    depends_on:
-      - service-registry
-      - config-service
-      - static-service-mysql
     ports:
       - 8083:8083
     networks:
@@ -110,10 +47,6 @@ services:
       dockerfile: Dockerfile
     image: notification-service:latest
     restart: on-failure
-    depends_on:
-      - service-registry
-      - config-service
-      - notification-service-mysql
     ports:
       - 8086:8086
     networks:
@@ -138,6 +71,5 @@ networks:
   blog-network:
     driver: bridge
 volumes:
-  application-service-mysql-data:
-  static-service-mysql-data:
-  notification-service-mysql-data:
+  application-mongo:
+  notification-mongo:
