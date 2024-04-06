@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.CommentIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
@@ -132,7 +133,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public List<CommentDTO> getThreadsOfComment(String userId, String blogId, String commentId) throws AppException {
         List<Comment> comments = commentRepository.findByParentCommentId(commentId);
@@ -164,7 +164,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-    @UserIdValidator(positions = 0)
+    @BlogAccessTracker(userIdPosition = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
 	public List<CommentDTO> getCommentsOfBlog(String userId, String blogId) throws AppException {
 		List<Comment> rootComments = commentRepository.findByBlogIdAndParentCommentIdIsNull(blogId);
