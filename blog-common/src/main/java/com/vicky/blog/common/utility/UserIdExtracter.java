@@ -1,10 +1,13 @@
 package com.vicky.blog.common.utility;
 
 import java.security.Principal;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class UserIdExtracter {
@@ -18,14 +21,18 @@ public class UserIdExtracter {
 
         String userId = "";
 
-        if(mode.equals("single-user")) {
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+        if (mode.equals("single-user")) {
             userId = "DEVELOPMENT";
         } else if (principal != null) {
             userId = principal.getName();
         } else {
-            userId = GUEST_USER_ID_PREFIX + UUID.randomUUID().toString();
+            String requestUserIp = request.getRemoteAddr();
+            userId = GUEST_USER_ID_PREFIX + requestUserIp;
         }
-        
+
         return userId;
     }
 }
