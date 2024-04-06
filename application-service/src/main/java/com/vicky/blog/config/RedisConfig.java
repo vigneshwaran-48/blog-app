@@ -12,8 +12,10 @@ public class RedisConfig {
     
     @Bean
     LettuceConnectionFactory lettuceConnectionFactory() {
-        return new LettuceConnectionFactory();
-}
+        LettuceConnectionFactory factory = new LettuceConnectionFactory();
+        factory.setHostName("redis-service");
+        return factory;
+    }
 
     @Bean
     RedisTemplate<String, UserAccessDetails> redisTemplate() {

@@ -2,6 +2,17 @@ version: '3.8'
 
 services:
 
+  redis-service:
+    container_name: redis-service
+    image: redis
+    restart: on-failure
+    ports: 
+      - "6380:6379"
+    volumes:
+      - redis_data:/data/db
+    networks:
+      - blog-network
+
   application-mondodb:
     container_name: application-mondodb
     image: mongo
@@ -93,3 +104,4 @@ volumes:
   application-mongo:
   notification-mongo:
   static-service-mongo:
+  redis_data:
