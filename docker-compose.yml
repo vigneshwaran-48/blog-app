@@ -3,18 +3,34 @@ version: '3.8'
 services:
 
   application-mondodb:
-    image: mongo
-    ports: 
-      - "27017:27017"
-    volumes: 
-      - application-mongo:/data/db
-
-  notification-mondodb:
+    container_name: application-mondodb
     image: mongo
     ports: 
       - "27018:27017"
     volumes: 
+      - application-mongo:/data/db
+    networks:
+      - blog-network
+
+  notification-mondodb:
+    container_name: notification-mondodb
+    image: mongo
+    ports: 
+      - "27019:27017"
+    volumes: 
       - notification-mongo:/data/db
+    networks:
+      - blog-network
+    
+  static-service-mondodb:
+    container_name: static-service-mondodb
+    image: mongo
+    ports: 
+      - "27020:27017"
+    volumes: 
+      - static-service-mongo:/data/db
+    networks:
+      - blog-network
 
   application-service:
     container_name: application-service
@@ -23,6 +39,8 @@ services:
       dockerfile: Dockerfile
     image: application-service:latest
     restart: on-failure
+    depends_on:
+      - application-mondodb
     ports:
       - 8082:8082
     networks:
@@ -35,6 +53,8 @@ services:
       dockerfile: Dockerfile
     image: static-service:latest
     restart: on-failure
+    depends_on:
+      - static-service-mondodb
     ports:
       - 8083:8083
     networks:
@@ -47,6 +67,8 @@ services:
       dockerfile: Dockerfile
     image: notification-service:latest
     restart: on-failure
+    depends_on:
+      - notification-mondodb
     ports:
       - 8086:8086
     networks:
@@ -59,9 +81,6 @@ services:
       dockerfile: Dockerfile
     image: api-gateway:latest
     restart: on-failure
-    depends_on:
-      - service-registry
-      - config-service
     ports:
       - 7000:7000
     networks:
@@ -73,3 +92,4 @@ networks:
 volumes:
   application-mongo:
   notification-mongo:
+  static-service-mongo:
