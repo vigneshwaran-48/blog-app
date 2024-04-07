@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
 import com.vicky.blog.common.exception.AppException;
 
 public interface BlogService {
@@ -28,5 +29,5 @@ public interface BlogService {
 
     List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException;
 
-    List<BlogDTO> getBlogsForUserFeed(String userId, int page, int limit) throws AppException;
+    BlogFeedsDTO getBlogsForUserFeed(String userId, int page, int limit) throws AppException;
 }

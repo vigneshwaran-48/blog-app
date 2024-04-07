@@ -21,6 +21,8 @@ import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO.PageStatus;
 import com.vicky.blog.common.dto.follower.FollowDTO;
 import com.vicky.blog.common.dto.notification.NotificationDTO;
 import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSenderType;
@@ -295,8 +297,11 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public List<BlogDTO> getBlogsForUserFeed(String userId, int page, int size) throws AppException {
+    public BlogFeedsDTO getBlogsForUserFeed(String userId, int page, int size) throws AppException {
         UserType userType = userService.getUserType(userId);
+        if (userType == UserType.GUEST && page > 0) {
+            return new BlogFeedsDTO(PageStatus.SIGNUP, List.of());
+        }
         Pageable pageable = PageRequest.of(page, size);
         Page<Blog> blogs = blogRepository.findByOwnerIdNotAndIsPublised(userId, true, pageable);
         List<BlogDTO> blogsForFeed = new ArrayList<>();
@@ -317,6 +322,13 @@ public class BlogServiceImpl implements BlogService {
             blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
             blogsForFeed.add(blogDTO);
         }
-        return blogsForFeed;
+        BlogFeedsDTO feedsDTO = new BlogFeedsDTO();
+        feedsDTO.setFeeds(blogsForFeed);
+        if (blogsForFeed.size() < size) {
+            feedsDTO.setStatus(PageStatus.NOT_AVAILABLE);
+        } else {
+            feedsDTO.setStatus(PageStatus.AVAILABLE);
+        }
+        return feedsDTO;
     }
 }

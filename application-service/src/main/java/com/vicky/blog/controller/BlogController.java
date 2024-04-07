@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
 import com.vicky.blog.common.dto.blog.BlogFeedsResponse;
 import com.vicky.blog.common.dto.blog.BlogResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
@@ -276,14 +277,15 @@ public class BlogController {
         if (size == null) {
             size = 20;
         }
-        List<BlogDTO> blogs = blogService.getBlogsForUserFeed(userId, page, size);
+        BlogFeedsDTO feeds = blogService.getBlogsForUserFeed(userId, page, size);
 
         BlogFeedsResponse response = new BlogFeedsResponse();
-        response.setBlogs(blogs);
+        response.setBlogs(feeds.getFeeds());
         response.setMessage("success");
         response.setPath(request.getServletPath());
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
+        response.setNextPageStatus(feeds.getStatus());
 
         return ResponseEntity.ok().body(response);
     }
