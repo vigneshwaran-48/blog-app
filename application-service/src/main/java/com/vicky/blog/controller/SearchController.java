@@ -2,6 +2,7 @@ package com.vicky.blog.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.search.SearchDTO;
 import com.vicky.blog.common.dto.search.SearchResponse;
+import com.vicky.blog.common.dto.search.SearchDTO.SearchBy;
 import com.vicky.blog.common.dto.search.SearchDTO.SearchType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.SearchService;
@@ -29,13 +31,17 @@ public class SearchController {
 
     @Autowired
     private SearchService searchService;
-    
+
     @GetMapping
-    public ResponseEntity<SearchResponse> search(@RequestParam String query, @RequestParam SearchType type, 
-        Principal principal, HttpServletRequest request) throws AppException {
+    public ResponseEntity<SearchResponse> search(@RequestParam String query, @RequestParam List<SearchType> type,
+            @RequestParam(required = false) List<SearchBy> searchBy, Principal principal, HttpServletRequest request)
+            throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-        SearchDTO searchDTO = searchService.search(userId, query, type);
+        if (searchBy == null) {
+            searchBy = List.of(SearchBy.ALL);
+        }
+        SearchDTO searchDTO = searchService.search(userId, query, type, searchBy);
         SearchResponse response = new SearchResponse();
         response.setMessage("success");
         response.setPath(request.getServletPath());

@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
+import com.vicky.blog.common.utility.UserIdExtracter;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.mongo.UserMongoRepository;
 import com.vicky.blog.service.I18NMessages;
@@ -127,6 +129,16 @@ public class UserServiceImpl implements UserService {
                                 }).collect(Collectors.toList());
     }
 
+    @Override
+    public UserType getUserType(String userId) throws AppException {
+        if (userId == null || userId.startsWith(UserIdExtracter.GUEST_USER_ID_PREFIX)) {
+            return UserType.GUEST;
+        } else {
+            // Need to add logic for premium users.
+            return UserType.NORMAL;
+        }
+    }
+
 
     private void checkAndFillMissingDataForPatchUpdate(UserDTO newData, User existingData) throws AppException {
         if(newData.getAge() == 0) {
@@ -199,7 +211,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
         }
     }
-
     
 
 }

@@ -21,7 +21,7 @@ spring:
   
     data:
         mongodb:
-            host: localhost
+            host: notification-mondodb
             port: 27017
             database: notification
 
@@ -40,4 +40,4 @@ logging:
 
 services:
     api-gateway:
-        base: http://localhost:7000
+        base: http://api-gateway:7000

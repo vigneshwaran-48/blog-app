@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
 
 public interface UserService {
@@ -13,5 +14,6 @@ public interface UserService {
     boolean deleteUser(String userId) throws AppException;
     Optional<UserDTO> getUser(String userId) throws AppException;
     List<UserDTO> getUsers(String userId) throws AppException;
+    UserType getUserType(String userId) throws AppException;
 
 }

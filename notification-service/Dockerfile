@@ -4,4 +4,4 @@ WORKDIR /opt/app
 
 COPY target/notification-service-0.0.1-SNAPSHOT.jar notification-service.jar
 
-ENTRYPOINT ["java","-jar", "-Dspring.profiles.active=dev", "notification-service.jar"]
+ENTRYPOINT ["java","-jar", "-Dspring.profiles.active=docker", "notification-service.jar"]

@@ -76,7 +76,6 @@ public class BlogLikeServiceImpl implements BlogLikeService {
     @Override
     public List<BlogLikeDTO> getLikesOfBlog(String userId, String blogId, String profileId) throws AppException {
         // Just validating given details.
-        getUser(userId);
         getBlog(userId, profileId, blogId);
 
         return blogLikeRepository.findByBlogId(blogId)

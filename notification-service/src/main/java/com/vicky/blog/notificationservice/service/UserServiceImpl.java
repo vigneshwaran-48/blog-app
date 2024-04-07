@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.dto.user.UserResponseData;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UserService;
@@ -50,6 +51,12 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> getUsers(String userId) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getUsers'");
+    }
+
+    @Override
+    public UserType getUserType(String userId) throws AppException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserType'");
     }
     
 }

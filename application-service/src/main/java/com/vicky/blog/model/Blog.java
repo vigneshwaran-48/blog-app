@@ -77,6 +77,9 @@ public class Blog {
     blogDTO.setPostedTime(postedTime);
     blogDTO.setPublised(isPublised);
     blogDTO.setPublishedAt(publishedAt != null ? publishedAt.toDTO() : null);
+    if(publishedAt != null) {
+      blogDTO.setPostedProfileId(publishedAt.getProfileId());
+    }
 
     return blogDTO;
   }

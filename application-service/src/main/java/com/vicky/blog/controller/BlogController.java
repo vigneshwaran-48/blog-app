@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsResponse;
 import com.vicky.blog.common.dto.blog.BlogResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
 import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
@@ -42,8 +44,6 @@ public class BlogController {
     private UserIdExtracter userIdExtracter;
     @Autowired
     private BlogLikeService blogLikeService;
-
-    // private ProfileIdSer
 
     @PostMapping
     public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, Principal principal)
@@ -167,8 +167,8 @@ public class BlogController {
     }
 
     @DeleteMapping("/{blogId}/like")
-    public ResponseEntity<?> unLikeBlog(@PathVariable String blogId, @RequestParam String profileId, Principal principal,
-            HttpServletRequest request) throws AppException {
+    public ResponseEntity<?> unLikeBlog(@PathVariable String blogId, @RequestParam String profileId,
+            Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
         blogLikeService.removeLike(blogId, userId, profileId);
@@ -261,6 +261,31 @@ public class BlogController {
         response.setPath(request.getServletPath());
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/feeds")
+    public ResponseEntity<BlogFeedsResponse> getFeedsForUser(@RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size, HttpServletRequest request, Principal principal)
+            throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
+            size = 20;
+        }
+        BlogFeedsDTO feeds = blogService.getBlogsForUserFeed(userId, page, size);
+
+        BlogFeedsResponse response = new BlogFeedsResponse();
+        response.setBlogs(feeds.getFeeds());
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+        response.setNextPageStatus(feeds.getStatus());
 
         return ResponseEntity.ok().body(response);
     }

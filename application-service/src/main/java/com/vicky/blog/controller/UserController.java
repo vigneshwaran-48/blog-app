@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,11 +102,21 @@ public class UserController {
 
         String userId = userIdExtracter.getUserId(principal);
 
-        UserDTO user = userService.getUser(userId).orElseThrow(() -> 
-                                        new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists"));
+        UserDTO user = userService.getUser(userId).orElse(null);
+
+        int status = HttpStatus.SC_OK;
+
+        if (user == null) {
+            user = new UserDTO();
+            user.setAge(-1);
+            user.setName("Guest");
+            user.setId(userId);
+            user.setProfileId(userId);
+            status = 401;
+        }
 
         UserResponseData response = new UserResponseData();
-        response.setStatus(HttpStatus.SC_OK);
+        response.setStatus(status);
         response.setMessage("success");
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());

@@ -1,10 +1,10 @@
 
 server:
-  port: 8086
+  port: 8083
 
 spring:
     application:
-        name: notification-service
+        name: static-service
 
     main:
         allow-circular-references: true
@@ -21,9 +21,9 @@ spring:
   
     data:
         mongodb:
-            host: localhost
+            host: static-service-mondodb
             port: 27017
-            database: notification
+            database: static
 
     security:
         oauth2:
@@ -40,4 +40,4 @@ logging:
 
 services:
     api-gateway:
-        base: http://localhost:7000
+        base: http://api-gateway:7000

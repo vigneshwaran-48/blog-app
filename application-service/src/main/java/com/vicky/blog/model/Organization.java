@@ -31,6 +31,8 @@ public class Organization {
 
     private String image = "http://localhost:7000/static/1";
 
+    private String profileId;
+
     public String getId() {
         return id;
     }
@@ -95,7 +97,15 @@ public class Organization {
         this.image = image;
     }
 
-    public OrganizationDTO toDTO(String profileId) {
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
+    }
+
+    public OrganizationDTO toDTO() {
 
         OrganizationDTO organizationDTO = new OrganizationDTO();
         organizationDTO.setCreatedTime(createdTime);
@@ -119,6 +129,7 @@ public class Organization {
         organization.setId(organizationDTO.getId());
         organization.setName(organizationDTO.getName());
         organization.setOwner(User.build(organizationDTO.getOwner()));
+        organization.setProfileId(organizationDTO.getProfileId());
 
         if(organizationDTO.getImage() != null) {
             organization.setImage(organizationDTO.getImage());

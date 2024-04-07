@@ -11,18 +11,27 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO.PageStatus;
 import com.vicky.blog.common.dto.follower.FollowDTO;
 import com.vicky.blog.common.dto.notification.NotificationDTO;
 import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSenderType;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
+import com.vicky.blog.common.dto.redis.UserAccessDetails;
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.BlogService;
@@ -61,6 +70,9 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private RedisTemplate<String, UserAccessDetails> redisTemplate;
+
     @Override
     @UserIdValidator(positions = 0)
     public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
@@ -83,7 +95,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @UserIdValidator(positions = 0)
+    @BlogAccessTracker(userIdPosition = 0)
     public Optional<BlogDTO> getBlog(String userId, String id) throws AppException {
         
         Optional<Blog> blog = blogRepository.findById(id);
@@ -103,6 +115,7 @@ public class BlogServiceImpl implements BlogService {
         blogDTO.getOwner().setProfileId(ownerProfileId);
 
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+
         return Optional.of(blogDTO);
     }
 
@@ -201,7 +214,7 @@ public class BlogServiceImpl implements BlogService {
     }
     
     @Override
-    @UserIdValidator(positions = 0)
+    @BlogAccessTracker(userIdPosition = 0)
     public Optional<BlogDTO> getBlogOfProfile(String userId, String blogId, String profileId) throws AppException {
 
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
@@ -223,6 +236,7 @@ public class BlogServiceImpl implements BlogService {
         }
         BlogDTO blogDTO = blog.get().toDTO();
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+
         return Optional.of(blogDTO);
     }
 
@@ -258,12 +272,14 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException {
         List<Blog> blogs = blogRepository.findAll();
         List<BlogDTO> blogsUserHasAcces = new LinkedList<>();
         for (Blog blog : blogs) {
             ProfileId publishedProfile = blog.getPublishedAt();
+            if (publishedProfile == null) {
+                continue;
+            }
             if (publishedProfile.getType() == ProfileType.ORGANIZATION) {
                 try {
                     organizationService.getOrganization(userId, publishedProfile.getEntityId());
@@ -278,5 +294,41 @@ public class BlogServiceImpl implements BlogService {
             blogsUserHasAcces.add(blog.toDTO());
         }
         return blogsUserHasAcces;
+    }
+
+    @Override
+    public BlogFeedsDTO getBlogsForUserFeed(String userId, int page, int size) throws AppException {
+        UserType userType = userService.getUserType(userId);
+        if (userType == UserType.GUEST && page > 0) {
+            return new BlogFeedsDTO(PageStatus.SIGNUP, List.of());
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Blog> blogs = blogRepository.findByOwnerIdNotAndIsPublised(userId, true, pageable);
+        List<BlogDTO> blogsForFeed = new ArrayList<>();
+        for (Blog blog : blogs) {
+            ProfileId profileId = blog.getPublishedAt();
+            if (profileId.getType() == ProfileType.ORGANIZATION) {
+                try {
+                    organizationService.getOrganization(userId, profileId.getEntityId());
+                } catch (OrganizationNotAccessible e) {
+                    // Ignoring
+                    // If this happens then the user not have access to the organization
+                    // publishin blogs.
+                    LOGGER.info("User {} not have access to the blog {}", userId, blog.getId());
+                    continue;
+                }
+            }
+            BlogDTO blogDTO = blog.toDTO();
+            blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+            blogsForFeed.add(blogDTO);
+        }
+        BlogFeedsDTO feedsDTO = new BlogFeedsDTO();
+        feedsDTO.setFeeds(blogsForFeed);
+        if (blogsForFeed.size() < size) {
+            feedsDTO.setStatus(PageStatus.NOT_AVAILABLE);
+        } else {
+            feedsDTO.setStatus(PageStatus.AVAILABLE);
+        }
+        return feedsDTO;
     }
 }
