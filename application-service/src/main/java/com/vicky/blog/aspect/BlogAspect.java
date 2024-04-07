@@ -1,7 +1,6 @@
 package com.vicky.blog.aspect;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpStatus;
 import org.aspectj.lang.JoinPoint;
@@ -83,10 +82,10 @@ public class BlogAspect {
             userAccessDetails.setBlogAccessCount(1);
             userAccessDetails.setUserId(userId);
         }
+        LOGGER.info("User Access Details {}", userAccessDetails);
         if (userService.getUserType(userId) == UserType.GUEST && userAccessDetails.getBlogAccessCount() > 10) {
             throw new AppException(HttpStatus.SC_TOO_MANY_REQUESTS, "Your daily read limit reached!");
         }
-        LOGGER.info("User Access Details {}", userAccessDetails);
         redisTemplate.opsForValue().set(userId, userAccessDetails, redisConfiguration.getExpireTime(),
                 redisConfiguration.getExpireTimeUnit());
     }

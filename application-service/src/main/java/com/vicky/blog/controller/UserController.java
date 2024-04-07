@@ -104,16 +104,19 @@ public class UserController {
 
         UserDTO user = userService.getUser(userId).orElse(null);
 
+        int status = HttpStatus.SC_OK;
+
         if (user == null) {
             user = new UserDTO();
             user.setAge(-1);
             user.setName("Guest");
             user.setId(userId);
             user.setProfileId(userId);
+            status = 401;
         }
 
         UserResponseData response = new UserResponseData();
-        response.setStatus(HttpStatus.SC_OK);
+        response.setStatus(status);
         response.setMessage("success");
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
