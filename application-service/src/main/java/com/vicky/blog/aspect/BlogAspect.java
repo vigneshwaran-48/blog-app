@@ -16,8 +16,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO.PageStatus;
 import com.vicky.blog.common.dto.redis.UserAccessDetails;
 import com.vicky.blog.common.dto.user.UserDTO.UserType;
+import com.vicky.blog.common.exception.AccessLimitReachedException;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.service.UserService;
@@ -84,7 +86,7 @@ public class BlogAspect {
         }
         LOGGER.info("User Access Details {}", userAccessDetails);
         if (userService.getUserType(userId) == UserType.GUEST && userAccessDetails.getBlogAccessCount() > 10) {
-            throw new AppException(HttpStatus.SC_TOO_MANY_REQUESTS, "Your daily read limit reached!");
+            throw new AccessLimitReachedException("Your daily read limit reached!", PageStatus.SIGNUP);
         }
         redisTemplate.opsForValue().set(userId, userAccessDetails, redisConfiguration.getExpireTime(),
                 redisConfiguration.getExpireTimeUnit());
