@@ -19,6 +19,12 @@ services:
   api-gateway:
     base: https://api-gateway-50018270010.development.catalystappsail.in
 
+app:
+  redis:
+    host: redis-11404.c323.us-east-1-2.ec2.cloud.redislabs.com
+    port: 11404
+    password: ${REDIS_PASSWORD}
+
 logging:
     level:
         org:
