@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,16 +22,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedResponse;
 import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
 import com.vicky.blog.common.dto.blog.BlogFeedsResponse;
 import com.vicky.blog.common.dto.blog.BlogResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO.PageStatus;
 import com.vicky.blog.common.dto.bloglike.BlogLikeDTO;
 import com.vicky.blog.common.dto.bloglike.BlogLikesCountResponse;
 import com.vicky.blog.common.dto.bloglike.BlogLikesResponse;
+import com.vicky.blog.common.dto.comment.CommentDTO;
+import com.vicky.blog.common.exception.AccessLimitReachedException;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogLikeService;
 import com.vicky.blog.common.service.BlogService;
+import com.vicky.blog.common.service.CommentService;
 import com.vicky.blog.common.utility.UserIdExtracter;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +52,10 @@ public class BlogController {
     private UserIdExtracter userIdExtracter;
     @Autowired
     private BlogLikeService blogLikeService;
+    @Autowired
+    private CommentService commentService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlogController.class);
 
     @PostMapping
     public ResponseEntity<?> addBlog(@RequestBody BlogDTO blogDTO, HttpServletRequest request, Principal principal)
@@ -234,15 +246,34 @@ public class BlogController {
             HttpServletRequest request, Principal principal) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
+        String responseMessage = "Blog not exists!";
 
-        Optional<BlogDTO> blog = blogService.getBlogOfProfile(userId, id, profileId);
+        Optional<BlogDTO> blog = Optional.empty();
+        BlogFeedDTO feedDTO = new BlogFeedDTO();
+        PageStatus status = PageStatus.AVAILABLE;
+        try {
+            blog = blogService.getBlogOfProfile(userId, id, profileId);
+            if (!blog.isEmpty()) {
+                responseMessage = "success";
+                List<CommentDTO> comments = commentService.getCommentsOfBlog(userId, id);
+                feedDTO.setBlog(blog.get());
+                feedDTO.setComments(comments);
+                feedDTO.setLikesOfBlog(blogLikeService.getLikesOfBlog(userId, id, profileId));
+            }
 
-        BlogResponse response = new BlogResponse();
-        response.setBlog(blog.isPresent() ? blog.get() : null);
-        response.setMessage(blog.isPresent() ? "success" : "Blog not exists!");
+        } catch (AccessLimitReachedException e) {
+            LOGGER.error(e.getMessage(), e);
+            status = e.getPageStatus();
+            responseMessage = e.getMessage();
+        }
+
+        BlogFeedResponse response = new BlogFeedResponse();
+        response.setFeed(feedDTO);
+        response.setMessage(responseMessage);
         response.setPath(request.getServletPath());
         response.setStatus(blog.isPresent() ? HttpStatus.SC_OK : HttpStatus.SC_NO_CONTENT);
         response.setTime(LocalDateTime.now());
+        response.setBlogStatus(status);
 
         return ResponseEntity.ok().body(response);
     }
