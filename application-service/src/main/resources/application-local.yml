@@ -29,6 +29,12 @@ services:
     api-gateway:
         base: http://localhost:7000
 
+app:
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+
 logging:
   level:
     org:

@@ -21,8 +21,8 @@ services:
 
 app:
   redis:
-    host: redis-11404.c323.us-east-1-2.ec2.cloud.redislabs.com
-    port: 11404
+    host: renewed-crappie-44493.upstash.io
+    port: 44493
     password: ${REDIS_PASSWORD}
 
 logging:

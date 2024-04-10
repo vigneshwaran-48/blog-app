@@ -24,7 +24,7 @@ public class RedisConfig {
     private String password;
 
     @Bean
-    @Profile("!prod")
+    @Profile("docker || local")
     LettuceConnectionFactory lettuceConnectionFactory() {
         LettuceConnectionFactory factory = new LettuceConnectionFactory();
         factory.setHostName(redisHostName);
@@ -32,13 +32,14 @@ public class RedisConfig {
         return factory;
     }
 
-    @Bean
+    @Bean("lettuceConnectionFactory")
     @Profile("prod")
     LettuceConnectionFactory productionLettuceConnectionFactory() {
         LettuceConnectionFactory factory = new LettuceConnectionFactory();
         factory.setHostName(redisHostName);
         factory.setPort(Integer.parseInt(port));
         factory.setPassword(password);
+        factory.setUseSsl(true);
         return factory;
     }
 
