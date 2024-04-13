@@ -50,9 +50,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO user, HttpServletRequest request) throws AppException {
 
-        boolean userAdded = userService.addUser(user);
+        String userId = userService.addUser(user);
 
-        if (!userAdded) {
+        if (userId == null) {
             throw new AppException(500, "Error while creating user");
         }
 
@@ -149,11 +149,8 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable("userId") String userId, HttpServletRequest request)
             throws AppException {
 
-        boolean deleted = userService.deleteUser(userId);
+        userService.deleteUser(userId);
 
-        if (!deleted) {
-            throw new AppException("Unable to delete the user");
-        }
         EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
         response.setMessage("success");

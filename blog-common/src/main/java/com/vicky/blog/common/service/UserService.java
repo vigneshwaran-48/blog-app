@@ -9,9 +9,9 @@ import com.vicky.blog.common.exception.AppException;
 
 public interface UserService {
 
-    boolean addUser(UserDTO userDTO) throws AppException;
+    String addUser(UserDTO userDTO) throws AppException;
     Optional<UserDTO> updateUser(UserDTO user) throws AppException;
-    boolean deleteUser(String userId) throws AppException;
+    String deleteUser(String userId) throws AppException;
     Optional<UserDTO> getUser(String userId) throws AppException;
     List<UserDTO> getUsers(String userId) throws AppException;
     UserType getUserType(String userId) throws AppException;

@@ -70,9 +70,6 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private NotificationService notificationService;
 
-    @Autowired
-    private RedisTemplate<String, UserAccessDetails> redisTemplate;
-
     @Override
     @UserIdValidator(positions = 0)
     public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
