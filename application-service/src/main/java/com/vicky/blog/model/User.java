@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.vicky.blog.common.dto.user.UserDTO;
-import com.vicky.blog.common.dto.user.UserDTO.Theme;
 
 /**
  * 
@@ -25,8 +24,6 @@ import com.vicky.blog.common.dto.user.UserDTO.Theme;
     private String email;
 
     private String description;
-
-    private Theme theme = Theme.LIGHT;
 
     private String image = "http://localhost:8083/static/resource/179rjncje984934";
 
@@ -70,14 +67,6 @@ import com.vicky.blog.common.dto.user.UserDTO.Theme;
         this.description = description;
     }
 
-    public Theme getTheme() {
-        return theme;
-    }
-
-    public void setTheme(Theme theme) {
-        this.theme = theme;
-    }
-
     public String getImage() {
         return image;
     }
@@ -94,7 +83,6 @@ import com.vicky.blog.common.dto.user.UserDTO.Theme;
         userDTO.setId(id);
         userDTO.setImage(image);
         userDTO.setName(name);
-        userDTO.setTheme(theme);
         userDTO.setDescription(description);
         
         return userDTO;
@@ -108,10 +96,6 @@ import com.vicky.blog.common.dto.user.UserDTO.Theme;
         user.setId(userDTO.getId());
         user.setName(userDTO.getName());
         user.setDescription(userDTO.getDescription());
-
-        if(userDTO.getTheme() != null) {
-            user.setTheme(userDTO.getTheme());
-        }
 
         if(userDTO.getImage() != null) {
             user.setImage(userDTO.getImage());
