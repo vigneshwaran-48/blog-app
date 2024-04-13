@@ -11,10 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vicky.blog.common.dto.preference.PreferenceDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.PreferenceService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.common.utility.UserIdExtracter;
@@ -38,6 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ProfileIdUtil profileIdUtil;
+
+    @Autowired
+    private PreferenceService preferenceService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -94,15 +99,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> getUser(String userId) throws AppException {
-        
         Optional<User> user = userRepository.findById(userId);
-
         if(user.isEmpty()) {
             return Optional.empty();
         }
         UserDTO userDTO = user.get().toDTO();
         Optional<String> profileId = profileIdService.getProfileIdByEntityId(userDTO.getId());
         userDTO.setProfileId(profileId.isPresent() ? profileId.get() : userDTO.getId());
+        Optional<PreferenceDTO> preferenceOptional = preferenceService.getPreferences(userId);
+        if (preferenceOptional.isEmpty()) {
+            userDTO.setPreferences(preferenceService.enablePreferencesForUser(userDTO));
+        } else {
+            userDTO.setPreferences(preferenceOptional.get());
+        }
         return Optional.of(userDTO);
     }
 
@@ -162,9 +171,6 @@ public class UserServiceImpl implements UserService {
         }
         if(newData.getImage() == null) {
             newData.setImage(existingData.getImage());
-        }
-        if(newData.getTheme() == null) {
-            newData.setTheme(existingData.getTheme());
         }
     }
     

@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
+import com.vicky.blog.common.dto.preference.PreferenceDTO;
+import com.vicky.blog.common.dto.preference.PreferenceResponse;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserResponseData;
 import com.vicky.blog.common.dto.user.UsersResponseData;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.PreferenceService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.common.utility.UserIdExtracter;
 
@@ -32,23 +34,25 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/app/user")
 public class UserController {
-    
+
     @Autowired
     private UserService userService;
 
     @Autowired
     private UserIdExtracter userIdExtracter;
 
+    @Autowired
+    private PreferenceService preferenceService;
+
     /**
      * Need to remove this controller later because user should be created by the login process only.
      */
     @PostMapping
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO user, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO user, HttpServletRequest request) throws AppException {
 
         boolean userAdded = userService.addUser(user);
 
-        if(!userAdded) {
+        if (!userAdded) {
             throw new AppException(500, "Error while creating user");
         }
 
@@ -65,8 +69,7 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO, HttpServletRequest request) throws AppException {
 
         Optional<UserDTO> updatedUser = userService.updateUser(userDTO);
 
@@ -81,11 +84,11 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUser(@PathVariable("userId") String userId, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> getUser(@PathVariable("userId") String userId, HttpServletRequest request)
+            throws AppException {
 
-        UserDTO user = userService.getUser(userId).orElseThrow(() -> 
-                                        new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists"));
+        UserDTO user = userService.getUser(userId)
+                .orElseThrow(() -> new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists"));
 
         UserResponseData response = new UserResponseData();
         response.setStatus(HttpStatus.SC_OK);
@@ -112,6 +115,7 @@ public class UserController {
             user.setName("Guest");
             user.setId(userId);
             user.setProfileId(userId);
+            user.setPreferences(preferenceService.getDefaultPreferences());
             status = 401;
         }
 
@@ -142,18 +146,35 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable("userId") String userId, HttpServletRequest request) 
-        throws AppException {
+    public ResponseEntity<?> deleteUser(@PathVariable("userId") String userId, HttpServletRequest request)
+            throws AppException {
 
         boolean deleted = userService.deleteUser(userId);
 
-        if(!deleted) {
+        if (!deleted) {
             throw new AppException("Unable to delete the user");
         }
         EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
         response.setMessage("success");
         response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PatchMapping("/preferences")
+    public ResponseEntity<PreferenceResponse> updatePreferences(@RequestBody PreferenceDTO preferenceDTO,
+            HttpServletRequest request, Principal principal) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        preferenceDTO.setUserId(userId);
+        PreferenceDTO preferences = preferenceService.updatePreferences(userId, preferenceDTO);
+        PreferenceResponse response = new PreferenceResponse();
+        response.setMessage("sucess");
+        response.setPath(request.getServletPath());
+        response.setPreferences(preferences);
+        response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
 
         return ResponseEntity.ok().body(response);
