@@ -223,9 +223,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @UserIdValidator(positions = 0)
     @Caching(evict = {
         @CacheEvict(value = "organizations", key = "'organization_' + #userId"),
-        @CacheEvict(value = "organizations", key = "'organization_' + #userId + '_visible'")
+        @CacheEvict(value = "organizations", key = "'organization_' + #userId + '_visible'"),
+        @CacheEvict(value = "organizations", key = "'organization_' + #organizationId + '_users'")
     })
-    @CachePut(value = "organizations", key = "'organization_' + #organizationId + '_users'")
     public Optional<OrganizationUserDTO> addUsersToOrganization(String userId, String organizationId,
             List<String> usersToAdd) throws AppException {
         OrganizationUserDTO organizationUserDTO = new OrganizationUserDTO();
@@ -312,7 +312,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Caching(evict = {
         @CacheEvict(value = "organizations", key = "'organization_' + #organizationId + '_users'"),
         @CacheEvict(value = "organizations", key = "'organization_' + #userId"),
-        @CacheEvict(value = "organizations", key = "'organization_' + #userId + '_' + role")
+        @CacheEvict(value = "organizations", key = "'organization_' + #userId + '_' + 'role'")
     })
     public void changePermissionForUser(String userId, String organizationId, String userToChangePermission,
             UserOrganizationRole role) throws AppException {
