@@ -1,10 +1,11 @@
 package com.vicky.blog.common.dto.organization;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.vicky.blog.common.dto.user.UserDTO;
 
-public class OrganizationUserDTO {
+public class OrganizationUserDTO implements Serializable {
     
     public class OrgUser {
 

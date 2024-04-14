@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "users", key = "applicationUsers")
+    @Cacheable(value = "users", key = "'applicationUsers'")
     public List<UserDTO> getUsers(String userId) throws AppException {
         if(getUser(userId).isEmpty()) {
             LOGGER.error("User {} is not registered", userId);

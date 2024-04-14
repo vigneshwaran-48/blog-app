@@ -74,7 +74,10 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    @CacheEvict(value = "blogs", key = "#userId")
+    @Caching(evict = { 
+        @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
+        @CacheEvict(value = "blogs", key = "#userId")
+    })
     public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
 
         UserDTO user = userService.getUser(userId).get();
@@ -125,7 +128,8 @@ public class BlogServiceImpl implements BlogService {
     @CachePut(value = "blogs", key = "#blogDTO.getId()")
     @Caching(evict = { 
         @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-        @CacheEvict(value = "blogs", key = "#userId")
+        @CacheEvict(value = "blogs", key = "#userId"),
+        @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'")
     })
     public Optional<BlogDTO> updateBlog(String userId, BlogDTO blogDTO) throws AppException {
         
@@ -154,7 +158,8 @@ public class BlogServiceImpl implements BlogService {
     @Caching(evict = { 
             @CacheEvict(value = "blogs", key = "#id"), 
             @CacheEvict(value = "blogs", key = "#userId"),
-            @CacheEvict(value = "blogs", key = "#userId + '_visible'")
+            @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
+            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'")
         })
     public void deleteBlog(String userId, String id) throws AppException {
         blogRepository.deleteByOwnerIdAndId(userId, id);
@@ -187,7 +192,8 @@ public class BlogServiceImpl implements BlogService {
     @Caching(evict = { 
         @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
         @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
-        @CacheEvict(value = "blogs", key = "#userId + '_visible'")
+        @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
+        @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'")
     })
     public void publishBlog(String userId, String blogId, String publishAt) throws AppException {
         UserDTO user = userService.getUser(userId).get();
@@ -317,7 +323,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @Cacheable(value = "blogs", key = "#userId + '_' + #page + '_' + #size")
+    @Cacheable(value = "blogs", key = "'feeds_' + #userId + '_' + #page + '_' + #size")
     public BlogFeedsDTO getBlogsForUserFeed(String userId, int page, int size) throws AppException {
         UserType userType = userService.getUserType(userId);
         if (userType == UserType.GUEST && page > 0) {
