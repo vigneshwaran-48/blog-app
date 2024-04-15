@@ -23,7 +23,7 @@ spring:
 
 services:
     api-gateway:
-        base: https://api-gateway-50018270010.development.catalystappsail.in
+        base: https://api-gateway-50018270010.catalystappsail.in
 
 logging:
     level:
