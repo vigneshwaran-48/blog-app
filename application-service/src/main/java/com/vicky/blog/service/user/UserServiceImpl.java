@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CachePut(value = "users", key = "#user.getId()")
+    @CacheEvict(value = "users", key = "applicationUsers")
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
         Optional<User> existingUser = userRepository.findById(user.getId());
 
@@ -97,6 +98,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "users", key = "#userId")
     public String deleteUser(String userId) throws AppException {
         userRepository.deleteById(userId);
         return userId;
