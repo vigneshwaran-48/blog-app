@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.BlogAccessTracker;
@@ -74,10 +75,8 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    @Caching(evict = { 
-        @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
-        @CacheEvict(value = "blogs", key = "#userId")
-    })
+    @Caching(evict = { @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
+            @CacheEvict(value = "blogs", key = "#userId") })
     public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
 
         UserDTO user = userService.getUser(userId).get();
@@ -90,7 +89,7 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = Blog.build(blogDTO);
         Blog savedBlog = blogRepository.save(blog);
 
-        if(savedBlog == null) {
+        if (savedBlog == null) {
             LOGGER.error("Error while adding blog {}", blog);
             throw new AppException("Errow while adding blog!");
         }
@@ -101,17 +100,17 @@ public class BlogServiceImpl implements BlogService {
     @BlogAccessTracker(userIdPosition = 0)
     @Cacheable(value = "blogs", key = "#id")
     public Optional<BlogDTO> getBlog(String userId, String id) throws AppException {
-        
+
         Optional<Blog> blog = blogRepository.findById(id);
 
-        if(blog.isEmpty()) {
+        if (blog.isEmpty()) {
             return Optional.empty();
         }
         BlogDTO blogDTO = blog.get().toDTO();
 
-        boolean isBlogOwnerNotTheUserAndBlogNotPublished = 
-                                    !blogDTO.getOwner().getId().equals(userId) && !blogDTO.isPublised();
-        if(isBlogOwnerNotTheUserAndBlogNotPublished) {
+        boolean isBlogOwnerNotTheUserAndBlogNotPublished =
+                !blogDTO.getOwner().getId().equals(userId) && !blogDTO.isPublised();
+        if (isBlogOwnerNotTheUserAndBlogNotPublished) {
             LOGGER.info("Blog {} owner is not the user {} and it is not published!", id, userId);
             return Optional.empty();
         }
@@ -126,16 +125,14 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @CachePut(value = "blogs", key = "#blogDTO.getId()")
-    @Caching(evict = { 
-        @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-        @CacheEvict(value = "blogs", key = "#userId"),
-        @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'")
-    })
+    @Caching(evict = { @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
+            @CacheEvict(value = "blogs", key = "#userId"),
+            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'") })
     public Optional<BlogDTO> updateBlog(String userId, BlogDTO blogDTO) throws AppException {
-        
+
         Optional<BlogDTO> existingBlog = getBlog(userId, blogDTO.getId());
 
-        if(existingBlog.isEmpty()) {
+        if (existingBlog.isEmpty()) {
             LOGGER.error("Blog {} not exists", blogDTO.getId());
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Blog not exists");
         }
@@ -145,7 +142,7 @@ public class BlogServiceImpl implements BlogService {
 
         Blog savedBlog = blogRepository.save(Blog.build(blogDTO));
 
-        if(savedBlog == null) {
+        if (savedBlog == null) {
             LOGGER.error("Error while saving blog {}", blogDTO);
             throw new AppException("Errow while saving blog!");
         }
@@ -155,12 +152,9 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    @Caching(evict = { 
-            @CacheEvict(value = "blogs", key = "#id"), 
-            @CacheEvict(value = "blogs", key = "#userId"),
+    @Caching(evict = { @CacheEvict(value = "blogs", key = "#id"), @CacheEvict(value = "blogs", key = "#userId"),
             @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'")
-        })
+            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'") })
     public void deleteBlog(String userId, String id) throws AppException {
         blogRepository.deleteByOwnerIdAndId(userId, id);
     }
@@ -171,11 +165,11 @@ public class BlogServiceImpl implements BlogService {
     public List<BlogDTO> getAllBlogsOfUser(String userId) throws AppException {
         List<Blog> blogs = blogRepository.findByOwnerId(userId);
 
-        if(blogs.isEmpty()) {
+        if (blogs.isEmpty()) {
             return List.of();
         }
         List<BlogDTO> blogDTOs = new ArrayList<>();
-        for(Blog blog : blogs) {
+        for (Blog blog : blogs) {
             BlogDTO blogDTO = blog.toDTO();
             blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
             String ownerProfileId = profileIdService.getProfileIdByEntityId(blogDTO.getOwner().getId()).get();
@@ -189,26 +183,23 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    @Caching(evict = { 
-        @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
-        @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
-        @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-        @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'")
-    })
+    @Caching(evict = { @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
+            @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
+            @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
+            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'") })
     public void publishBlog(String userId, String blogId, String publishAt) throws AppException {
         UserDTO user = userService.getUser(userId).get();
-        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(publishAt).orElseThrow(
-                                () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
+        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(publishAt)
+                .orElseThrow(() -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
         BlogDTO blogDTO = getBlog(userId, blogId).get();
         OrganizationDTO organizationDTO = null;
 
-        if(profileIdDTO.getType() == ProfileType.USER) {
-            if(!user.getId().equals(profileIdDTO.getEntityId())) {
+        if (profileIdDTO.getType() == ProfileType.USER) {
+            if (!user.getId().equals(profileIdDTO.getEntityId())) {
                 LOGGER.error("User {} tried to publish as {}", userId, profileIdDTO.getEntityId());
                 throw new AppException(HttpStatus.SC_FORBIDDEN, "You can't publish as other user!");
             }
-        }
-        else {
+        } else {
             // Validating does user can access organization.
             organizationDTO = organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
@@ -223,38 +214,38 @@ public class BlogServiceImpl implements BlogService {
         NotificationDTO notification = new NotificationDTO();
         notification.setSenderType(NotificationSenderType.USER);
         notification.setMessage(user.getName() + " has published a blog");
-        
-        if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
+
+        if (profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             notification.setSenderType(NotificationSenderType.ORGANIZATION);
             notification.setOrganizationId(organizationDTO.getId());
             notification.setMessage(organizationDTO.getName() + " has published a blog");
         }
-        for(FollowDTO follower : followers) {
+        for (FollowDTO follower : followers) {
             notification.setUserId(follower.getFollower().getEntityId());
             notificationService.addNotification(userId, notification);
         }
         LOGGER.info("Notified the profile {} followers", profileIdDTO.getProfileId());
     }
-    
+
     @Override
     @BlogAccessTracker(userIdPosition = 0)
     @Cacheable(value = "blogs", key = "#profileId + '_' + #blogId")
     public Optional<BlogDTO> getBlogOfProfile(String userId, String blogId, String profileId) throws AppException {
 
-        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
-                                () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
+        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId)
+                .orElseThrow(() -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
 
-        if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
+        if (profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             // Validating does user can access organization.
             organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
         Optional<Blog> blog = blogRepository.findByIdAndPublishedAtId(blogId, profileIdDTO.getId());
-        if(blog.isEmpty()) {
+        if (blog.isEmpty()) {
             // If the user wants to see his own blog with his profileId
             // But Not getting userId from profileDTO because it will lead to anyone can
             // access the blog with a user's profileId.
             blog = blogRepository.findByOwnerIdAndId(userId, blogId);
-            if(blog.isEmpty()) {
+            if (blog.isEmpty()) {
                 return Optional.empty();
             }
         }
@@ -264,36 +255,33 @@ public class BlogServiceImpl implements BlogService {
         return Optional.of(blogDTO);
     }
 
-	@Override
+    @Override
     @UserIdValidator(positions = 0)
     @Cacheable(value = "blogs", key = "#userId + '_' + #profileId")
-	public List<BlogDTO> getAllBlogsOfProfile(String userId, String profileId) throws AppException {
-		ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).orElseThrow(
-                                () -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
+    public List<BlogDTO> getAllBlogsOfProfile(String userId, String profileId) throws AppException {
+        ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId)
+                .orElseThrow(() -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
 
-        if(profileIdDTO.getType() == ProfileType.ORGANIZATION) {
+        if (profileIdDTO.getType() == ProfileType.ORGANIZATION) {
             // Validating does user can access organization.
             organizationService.getOrganization(userId, profileIdDTO.getEntityId()).get();
         }
         List<Blog> blogs = blogRepository.findByPublishedAtId(profileIdDTO.getId());
         return blogs.stream().map(blog -> blog.toDTO()).collect(Collectors.toList());
-	}
+    }
 
-	@Override
+    @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-	public void unPublishBlog(String userId, String blogId) throws AppException {
-        BlogDTO blogDTO = getAllBlogsOfUser(userId)
-                                .stream()
-                                .filter(blog -> blog.getId().equals(blogId))
-                                .findFirst()
-                                .get();
-        
+    public void unPublishBlog(String userId, String blogId) throws AppException {
+        BlogDTO blogDTO =
+                getAllBlogsOfUser(userId).stream().filter(blog -> blog.getId().equals(blogId)).findFirst().get();
+
         blogDTO.setPublised(false);
         blogDTO.setPublishedAt(null);
         updateBlog(userId, blogDTO);
         LOGGER.info("UnPublished blog {}", blogId);
-	}
+    }
 
     @Override
     @UserIdValidator(positions = 0)
@@ -352,6 +340,26 @@ public class BlogServiceImpl implements BlogService {
         BlogFeedsDTO feedsDTO = new BlogFeedsDTO();
         feedsDTO.setFeeds(blogsForFeed);
         if (blogsForFeed.size() < size) {
+            feedsDTO.setStatus(PageStatus.NOT_AVAILABLE);
+        } else {
+            feedsDTO.setStatus(PageStatus.AVAILABLE);
+        }
+        return feedsDTO;
+    }
+
+    @Override
+    public BlogFeedsDTO getBlogsOfFollowingUsers(String userId, int page, int limit) throws AppException {
+        List<UserDTO> followingUsers = followService.getAllFollowingUsers(userId);
+        BlogFeedsDTO feedsDTO = new BlogFeedsDTO();
+        for (UserDTO userDTO : followingUsers) {
+            List<BlogDTO> blogs = blogUtil.getPostedBlogsOfUser(userDTO.getId(), page, limit);
+            if (feedsDTO.getFeeds() == null) {
+                feedsDTO.setFeeds(blogs);
+                continue;
+            }
+            feedsDTO.getFeeds().addAll(blogs);
+        }
+        if (feedsDTO.getFeeds() == null || feedsDTO.getFeeds().size() < limit) {
             feedsDTO.setStatus(PageStatus.NOT_AVAILABLE);
         } else {
             feedsDTO.setStatus(PageStatus.AVAILABLE);

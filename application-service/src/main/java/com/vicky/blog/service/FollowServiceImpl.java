@@ -1,6 +1,8 @@
 package com.vicky.blog.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.hc.core5.http.HttpStatus;
@@ -14,11 +16,13 @@ import com.vicky.blog.annotation.ProfileIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.follower.FollowDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
+import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
+import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Follow;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.mongo.FollowMongoRepository;
@@ -34,6 +38,9 @@ public class FollowServiceImpl implements FollowService {
 
     @Autowired
     private FollowMongoRepository followRepository;
+
+    @Autowired
+    private UserService userService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowServiceImpl.class);
 
@@ -84,6 +91,26 @@ public class FollowServiceImpl implements FollowService {
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId).get();
         
         followRepository.deleteByUserProfileIdAndFollowerId(profileIdDTO.getId(), userProfile.getId());
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<UserDTO> getAllFollowingUsers(String userId) throws AppException {
+        ProfileIdDTO userProfile = profileIdService.getProfileByEntityId(userId).get();
+        List<Follow> following = followRepository.findByFollowerId(userProfile.getId());
+        List<UserDTO> followingUsers = new ArrayList<>();
+        LOGGER.info(following + "");
+        for (Follow follow : following) {
+            if (follow.getUserProfile().getType() != ProfileType.USER) {
+                continue;
+            }
+            Optional<UserDTO> userOptional = userService.getUser(follow.getUserProfile().getEntityId());
+            if (userOptional.isEmpty()) {
+                throw new AppException("The following user is not exists!");
+            }
+            followingUsers.add(userOptional.get());
+        }
+        return followingUsers;
     }
     
 }

@@ -25,4 +25,6 @@ public interface BlogMongoRepository extends MongoRepository<Blog, String> {
     void deleteByOwnerIdAndId(String userId, String id);
 
     Page<Blog> findByOwnerIdNotAndIsPublised(String userId, boolean isPublised, Pageable pageable);
+    
+    Page<Blog> findByOwnerIdAndIsPublised(String userId, boolean isPublised, Pageable pageable);
 }

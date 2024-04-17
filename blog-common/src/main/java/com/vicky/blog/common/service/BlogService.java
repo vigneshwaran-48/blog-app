@@ -30,4 +30,6 @@ public interface BlogService {
     List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException;
 
     BlogFeedsDTO getBlogsForUserFeed(String userId, int page, int limit) throws AppException;
+
+    BlogFeedsDTO getBlogsOfFollowingUsers(String userId, int page, int limit) throws AppException;
 }

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.preference.PreferenceDTO;
@@ -75,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CachePut(value = "users", key = "#user.getId()")
-    @CacheEvict(value = "users", key = "applicationUsers")
+    @CacheEvict(value = "users", key = "'applicationUsers'")
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
         Optional<User> existingUser = userRepository.findById(user.getId());
 
@@ -98,7 +99,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = "users", key = "#userId")
+    @Caching(evict = {
+        @CacheEvict(value = "users", key = "#userId"),
+        @CacheEvict(value = "users", key = "'applicationUsers'")
+    })
     public String deleteUser(String userId) throws AppException {
         userRepository.deleteById(userId);
         return userId;
