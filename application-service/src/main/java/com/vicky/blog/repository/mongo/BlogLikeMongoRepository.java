@@ -3,6 +3,7 @@ package com.vicky.blog.repository.mongo;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.vicky.blog.model.BlogLike;
@@ -17,4 +18,6 @@ public interface BlogLikeMongoRepository extends MongoRepository<BlogLike, Strin
     List<BlogLike> findByBlogId(String blogId);
 
     Optional<BlogLike> findByBlogIdAndLikedById(String blogId, String userId);
+
+    List<BlogLike> findByBlogId(String blogId, Pageable pageable);
 }

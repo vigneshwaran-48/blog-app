@@ -345,4 +345,21 @@ public class BlogController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    @GetMapping("/most-liked")
+    public ResponseEntity<BlogsResponse> getMostLikedBlogs(Principal principal, HttpServletRequest request)
+            throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<BlogDTO> mostLikedBlogs = blogLikeService.getMostLikedBlogs(userId);
+        BlogsResponse response = new BlogsResponse();
+        response.setBlogs(mostLikedBlogs);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
 }
