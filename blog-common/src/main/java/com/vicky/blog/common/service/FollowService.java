@@ -15,4 +15,6 @@ public interface FollowService {
     void unFollowProfile(String userId, String profileId) throws AppException;
 
     List<UserDTO> getAllFollowingUsers(String userId) throws AppException;
+
+    List<UserDTO> getMostFollowedUsers(String userId) throws AppException;
 }

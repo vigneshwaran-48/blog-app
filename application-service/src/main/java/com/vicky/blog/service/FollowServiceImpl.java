@@ -25,7 +25,12 @@ import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Follow;
 import com.vicky.blog.model.ProfileId;
+import com.vicky.blog.model.User;
 import com.vicky.blog.repository.mongo.FollowMongoRepository;
+import com.vicky.blog.repository.mongo.UserMongoRepository;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Service
 public class FollowServiceImpl implements FollowService {
@@ -41,6 +46,9 @@ public class FollowServiceImpl implements FollowService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserMongoRepository userRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowServiceImpl.class);
 
@@ -111,6 +119,33 @@ public class FollowServiceImpl implements FollowService {
             followingUsers.add(userOptional.get());
         }
         return followingUsers;
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<UserDTO> getMostFollowedUsers(String userId) throws AppException {
+        @Data
+        @AllArgsConstructor
+        class UserFollowersCount {
+            private int follwersCount;
+            private User user;
+        }
+        return userRepository.findAll()
+                            .stream()
+                            .map(user -> {
+                                List<FollowDTO> followers = new ArrayList<>();
+                                try {
+                                    ProfileIdDTO profileIdDTO = profileIdService.getProfileByEntityId(user.getId()).get();
+                                    followers = getFollowersOfProfile(user.getId(), profileIdDTO.getProfileId());
+                                } catch (AppException e) {
+                                    LOGGER.error(e.getMessage(), e);
+                                }
+                                return new UserFollowersCount(followers.size(), user);
+                            })
+                            .sorted((a, b) -> Integer.compare(a.follwersCount, b.follwersCount))
+                            .limit(5)
+                            .map(userFollowersCount -> userFollowersCount.user.toDTO())
+                            .collect(Collectors.toList());
     }
     
 }

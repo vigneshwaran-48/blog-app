@@ -123,7 +123,6 @@ public class BlogLikeServiceImpl implements BlogLikeService {
     @Override
     @UserIdValidator(positions = 0)
     public List<BlogDTO> getMostLikedBlogs(String userId) throws AppException {
-        ProfileIdDTO profileIdDTO = profileIdService.getProfileByEntityId(userId).get();
         @Data
         @AllArgsConstructor
         class BlogLikeCount {
@@ -138,14 +137,14 @@ public class BlogLikeServiceImpl implements BlogLikeService {
 
                     int likesCount = 0;
                     try {
-                        likesCount = getLikesOfBlog(userId, blog.getId(), profileIdDTO.getProfileId()).size();
+                        likesCount = getLikesOfBlog(userId, blog.getId(), blog.getPublishedAt().getProfileId()).size();
                     } catch (AppException e) {
                         LOGGER.error(e.getMessage(), e);
                     }
                     return new BlogLikeCount(likesCount, blog);
                 })
                 .sorted((a, b) -> Integer.compare(a.likesCount, b.likesCount))
-                .limit(10)
+                .limit(5)
                 .map(blogLikeCount -> blogLikeCount.blog)
                 .collect(Collectors.toList());
     }
