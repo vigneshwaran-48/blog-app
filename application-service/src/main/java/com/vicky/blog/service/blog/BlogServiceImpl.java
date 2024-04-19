@@ -183,10 +183,15 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    @Caching(evict = { @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
+    @Caching(evict = { 
+            @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
             @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
             @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'") })
+            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
+            @CacheEvict(value = "blogs", key = "#userId"),
+            @CacheEvict(value = "blogs", key = "#blogId"),
+        }
+    )
     public void publishBlog(String userId, String blogId, String publishAt) throws AppException {
         UserDTO user = userService.getUser(userId).get();
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(publishAt)
@@ -273,6 +278,15 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
+    @Caching(evict = { 
+            @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
+            @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
+            @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
+            @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
+            @CacheEvict(value = "blogs", key = "#userId"),
+            @CacheEvict(value = "blogs", key = "#blogId"),
+        }
+    )
     public void unPublishBlog(String userId, String blogId) throws AppException {
         BlogDTO blogDTO =
                 getAllBlogsOfUser(userId).stream().filter(blog -> blog.getId().equals(blogId)).findFirst().get();
