@@ -3,6 +3,7 @@ package com.vicky.blog.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.UserIdValidator;
@@ -81,6 +82,7 @@ public class PreferenceServiceImpl implements PreferenceService {
 
     @Override
     @UserIdValidator(positions = 0)
+    @CacheEvict(value = "users", key = "#userId")
     public PreferenceDTO updatePreferences(String userId, PreferenceDTO preferenceDTO) throws AppException {
         Optional<Preference> preferenceOptional = preferenceRepository.findByUserId(userId);
         preferenceDTO.setUserId(userId);

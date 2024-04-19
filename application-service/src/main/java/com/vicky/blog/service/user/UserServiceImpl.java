@@ -124,6 +124,7 @@ public class UserServiceImpl implements UserService {
         } else {
             userDTO.setPreferences(preferenceOptional.get());
         }
+        LOGGER.info(userDTO.toString());
         return Optional.of(userDTO);
     }
 
