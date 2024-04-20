@@ -195,4 +195,19 @@ public class UserController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    @GetMapping("/following")
+    public ResponseEntity<UsersResponseData> getFollowingUsers(Principal principal, HttpServletRequest request) throws AppException {
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<UserDTO> followingUsers = followService.getFollowingUsers(userId);
+        UsersResponseData response = new UsersResponseData();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setUsers(followingUsers);
+
+        return ResponseEntity.ok().body(response);
+    }
 }

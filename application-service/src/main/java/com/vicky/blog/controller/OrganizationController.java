@@ -27,6 +27,7 @@ import com.vicky.blog.common.dto.organization.OrganizationUserResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationsResponseData;
 import com.vicky.blog.common.dto.organization.OrganizationUserDTO.UserOrganizationRole;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.utility.UserIdExtracter;
 
@@ -39,6 +40,9 @@ public class OrganizationController {
     
     @Autowired
     private OrganizationService organizationService;
+    
+    @Autowired
+    private FollowService followService;
 
     @Autowired
     private UserIdExtracter userIdExtracter;
@@ -228,6 +232,22 @@ public class OrganizationController {
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
         response.setHasPermission(permission);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<OrganizationsResponseData> getFollowingOrganizations(Principal principal, HttpServletRequest request) throws AppException {
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<OrganizationDTO> followingOrganizations = followService.getFollowingOrganizations(userId);
+
+        OrganizationsResponseData response = new OrganizationsResponseData();
+        response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+        response.setPath(request.getServletPath());
+        response.setOrganizations(followingOrganizations);
 
         return ResponseEntity.ok().body(response);
     }
