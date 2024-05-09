@@ -14,8 +14,9 @@ public class Tag {
     @Id
     private String id;
     private String name;
+    private String description;
 
     public TagDTO toDTO() {
-        return new TagDTO(id, name);
+        return new TagDTO(id, name, description);
     }
 }

@@ -11,7 +11,7 @@ public interface TagService {
     
     List<TagDTO> getTagsOfBlog(String userId, String blogId) throws AppException;
 
-    String addTag(String tagName) throws AppException;
+    String addTag(String tagName, String description) throws AppException;
 
     List<TagDTO> getAllTags() throws AppException;
 

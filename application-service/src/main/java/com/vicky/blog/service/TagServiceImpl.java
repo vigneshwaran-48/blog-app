@@ -73,9 +73,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public String addTag(String tagName) throws AppException {
+    public String addTag(String tagName, String description) throws AppException {
         Tag tag = new Tag();
         tag.setName(tagName);
+        tag.setDescription(description);
         Tag savedtag = tagRepository.save(tag);
         if (savedtag == null) {
             throw new AppException("Error while adding tag!");

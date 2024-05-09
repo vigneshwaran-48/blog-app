@@ -35,9 +35,9 @@ public class TagController {
     private TagService tagService;
 
     @PostMapping
-    public ResponseEntity<EmptyResponse> addTag(@RequestParam String name, Principal principal,
-            HttpServletRequest request) throws AppException {
-        String tagId = tagService.addTag(name);
+    public ResponseEntity<EmptyResponse> addTag(@RequestParam String name, @RequestParam String description,
+            Principal principal, HttpServletRequest request) throws AppException {
+        String tagId = tagService.addTag(name, description);
         EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
         response.setMessage("Added tag, Tag Id is " + tagId);
