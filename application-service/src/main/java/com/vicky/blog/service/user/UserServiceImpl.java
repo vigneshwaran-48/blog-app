@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
-    @CacheEvict(value = "users", key = "#result")
+    // @CacheEvict(value = "users", key = "#result")
     public String addUser(UserDTO userDTO) throws AppException {
 
         if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
@@ -75,8 +75,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CachePut(value = "users", key = "#user.getId()")
-    @CacheEvict(value = "users", key = "'applicationUsers'")
+    // @CachePut(value = "users", key = "#user.getId()")
+    // @CacheEvict(value = "users", key = "'applicationUsers'")
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
         Optional<User> existingUser = userRepository.findById(user.getId());
 
@@ -99,17 +99,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Caching(evict = {
-        @CacheEvict(value = "users", key = "#userId"),
-        @CacheEvict(value = "users", key = "'applicationUsers'")
-    })
+    // @Caching(evict = {
+    //     @CacheEvict(value = "users", key = "#userId"),
+    //     @CacheEvict(value = "users", key = "'applicationUsers'")
+    // })
     public String deleteUser(String userId) throws AppException {
         userRepository.deleteById(userId);
         return userId;
     }
 
     @Override
-    @Cacheable(value = "users", key = "#userId")
+    // @Cacheable(value = "users", key = "#userId")
     public Optional<UserDTO> getUser(String userId) throws AppException {
         Optional<User> user = userRepository.findById(userId);
         if(user.isEmpty()) {
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "users", key = "'applicationUsers'")
+    // @Cacheable(value = "users", key = "'applicationUsers'")
     public List<UserDTO> getUsers(String userId) throws AppException {
         if(getUser(userId).isEmpty()) {
             LOGGER.error("User {} is not registered", userId);
