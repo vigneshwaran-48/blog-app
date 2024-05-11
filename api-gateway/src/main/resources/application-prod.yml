@@ -6,14 +6,14 @@ spring:
     gateway:
         routes:
             - id: application-service
-              uri: https://application-service-50018270010.catalystappsail.in
+              uri: ${APPLICATION_SERVICE_BASE}
               predicates:
                 - Path=/api/v1/app/**
             - id: static-service
-              uri: https://static-service-50018270010.catalystappsail.in
+              uri: ${STATIC_SERVICE_BASE}
               predicates:
                 - Path=/static/**
             - id: notification-service
-              uri: https://notification-service-50018270010.catalystappsail.in
+              uri: ${NOTIFICATION_SERVICE}
               predicates:
                 - Path=/api/v1/notification/**

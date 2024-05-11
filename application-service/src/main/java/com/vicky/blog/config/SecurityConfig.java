@@ -20,7 +20,7 @@ public class SecurityConfig {
         return httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf()
                 .disable().authorizeHttpRequests(http -> {
                     http.requestMatchers(HttpMethod.GET, "/api/v1/app/blog/feeds", "/api/v1/app/user/profile",
-                            "/api/v1/app/blog/**").permitAll().anyRequest().authenticated();
+                            "/api/v1/app/blog/**", "/api/keep-alive").permitAll().anyRequest().authenticated();
                 }).oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }
 

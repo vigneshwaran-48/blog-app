@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.service.I18NMessages;
@@ -27,7 +28,7 @@ public class UserAspect {
 
     @Autowired
     private I18NMessages i18nMessages;
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(UserAspect.class);
 
     @Before("@annotation(userIdValidator)")
@@ -37,19 +38,21 @@ public class UserAspect {
 
         Object[] args = joinPoint.getArgs();
 
-        for(int position : positionsToCheck) {
+        for (int position : positionsToCheck) {
             String id = (String) args[position];
 
-            if(id == null) {
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, 
-                    new Object[] { "User Id" }));
+            if (id == null) {
+                throw new AppException(HttpStatus.SC_BAD_REQUEST,
+                        i18nMessages.getMessage(I18NMessage.REQUIRED, new Object[] { "User Id" }));
             }
 
             Optional<UserDTO> user = userService.getUser(id);
-            if(user.isEmpty()) {
-                LOGGER.error("User {} not exists", id);
-                throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.NOT_EXISTS, 
-                    new Object[] { "User" }));
+            if (user.isEmpty()) {
+                if (userService.getUserType(id) != UserType.GUEST) {
+                    LOGGER.error("User {} not exists", id);
+                    throw new AppException(HttpStatus.SC_BAD_REQUEST,
+                            i18nMessages.getMessage(I18NMessage.NOT_EXISTS, new Object[] { "User" }));
+                }
             }
         }
     }

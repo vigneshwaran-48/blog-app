@@ -24,6 +24,8 @@ app:
     host: renewed-crappie-44493.upstash.io
     port: 44493
     password: ${REDIS_PASSWORD}
+  scheduler:
+    baseUrl: ${SERVICE_BASE_URL}
 
 logging:
     level:
