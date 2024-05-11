@@ -24,6 +24,7 @@ import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserResponseData;
 import com.vicky.blog.common.dto.user.UsersResponseData;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.PreferenceService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.common.utility.UserIdExtracter;
@@ -44,15 +45,18 @@ public class UserController {
     @Autowired
     private PreferenceService preferenceService;
 
+    @Autowired
+    private FollowService followService;
+
     /**
      * Need to remove this controller later because user should be created by the login process only.
      */
     @PostMapping
     public ResponseEntity<?> addUser(@Valid @RequestBody UserDTO user, HttpServletRequest request) throws AppException {
 
-        boolean userAdded = userService.addUser(user);
+        String userId = userService.addUser(user);
 
-        if (!userAdded) {
+        if (userId == null) {
             throw new AppException(500, "Error while creating user");
         }
 
@@ -149,11 +153,8 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable("userId") String userId, HttpServletRequest request)
             throws AppException {
 
-        boolean deleted = userService.deleteUser(userId);
+        userService.deleteUser(userId);
 
-        if (!deleted) {
-            throw new AppException("Unable to delete the user");
-        }
         EmptyResponse response = new EmptyResponse();
         response.setStatus(HttpStatus.SC_OK);
         response.setMessage("success");
@@ -176,6 +177,36 @@ public class UserController {
         response.setPreferences(preferences);
         response.setStatus(HttpStatus.SC_OK);
         response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/most-followed")
+    public ResponseEntity<UsersResponseData> getMostFollowedUsers(Principal principal, HttpServletRequest request) throws AppException {
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<UserDTO> mostFollowedUsers = followService.getMostFollowedUsers(userId);
+        UsersResponseData response = new UsersResponseData();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setUsers(mostFollowedUsers);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/following")
+    public ResponseEntity<UsersResponseData> getFollowingUsers(Principal principal, HttpServletRequest request) throws AppException {
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<UserDTO> followingUsers = followService.getFollowingUsers(userId);
+        UsersResponseData response = new UsersResponseData();
+        response.setStatus(HttpStatus.SC_OK);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+        response.setUsers(followingUsers);
 
         return ResponseEntity.ok().body(response);
     }

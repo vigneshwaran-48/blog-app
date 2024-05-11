@@ -9,6 +9,10 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.preference.PreferenceDTO;
@@ -47,7 +51,8 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
-    public boolean addUser(UserDTO userDTO) throws AppException {
+    // @CacheEvict(value = "users", key = "#result")
+    public String addUser(UserDTO userDTO) throws AppException {
 
         if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             LOGGER.error("User with email id {} already exists", userDTO.getEmail());
@@ -64,12 +69,14 @@ public class UserServiceImpl implements UserService {
                 profileId = addedUser.getId();
             }
             profileIdService.addProfileId(addedUser.getId(), profileId, ProfileType.USER);
-            return true;
+            return addedUser.getId();
         }
-        return false;
+        return null;
     }
 
     @Override
+    // @CachePut(value = "users", key = "#user.getId()")
+    // @CacheEvict(value = "users", key = "'applicationUsers'")
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
         Optional<User> existingUser = userRepository.findById(user.getId());
 
@@ -92,12 +99,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean deleteUser(String userId) throws AppException {
+    // @Caching(evict = {
+    //     @CacheEvict(value = "users", key = "#userId"),
+    //     @CacheEvict(value = "users", key = "'applicationUsers'")
+    // })
+    public String deleteUser(String userId) throws AppException {
         userRepository.deleteById(userId);
-        return true;
+        return userId;
     }
 
     @Override
+    // @Cacheable(value = "users", key = "#userId")
     public Optional<UserDTO> getUser(String userId) throws AppException {
         Optional<User> user = userRepository.findById(userId);
         if(user.isEmpty()) {
@@ -112,10 +124,12 @@ public class UserServiceImpl implements UserService {
         } else {
             userDTO.setPreferences(preferenceOptional.get());
         }
+        LOGGER.info(userDTO.toString());
         return Optional.of(userDTO);
     }
 
     @Override
+    // @Cacheable(value = "users", key = "'applicationUsers'")
     public List<UserDTO> getUsers(String userId) throws AppException {
         if(getUser(userId).isEmpty()) {
             LOGGER.error("User {} is not registered", userId);

@@ -1,9 +1,11 @@
 package com.vicky.blog.common.dto.profile;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class ProfileDTO {
+public class ProfileDTO implements Serializable {
 
     public enum ProfileType {
         USER,

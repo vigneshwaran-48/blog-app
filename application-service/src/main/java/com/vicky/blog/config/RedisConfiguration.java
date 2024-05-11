@@ -1,15 +1,15 @@
-package com.vicky.blog.config;
+// package com.vicky.blog.config;
 
-import java.util.concurrent.TimeUnit;
+// import java.util.concurrent.TimeUnit;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+// import lombok.AllArgsConstructor;
+// import lombok.Data;
 
-@Data
-@AllArgsConstructor
-public class RedisConfiguration {
+// @Data
+// @AllArgsConstructor
+// public class RedisConfiguration {
     
-    private Long expireTime;
-    private TimeUnit expireTimeUnit;
+//     private Long expireTime;
+//     private TimeUnit expireTimeUnit;
 
-}
+// }

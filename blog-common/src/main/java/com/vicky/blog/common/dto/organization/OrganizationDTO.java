@@ -1,5 +1,6 @@
 package com.vicky.blog.common.dto.organization;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.vicky.blog.common.dto.user.UserDTO;
@@ -7,7 +8,7 @@ import com.vicky.blog.common.dto.user.UserDTO;
 import lombok.Data;
 
 @Data
-public class OrganizationDTO {
+public class OrganizationDTO implements Serializable {
 
     public enum Visibility {
         PRIVATE,

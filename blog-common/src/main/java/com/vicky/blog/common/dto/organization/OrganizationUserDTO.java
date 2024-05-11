@@ -1,36 +1,22 @@
 package com.vicky.blog.common.dto.organization;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.vicky.blog.common.dto.user.UserDTO;
 
-public class OrganizationUserDTO {
-    
-    public class OrgUser {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+public class OrganizationUserDTO implements Serializable {
+    
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class OrgUser implements Serializable {
         private UserDTO details;
         private UserOrganizationRole role;
-
-        public OrgUser() {}
-
-        public OrgUser(UserDTO details, UserOrganizationRole role) {
-            this.details = details;
-            this.role = role;
-        }
-
-        public UserDTO getDetails() {
-            return details;
-        }
-        public void setDetails(UserDTO details) {
-            this.details = details;
-        }
-        public UserOrganizationRole getRole() {
-            return role;
-        }
-        public void setRole(UserOrganizationRole role) {
-            this.role = role;
-        }
-        
     }
 
     public enum UserOrganizationRole {

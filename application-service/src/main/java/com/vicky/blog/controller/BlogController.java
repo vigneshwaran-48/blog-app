@@ -320,4 +320,46 @@ public class BlogController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    @GetMapping("/following/feeds")
+    public ResponseEntity<BlogFeedsResponse> getFollowingFeedsForUser(@RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size, HttpServletRequest request, Principal principal)
+            throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
+            size = 20;
+        }
+        BlogFeedsDTO feeds = blogService.getBlogsOfFollowingUsers(userId, page, size);
+
+        BlogFeedsResponse response = new BlogFeedsResponse();
+        response.setBlogs(feeds.getFeeds());
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+        response.setNextPageStatus(feeds.getStatus());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/most-liked")
+    public ResponseEntity<BlogsResponse> getMostLikedBlogs(Principal principal, HttpServletRequest request)
+            throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+
+        List<BlogDTO> mostLikedBlogs = blogLikeService.getMostLikedBlogs(userId);
+        BlogsResponse response = new BlogsResponse();
+        response.setBlogs(mostLikedBlogs);
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
 }

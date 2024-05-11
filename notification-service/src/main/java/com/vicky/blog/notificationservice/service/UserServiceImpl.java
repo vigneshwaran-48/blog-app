@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private UserServiceClient userServiceClient;
 
     @Override
-    public boolean addUser(UserDTO userDTO) throws AppException {
+    public String addUser(UserDTO userDTO) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addUser'");
     }
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean deleteUser(String userId) throws AppException {
+    public String deleteUser(String userId) throws AppException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
     }

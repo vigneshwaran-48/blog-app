@@ -1,9 +1,11 @@
 package com.vicky.blog.common.dto.preference;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class PreferenceDTO {
+public class PreferenceDTO implements Serializable {
 
     public enum Theme {
         DARK,
