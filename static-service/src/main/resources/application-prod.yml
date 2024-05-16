@@ -16,8 +16,7 @@ spring:
         oauth2:
             resourceserver:
                 jwt:
-                    issuer-uri: https://accounts.google.com
-                    jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+                    issuer-uri: https://authorization-server-50019167766.catalystappsail.in
 
 
 services:
