@@ -9,10 +9,6 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.common.dto.preference.PreferenceDTO;
@@ -51,7 +47,6 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
-    // @CacheEvict(value = "users", key = "#result")
     public String addUser(UserDTO userDTO) throws AppException {
 
         if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
@@ -75,8 +70,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // @CachePut(value = "users", key = "#user.getId()")
-    // @CacheEvict(value = "users", key = "'applicationUsers'")
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
         Optional<User> existingUser = userRepository.findById(user.getId());
 
