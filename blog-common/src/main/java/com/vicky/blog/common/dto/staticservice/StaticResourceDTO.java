@@ -2,6 +2,8 @@ package com.vicky.blog.common.dto.staticservice;
 
 public class StaticResourceDTO {
 
+    public static final String DEFAULT_COMPOSE_BANNER_IMAGE_ID = "552";
+
     public enum ContentType {
 
         IMAGE_JPG("image/jpg"),
