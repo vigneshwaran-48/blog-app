@@ -49,10 +49,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(UserDTO userDTO) throws AppException {
 
-        if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            LOGGER.error("User with email id {} already exists", userDTO.getEmail());
-            throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
-        }
+        /**
+         * Allowing to create user with same email id because some may use same email id in
+         * both github and google.
+         * This leads to users with same email with different id.
+         * 
+         * In future, When I implement account linking feature in the Vapps authorization server
+         * that time need to refactor.
+         * 
+         */
         validateUser(userDTO);
         User user = User.build(userDTO);
         User addedUser = userRepository.save(user);
