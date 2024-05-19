@@ -74,6 +74,9 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public String addTag(String tagName, String description) throws AppException {
+        if (tagRepository.findByName(tagName).isPresent()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Tag name already exists!");
+        }
         Tag tag = new Tag();
         tag.setName(tagName);
         tag.setDescription(description);
@@ -129,5 +132,14 @@ public class TagServiceImpl implements TagService {
                         .stream()
                         .map(tagFollow -> tagFollow.getTag().toDTO())
                         .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<TagDTO> getTagByName(String name) throws AppException {
+        Optional<Tag> tag = tagRepository.findByName(name);
+        if (tag.isPresent()) {
+            return Optional.of(tag.get().toDTO());
+        }
+        return Optional.empty();
     }
 }
