@@ -3,6 +3,7 @@ package com.vicky.blog.common.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.exception.AppException;
 
@@ -25,5 +26,9 @@ public interface TagService {
     List<TagDTO> getFollowingTags(String userId) throws AppException;
 
     Optional<TagDTO> getTagByName(String name) throws AppException;
+
+    Optional<TagDTO> getTag(String id) throws AppException;
+
+    List<BlogDTO> getAllBlogsOfTag(String tagId) throws AppException;
 
 }

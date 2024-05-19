@@ -14,6 +14,8 @@ public interface BlogTagRepoistory extends MongoRepository<BlogTag, String> {
     
     List<BlogTag> findByBlogId(String blogId);
 
+    List<BlogTag> findByTagId(String tagId);
+
     @Transactional
     void deleteByBlogIdAndTagId(String blogId, String tagId);
 }

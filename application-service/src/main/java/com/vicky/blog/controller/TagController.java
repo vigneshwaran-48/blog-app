@@ -3,6 +3,7 @@ package com.vicky.blog.controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
+import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogsResponse;
 import com.vicky.blog.common.dto.tag.TagDTO;
+import com.vicky.blog.common.dto.tag.TagResponse;
 import com.vicky.blog.common.dto.tag.TagsResponse;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.TagService;
@@ -61,6 +65,25 @@ public class TagController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/{tagId}")
+    public ResponseEntity<TagResponse> getTag(@PathVariable String tagId, Principal principal, HttpServletRequest request)
+            throws AppException {
+        Optional<TagDTO> tag = tagService.getTag(tagId);
+
+        if (tag.isEmpty()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Invalid tag id!");
+        }
+
+        TagResponse response = new TagResponse();
+        response.setTag(tag.get());
+        response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
     @PostMapping("/{tagId}/blog/{blogId}")
     public ResponseEntity<EmptyResponse> applyTag(@PathVariable String tagId, @PathVariable String blogId,
             Principal principal, HttpServletRequest request) throws AppException {
@@ -83,6 +106,21 @@ public class TagController {
 
         TagsResponse response = new TagsResponse();
         response.setTags(tags);
+        response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{tagId}/blog")
+    public ResponseEntity<BlogsResponse> getBlogsOfTag(@PathVariable String tagId, Principal principal,
+            HttpServletRequest request) throws AppException {
+        List<BlogDTO> blogs = tagService.getAllBlogsOfTag(tagId);
+
+        BlogsResponse response = new BlogsResponse();
+        response.setBlogs(blogs);
         response.setMessage("success");
         response.setStatus(HttpStatus.SC_OK);
         response.setPath(request.getServletPath());

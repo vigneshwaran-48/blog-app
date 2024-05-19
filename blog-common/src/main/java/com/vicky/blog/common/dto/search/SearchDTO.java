@@ -14,7 +14,8 @@ public class SearchDTO {
     USER,
     ORGANIZATION,
     BLOG,
-    ALL
+    ALL,
+    TAG
   }
 
   public enum SearchBy {
