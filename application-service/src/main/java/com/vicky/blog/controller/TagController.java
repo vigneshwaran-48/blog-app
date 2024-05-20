@@ -66,8 +66,8 @@ public class TagController {
     }
 
     @GetMapping("/{tagId}")
-    public ResponseEntity<TagResponse> getTag(@PathVariable String tagId, Principal principal, HttpServletRequest request)
-            throws AppException {
+    public ResponseEntity<TagResponse> getTag(@PathVariable String tagId, Principal principal,
+            HttpServletRequest request) throws AppException {
         Optional<TagDTO> tag = tagService.getTag(tagId);
 
         if (tag.isEmpty()) {
@@ -107,6 +107,24 @@ public class TagController {
         TagsResponse response = new TagsResponse();
         response.setTags(tags);
         response.setMessage("success");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/blog/{blogId}")
+    public ResponseEntity<EmptyResponse> applyTags(@PathVariable String blogId, @RequestParam List<String> tagIds,
+            Principal principal, HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        for(String tagId : tagIds) {
+            tagService.applyTagToBlog(userId, blogId, tagId);
+        }
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Applied tags to blog!");
         response.setStatus(HttpStatus.SC_OK);
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
