@@ -119,9 +119,7 @@ public class TagController {
             Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = userIdExtracter.getUserId(principal);
-        for(String tagId : tagIds) {
-            tagService.applyTagToBlog(userId, blogId, tagId);
-        }
+        tagService.applyTagsToBlog(userId, blogId, tagIds);
 
         EmptyResponse response = new EmptyResponse();
         response.setMessage("Applied tags to blog!");

@@ -10,6 +10,8 @@ import com.vicky.blog.common.exception.AppException;
 public interface TagService {
     
     void applyTagToBlog(String userId, String blogId, String tagId) throws AppException;
+
+    void applyTagsToBlog(String userId, String blogId, List<String> tagIds) throws AppException;
     
     List<TagDTO> getTagsOfBlog(String userId, String blogId) throws AppException;
 

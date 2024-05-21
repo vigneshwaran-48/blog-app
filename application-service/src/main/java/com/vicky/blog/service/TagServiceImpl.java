@@ -64,7 +64,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @UserIdValidator(positions = 0)
-    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public List<TagDTO> getTagsOfBlog(String userId, String blogId) throws AppException {
         List<BlogTag> blogTags = blogTagRepoistory.findByBlogId(blogId);
         return blogTags.stream().map(blogTag -> blogTag.getTag().toDTO()).collect(Collectors.toList());
@@ -149,5 +148,13 @@ public class TagServiceImpl implements TagService {
     public List<BlogDTO> getAllBlogsOfTag(String tagId) throws AppException {
         return blogTagRepoistory.findByTagId(tagId).stream().map(blogTag -> blogTag.getBlog().toDTO())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void applyTagsToBlog(String userId, String blogId, List<String> tagIds) throws AppException {
+        blogTagRepoistory.deleteByBlogId(blogId);
+        for (String tagId : tagIds) {
+            applyTagToBlog(userId, blogId, tagId);
+        }
     }
 }
