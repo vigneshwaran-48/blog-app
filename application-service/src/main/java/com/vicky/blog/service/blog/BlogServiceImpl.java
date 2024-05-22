@@ -11,14 +11,9 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.BlogAccessTracker;
@@ -33,6 +28,7 @@ import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSender
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
+import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
@@ -42,6 +38,7 @@ import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.NotificationService;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
+import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.ProfileId;
@@ -72,6 +69,9 @@ public class BlogServiceImpl implements BlogService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private TagService tagService;
 
     @Override
     @UserIdValidator(positions = 0)
@@ -118,16 +118,13 @@ public class BlogServiceImpl implements BlogService {
         blogDTO.getOwner().setProfileId(ownerProfileId);
 
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+        blogDTO.setTags(tagService.getTagsOfBlog(userId, id));
 
         return Optional.of(blogDTO);
     }
 
     @Override
     @UserIdValidator(positions = 0)
-    // @CachePut(value = "blogs", key = "#blogDTO.getId()")
-    // @Caching(evict = { @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-    //         @CacheEvict(value = "blogs", key = "#userId"),
-    //         @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'") })
     public Optional<BlogDTO> updateBlog(String userId, BlogDTO blogDTO) throws AppException {
 
         Optional<BlogDTO> existingBlog = getBlog(userId, blogDTO.getId());
@@ -234,7 +231,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @BlogAccessTracker(userIdPosition = 0)
-    // @Cacheable(value = "blogs", key = "#profileId + '_' + #blogId")
     public Optional<BlogDTO> getBlogOfProfile(String userId, String blogId, String profileId) throws AppException {
 
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId)
@@ -256,7 +252,7 @@ public class BlogServiceImpl implements BlogService {
         }
         BlogDTO blogDTO = blog.get().toDTO();
         blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
-
+        blogDTO.setTags(tagService.getTagsOfBlog(userId, blogId));
         return Optional.of(blogDTO);
     }
 

@@ -28,7 +28,7 @@ import com.vicky.blog.repository.mongo.TagRepository;
 
 @Service
 public class TagServiceImpl implements TagService {
-    
+
     @Autowired
     private TagRepository tagRepository;
 
@@ -64,16 +64,16 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @UserIdValidator(positions = 0)
-    @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public List<TagDTO> getTagsOfBlog(String userId, String blogId) throws AppException {
         List<BlogTag> blogTags = blogTagRepoistory.findByBlogId(blogId);
-        return blogTags.stream()
-                        .map(blogTag -> blogTag.getTag().toDTO())
-                        .collect(Collectors.toList());
+        return blogTags.stream().map(blogTag -> blogTag.getTag().toDTO()).collect(Collectors.toList());
     }
 
     @Override
     public String addTag(String tagName, String description) throws AppException {
+        if (tagRepository.findByName(tagName).isPresent()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Tag name already exists!");
+        }
         Tag tag = new Tag();
         tag.setName(tagName);
         tag.setDescription(description);
@@ -86,10 +86,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<TagDTO> getAllTags() throws AppException {
-        return tagRepository.findAll()
-                            .stream()
-                            .map(tag -> tag.toDTO())
-                            .collect(Collectors.toList());
+        return tagRepository.findAll().stream().map(tag -> tag.toDTO()).collect(Collectors.toList());
     }
 
     @Override
@@ -125,9 +122,39 @@ public class TagServiceImpl implements TagService {
     @Override
     @UserIdValidator(positions = 0)
     public List<TagDTO> getFollowingTags(String userId) throws AppException {
-        return tagFollowRepository.findByFollowerId(userId)
-                        .stream()
-                        .map(tagFollow -> tagFollow.getTag().toDTO())
-                        .collect(Collectors.toList());
+        return tagFollowRepository.findByFollowerId(userId).stream().map(tagFollow -> tagFollow.getTag().toDTO())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<TagDTO> getTagByName(String name) throws AppException {
+        Optional<Tag> tag = tagRepository.findByName(name);
+        if (tag.isPresent()) {
+            return Optional.of(tag.get().toDTO());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<TagDTO> getTag(String id) throws AppException {
+        Optional<Tag> tag = tagRepository.findById(id);
+        if (tag.isPresent()) {
+            return Optional.of(tag.get().toDTO());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<BlogDTO> getAllBlogsOfTag(String tagId) throws AppException {
+        return blogTagRepoistory.findByTagId(tagId).stream().map(blogTag -> blogTag.getBlog().toDTO())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void applyTagsToBlog(String userId, String blogId, List<String> tagIds) throws AppException {
+        blogTagRepoistory.deleteByBlogId(blogId);
+        for (String tagId : tagIds) {
+            applyTagToBlog(userId, blogId, tagId);
+        }
     }
 }

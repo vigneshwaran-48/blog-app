@@ -14,10 +14,12 @@ import com.vicky.blog.common.dto.search.SearchDTO;
 import com.vicky.blog.common.dto.search.SearchDTO.Entity;
 import com.vicky.blog.common.dto.search.SearchDTO.SearchBy;
 import com.vicky.blog.common.dto.search.SearchDTO.SearchType;
+import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.service.OrganizationService;
+import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
 
 @Component
@@ -31,6 +33,9 @@ class SearchUtil {
 
     @Autowired
     private BlogService blogService;
+
+    @Autowired
+    private TagService tagService;
 
     List<OrganizationDTO> searchOrganizations(String userId, String query, List<SearchBy> searchBy)
             throws AppException {
@@ -69,6 +74,12 @@ class SearchUtil {
         }).collect(Collectors.toList());
     }
 
+    List<TagDTO> searchTags(String userId, String query) throws AppException {
+        return tagService.getAllTags().stream().filter(tag -> {
+            return tag.getName().toLowerCase().contains(query.toLowerCase());
+        }).collect(Collectors.toList());
+    }
+
     Optional<SearchDTO> search(String userId, String query, SearchType type, List<SearchBy> searchBy)
             throws AppException {
         List<Entity> entities = new ArrayList<>();
@@ -96,6 +107,13 @@ class SearchUtil {
         case BLOG:
             entities.addAll(searchBlogs(userId, query, searchBy).stream().map(blog -> searchDTO.new Entity(blog.getId(),
                     blog.getPostedProfileId(), SearchType.BLOG, blog.getImage(), blog.getTitle()))
+                    .collect(Collectors.toList()));
+            if (!isAll) {
+                break;
+            }
+        case TAG:
+            entities.addAll(searchTags(userId, query).stream()
+                    .map(tag -> searchDTO.new Entity(userId, tag.getId(), SearchType.TAG, null, tag.getName()))
                     .collect(Collectors.toList()));
             break;
         default:

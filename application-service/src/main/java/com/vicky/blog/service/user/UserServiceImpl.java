@@ -49,18 +49,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(UserDTO userDTO) throws AppException {
 
-        if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            LOGGER.error("User with email id {} already exists", userDTO.getEmail());
-            throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
-        }
+        /**
+         * Allowing to create user with same email id because some may use same email id in
+         * both github and google.
+         * This leads to users with same email with different id.
+         * 
+         * In future, When I implement account linking feature in the Vapps authorization server
+         * that time need to refactor.
+         * 
+         */
         validateUser(userDTO);
         User user = User.build(userDTO);
         User addedUser = userRepository.save(user);
 
-        if(addedUser != null) {
+        if (addedUser != null) {
             LOGGER.info("Added user {}", addedUser.getId());
             String profileId = userDTO.getProfileId();
-            if(profileId == null) {
+            if (profileId == null) {
                 profileId = addedUser.getId();
             }
             profileIdService.addProfileId(addedUser.getId(), profileId, ProfileType.USER);
@@ -73,14 +78,14 @@ public class UserServiceImpl implements UserService {
     public Optional<UserDTO> updateUser(UserDTO user) throws AppException {
         Optional<User> existingUser = userRepository.findById(user.getId());
 
-        if(existingUser.isEmpty()) {
+        if (existingUser.isEmpty()) {
             LOGGER.error("User with userId {} not found", user.getId());
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "User not exists");
         }
         validateUser(user);
         checkAndFillMissingDataForPatchUpdate(user, existingUser.get());
         User updatedUser = userRepository.save(User.build(user));
-        if(updatedUser == null) {
+        if (updatedUser == null) {
             LOGGER.error("Error while updating user {}", user.getId());
             throw new AppException("Error while updating user");
         }
@@ -93,8 +98,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     // @Caching(evict = {
-    //     @CacheEvict(value = "users", key = "#userId"),
-    //     @CacheEvict(value = "users", key = "'applicationUsers'")
+    // @CacheEvict(value = "users", key = "#userId"),
+    // @CacheEvict(value = "users", key = "'applicationUsers'")
     // })
     public String deleteUser(String userId) throws AppException {
         userRepository.deleteById(userId);
@@ -105,7 +110,7 @@ public class UserServiceImpl implements UserService {
     // @Cacheable(value = "users", key = "#userId")
     public Optional<UserDTO> getUser(String userId) throws AppException {
         Optional<User> user = userRepository.findById(userId);
-        if(user.isEmpty()) {
+        if (user.isEmpty()) {
             return Optional.empty();
         }
         UserDTO userDTO = user.get().toDTO();
@@ -124,25 +129,25 @@ public class UserServiceImpl implements UserService {
     @Override
     // @Cacheable(value = "users", key = "'applicationUsers'")
     public List<UserDTO> getUsers(String userId) throws AppException {
-        if(getUser(userId).isEmpty()) {
+        if (getUser(userId).isEmpty()) {
             LOGGER.error("User {} is not registered", userId);
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Current session user is not registered");
         }
 
         List<User> users = userRepository.findAll();
-        if(users.isEmpty()) {
+        if (users.isEmpty()) {
             return List.of();
         }
         return users.stream().map(user -> {
-                                    UserDTO userDTO = user.toDTO();
-                                    try {
-                                        Optional<String> profileId = profileIdService.getProfileIdByEntityId(userDTO.getId());
-                                        userDTO.setProfileId(profileId.isPresent() ? profileId.get() : userDTO.getId());
-                                    } catch (AppException e) {
-                                        LOGGER.error(e.getMessage(), e);
-                                    }
-                                    return userDTO;
-                                }).collect(Collectors.toList());
+            UserDTO userDTO = user.toDTO();
+            try {
+                Optional<String> profileId = profileIdService.getProfileIdByEntityId(userDTO.getId());
+                userDTO.setProfileId(profileId.isPresent() ? profileId.get() : userDTO.getId());
+            } catch (AppException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            return userDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -155,32 +160,37 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
     private void checkAndFillMissingDataForPatchUpdate(UserDTO newData, User existingData) throws AppException {
-        if(newData.getAge() == 0) {
+        if (newData.getAge() == 0) {
             newData.setAge(existingData.getAge());
         }
-        if(newData.getName() == null) {
+        if (newData.getName() == null) {
             newData.setName(existingData.getName());
         }
-        if(newData.getDescription() == null) {
+        if (newData.getDescription() == null) {
             newData.setDescription(existingData.getDescription());
         }
-        if(newData.getEmail() == null) {
+        if (newData.getEmail() == null) {
             newData.setEmail(existingData.getEmail());
-        }
-        else { 
-            Optional<User> userWithEmail = userRepository.findByEmail(newData.getEmail());
-            if(userWithEmail.isPresent() && !userWithEmail.get().getId().equals(newData.getId())) {
+        } else {
+            List<User> usersWithEmail = userRepository.findByEmail(newData.getEmail());
+            boolean userOwnsEmail = false;
+            for (User userWithEmail : usersWithEmail) {
+                if (userWithEmail.getId().equals(newData.getId())) {
+                    userOwnsEmail = true;
+                    break;
+                }
+            }
+            if (!userOwnsEmail) {
                 LOGGER.error("User with email id {} already exists", newData.getEmail());
                 throw new AppException(HttpStatus.SC_CONFLICT, "User with email id already exists");
             }
         }
-        if(newData.getImage() == null) {
+        if (newData.getImage() == null) {
             newData.setImage(existingData.getImage());
         }
     }
-    
+
     private void validateUser(UserDTO userDTO) throws AppException {
         profileIdUtil.validateUniqueName(userDTO.getId(), userDTO.getProfileId());
         validateName(userDTO.getName());
@@ -190,40 +200,39 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateName(String name) throws AppException {
-        if(name == null) {
+        if (name == null) {
             Object[] args = { "Name" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, args));
         }
-        if(name.length() < UserConstants.MIN_LENGTH || name.length() > UserConstants.MAX_LENGTH) {
+        if (name.length() < UserConstants.MIN_LENGTH || name.length() > UserConstants.MAX_LENGTH) {
             Object[] args = { "User name", UserConstants.MIN_LENGTH, UserConstants.MAX_LENGTH };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX, args));
         }
     }
 
     private void validateAge(int age) throws AppException {
-        if(age < UserConstants.MIN_AGE || age > UserConstants.MAX_AGE) {
+        if (age < UserConstants.MIN_AGE || age > UserConstants.MAX_AGE) {
             Object[] args = { "User age", UserConstants.MIN_AGE, UserConstants.MAX_AGE };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MIN_MAX, args));
         }
     }
 
     private void validateDescription(String description) throws AppException {
-        if(description != null && description.length() > UserConstants.MAX_DESCRIPTION_LENGTH) {
+        if (description != null && description.length() > UserConstants.MAX_DESCRIPTION_LENGTH) {
             Object[] args = { "Description", UserConstants.MAX_DESCRIPTION_LENGTH };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.MAX_LENGTH, args));
         }
     }
 
     private void validateEmail(String email) throws AppException {
-        if(email == null) {
+        if (email == null) {
             Object[] args = { "Email" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.REQUIRED, args));
         }
-        if(!Pattern.compile(UserConstants.EMAIL_REGEX).matcher(email).matches()) {
+        if (!Pattern.compile(UserConstants.EMAIL_REGEX).matcher(email).matches()) {
             Object[] args = { "Email" };
             throw new AppException(HttpStatus.SC_BAD_REQUEST, i18nMessages.getMessage(I18NMessage.INVALID, args));
         }
     }
-    
 
 }
