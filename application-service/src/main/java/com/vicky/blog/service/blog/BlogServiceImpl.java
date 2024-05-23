@@ -28,7 +28,6 @@ import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSender
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
-import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserDTO.UserType;
 import com.vicky.blog.common.exception.AppException;
@@ -75,8 +74,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Caching(evict = { @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
-    //         @CacheEvict(value = "blogs", key = "#userId") })
     public String addBlog(String userId, BlogDTO blogDTO) throws AppException {
 
         UserDTO user = userService.getUser(userId).get();
@@ -98,7 +95,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @BlogAccessTracker(userIdPosition = 0)
-    // @Cacheable(value = "blogs", key = "#id")
     public Optional<BlogDTO> getBlog(String userId, String id) throws AppException {
 
         Optional<Blog> blog = blogRepository.findById(id);
@@ -149,16 +145,12 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    // @Caching(evict = { @CacheEvict(value = "blogs", key = "#id"), @CacheEvict(value = "blogs", key = "#userId"),
-    //         @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-    //         @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'") })
     public void deleteBlog(String userId, String id) throws AppException {
         blogRepository.deleteByOwnerIdAndId(userId, id);
     }
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Cacheable(value = "blogs", key = "#userId")
     public List<BlogDTO> getAllBlogsOfUser(String userId) throws AppException {
         List<Blog> blogs = blogRepository.findByOwnerId(userId);
 
@@ -180,15 +172,6 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    // @Caching(evict = { 
-    //         @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
-    //         @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
-    //         @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-    //         @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
-    //         @CacheEvict(value = "blogs", key = "#userId"),
-    //         @CacheEvict(value = "blogs", key = "#blogId"),
-    //     }
-    // )
     public void publishBlog(String userId, String blogId, String publishAt) throws AppException {
         UserDTO user = userService.getUser(userId).get();
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(publishAt)
@@ -258,7 +241,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Cacheable(value = "blogs", key = "#userId + '_' + #profileId")
     public List<BlogDTO> getAllBlogsOfProfile(String userId, String profileId) throws AppException {
         ProfileIdDTO profileIdDTO = profileIdService.getProfileId(profileId)
                 .orElseThrow(() -> new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id not exists"));
@@ -274,15 +256,6 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
-    // @Caching(evict = { 
-    //         @CacheEvict(value = "blogs", key = "#publishAt + '_' + #blogId"),
-    //         @CacheEvict(value = "blogs", key = "#userId + '_' + #publishAt"),
-    //         @CacheEvict(value = "blogs", key = "#userId + '_visible'"),
-    //         @CacheEvict(value = "blogs", key = "'feeds_' + #userId + '_*'"),
-    //         @CacheEvict(value = "blogs", key = "#userId"),
-    //         @CacheEvict(value = "blogs", key = "#blogId"),
-    //     }
-    // )
     public void unPublishBlog(String userId, String blogId) throws AppException {
         BlogDTO blogDTO =
                 getAllBlogsOfUser(userId).stream().filter(blog -> blog.getId().equals(blogId)).findFirst().get();
@@ -295,7 +268,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Cacheable(value = "blogs", key = "#userId + '_visible'")
     public List<BlogDTO> getAllBlogsVisibleToUser(String userId) throws AppException {
         List<Blog> blogs = blogRepository.findAll();
         List<BlogDTO> blogsUserHasAcces = new LinkedList<>();
@@ -321,7 +293,6 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    // @Cacheable(value = "blogs", key = "'feeds_' + #userId + '_' + #page + '_' + #size")
     public BlogFeedsDTO getBlogsForUserFeed(String userId, int page, int size) throws AppException {
         UserType userType = userService.getUserType(userId);
         if (userType == UserType.GUEST && page > 0) {
