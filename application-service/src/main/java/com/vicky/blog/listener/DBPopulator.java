@@ -61,7 +61,6 @@ public class DBPopulator {
         }
         UserDTO userDTO = new UserDTO();
         userDTO.setId(BlogConstants.GUEST_USER_ID);
-        userDTO.setAge(-1);
         userDTO.setDescription("Application's guest user's representation");
         userDTO.setEmail("guest@blog.com");
         userDTO.setName("Guest");

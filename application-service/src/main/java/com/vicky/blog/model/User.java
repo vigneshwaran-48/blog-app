@@ -25,7 +25,7 @@ import com.vicky.blog.common.dto.user.UserDTO;
 
     private String description;
 
-    private String image = "http://localhost:8083/static/resource/179rjncje984934";
+    private String image;
 
     public String getId() {
         return id;
