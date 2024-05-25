@@ -15,6 +15,12 @@ public class UserDTO implements Serializable {
         PREMIUM
     }
 
+    public enum Gender {
+        MALE,
+        FEMALE,
+        OTHERS
+    }
+
     private String id;
     private String name;
     private String profileId;
@@ -23,5 +29,6 @@ public class UserDTO implements Serializable {
     private String image;
     private String description;
     private PreferenceDTO preferences;
+    private Gender gender;
 
 }

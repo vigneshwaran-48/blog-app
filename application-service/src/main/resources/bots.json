@@ -1,0 +1,202 @@
+[
+    {
+        "id": "bot1",
+        "name": "Alice Bot",
+        "profileId": "TechQueenAlice",
+        "age": 30,
+        "email": "alice.bot@example.com",
+        "image": "https://picsum.photos/200?random=1",
+        "description": "I love exploring new technologies.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot2",
+        "name": "Bob Bot",
+        "profileId": "CodeMasterBob",
+        "age": 35,
+        "email": "bob.bot@example.com",
+        "image": "https://picsum.photos/200?random=2",
+        "description": "A passionate coder and tech enthusiast.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot3",
+        "name": "Charlie Bot",
+        "profileId": "BlogWizardCharlie",
+        "age": 25,
+        "email": "charlie.bot@example.com",
+        "image": "https://picsum.photos/200?random=3",
+        "description": "Enjoys writing blog posts about programming.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot4",
+        "name": "David Bot",
+        "profileId": "AvidReaderDavid",
+        "age": 28,
+        "email": "david.bot@example.com",
+        "image": "https://picsum.photos/200?random=4",
+        "description": "Avid reader and blogger.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot5",
+        "name": "Eve Bot",
+        "profileId": "CyberGuruEve",
+        "age": 32,
+        "email": "eve.bot@example.com",
+        "image": "https://picsum.photos/200?random=5",
+        "description": "Cybersecurity expert and blogger.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot6",
+        "name": "Frank Bot",
+        "profileId": "TechSageFrank",
+        "age": 27,
+        "email": "frank.bot@example.com",
+        "image": "https://picsum.photos/200?random=6",
+        "description": "Tech-savvy and loves to share knowledge.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot7",
+        "name": "Grace Bot",
+        "profileId": "CodeNinjaGrace",
+        "age": 29,
+        "email": "grace.bot@example.com",
+        "image": "https://picsum.photos/200?random=7",
+        "description": "Software developer with a passion for blogging.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot8",
+        "name": "Hank Bot",
+        "profileId": "TechFanaticHank",
+        "age": 31,
+        "email": "hank.bot@example.com",
+        "image": "https://picsum.photos/200?random=8",
+        "description": "Tech enthusiast and a frequent blogger.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot9",
+        "name": "Ivy Bot",
+        "profileId": "AIGeniusIvy",
+        "age": 26,
+        "email": "ivy.bot@example.com",
+        "image": "https://picsum.photos/200?random=9",
+        "description": "Loves writing about AI and machine learning.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot10",
+        "name": "Jake Bot",
+        "profileId": "CloudGuruJake",
+        "age": 34,
+        "email": "jake.bot@example.com",
+        "image": "https://picsum.photos/200?random=10",
+        "description": "Cloud computing expert and blogger.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot11",
+        "name": "Kate Bot",
+        "profileId": "StackWhizKate",
+        "age": 28,
+        "email": "kate.bot@example.com",
+        "image": "https://picsum.photos/200?random=11",
+        "description": "Full-stack developer who loves to share tips.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot12",
+        "name": "Leo Bot",
+        "profileId": "TechWriterLeo",
+        "age": 30,
+        "email": "leo.bot@example.com",
+        "image": "https://picsum.photos/200?random=12",
+        "description": "Tech writer and enthusiast.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot13",
+        "name": "Mia Bot",
+        "profileId": "WebDevQueenMia",
+        "age": 33,
+        "email": "mia.bot@example.com",
+        "image": "https://picsum.photos/200?random=13",
+        "description": "Blogger focused on web development.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot14",
+        "name": "Nina Bot",
+        "profileId": "FrontendGuruNina",
+        "age": 27,
+        "email": "nina.bot@example.com",
+        "image": "https://picsum.photos/200?random=14",
+        "description": "Tech blogger with a knack for front-end development.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot15",
+        "name": "Oscar Bot",
+        "profileId": "DevOpsMasterOscar",
+        "age": 29,
+        "email": "oscar.bot@example.com",
+        "image": "https://picsum.photos/200?random=15",
+        "description": "Enthusiastic about DevOps and blogging.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot16",
+        "name": "Paul Bot",
+        "profileId": "BackendGuruPaul",
+        "age": 31,
+        "email": "paul.bot@example.com",
+        "image": "https://picsum.photos/200?random=16",
+        "description": "Back-end developer who loves to blog.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot17",
+        "name": "Quinn Bot",
+        "profileId": "AIResearcherQuinn",
+        "age": 26,
+        "email": "quinn.bot@example.com",
+        "image": "https://picsum.photos/200?random=17",
+        "description": "AI researcher and writer.",
+        "gender": "OTHERS"
+    },
+    {
+        "id": "bot18",
+        "name": "Rachel Bot",
+        "profileId": "TrendAnalystRachel",
+        "age": 32,
+        "email": "rachel.bot@example.com",
+        "image": "https://picsum.photos/200?random=18",
+        "description": "Writes about tech trends and innovations.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot19",
+        "name": "Sam Bot",
+        "profileId": "SecurityExpertSam",
+        "age": 30,
+        "email": "sam.bot@example.com",
+        "image": "https://picsum.photos/200?random=19",
+        "description": "Cybersecurity analyst and blogger.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot20",
+        "name": "Tina Bot",
+        "profileId": "AIJournalistTina",
+        "age": 28,
+        "email": "tina.bot@example.com",
+        "image": "https://picsum.photos/200?random=20",
+        "description": "Tech journalist with a passion for AI.",
+        "gender": "FEMALE"
+    }
+]

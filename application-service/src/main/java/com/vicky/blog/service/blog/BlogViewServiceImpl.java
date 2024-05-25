@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,9 +78,12 @@ public class BlogViewServiceImpl implements BlogViewService {
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
     public BlogViewStats getBlogViewStats(String userId, String blogId) throws AppException {
+        BlogDTO blogDTO = blogService.getBlog(userId, blogId).get();
+        
         List<BlogView> blogViews = blogViewRepository.findByBlogId(blogId);
         BlogViewStats blogViewStats = new BlogViewStats();
         blogViewStats.setBlogId(blogId);
+        blogViewStats.setTitle(blogDTO.getTitle());
         blogViewStats.setViewsCount(blogViews.size());
         List<BlogViewDTO> blogViewDTOs = new ArrayList<>();
         
@@ -90,6 +94,17 @@ public class BlogViewServiceImpl implements BlogViewService {
         }
         blogViewStats.setBlogViews(blogViewDTOs);
         blogViewStats.setUsersCount(userIds.size());
+        return blogViewStats;
+    }
+
+    @Override
+    @UserIdValidator(positions = 0, allowGuestType = false)
+    public List<BlogViewStats> getAllBlogViewStatsOfUser(String userId) throws AppException {
+        List<BlogDTO> allBlogsOfUser = blogService.getAllBlogsOfUser(userId);
+        List<BlogViewStats> blogViewStats = new ArrayList<>();
+        for (BlogDTO blog : allBlogsOfUser) {
+            blogViewStats.add(getBlogViewStats(userId, blog.getId()));
+        }
         return blogViewStats;
     }
 

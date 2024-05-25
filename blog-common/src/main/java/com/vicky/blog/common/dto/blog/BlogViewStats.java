@@ -8,6 +8,7 @@ import lombok.Data;
 public class BlogViewStats {
     
     private String blogId;
+    private String title;
     private int viewsCount;
     private int usersCount;
     private List<BlogViewDTO> blogViews;

@@ -19,6 +19,7 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Tag;
+import com.vicky.blog.model.User;
 
 @Component
 public class DBPopulator {
@@ -66,5 +67,15 @@ public class DBPopulator {
         userDTO.setName("Guest");
         String id = userService.addUser(userDTO);
         LOGGER.info("Created guest user with id {}", id);
+    }
+
+    private void createBots() throws AppException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        InputStream inputStream = getClass().getResourceAsStream("/tags.json");
+        List<User> bots = Arrays.asList(mapper.readValue(inputStream, User.class));
+
+        for (User bot : bots) {
+            
+        }
     }
 }

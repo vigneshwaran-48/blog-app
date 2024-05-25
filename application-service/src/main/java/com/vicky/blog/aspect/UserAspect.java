@@ -35,6 +35,7 @@ public class UserAspect {
     public void userIdValidator(JoinPoint joinPoint, UserIdValidator userIdValidator) throws Throwable {
 
         int[] positionsToCheck = userIdValidator.positions();
+        boolean allowGuestUsers = userIdValidator.allowGuestType();
 
         Object[] args = joinPoint.getArgs();
 
@@ -48,7 +49,7 @@ public class UserAspect {
 
             Optional<UserDTO> user = userService.getUser(id);
             if (user.isEmpty()) {
-                if (userService.getUserType(id) != UserType.GUEST) {
+                if (!allowGuestUsers || userService.getUserType(id) != UserType.GUEST) {
                     LOGGER.error("User {} not exists", id);
                     throw new AppException(HttpStatus.SC_BAD_REQUEST,
                             i18nMessages.getMessage(I18NMessage.NOT_EXISTS, new Object[] { "User" }));
