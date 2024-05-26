@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface UserIdValidator {
     int[] positions();
+    boolean allowGuestType() default true;
 }

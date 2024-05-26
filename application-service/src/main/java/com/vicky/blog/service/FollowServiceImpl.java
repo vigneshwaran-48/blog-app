@@ -26,7 +26,6 @@ import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Follow;
 import com.vicky.blog.model.ProfileId;
-import com.vicky.blog.model.User;
 import com.vicky.blog.repository.mongo.FollowMongoRepository;
 import com.vicky.blog.repository.mongo.UserMongoRepository;
 
@@ -128,19 +127,22 @@ public class FollowServiceImpl implements FollowService {
         @AllArgsConstructor
         class UserFollowersCount {
             private int follwersCount;
-            private User user;
+            private UserDTO user;
         }
         return userRepository.findAll().stream().map(user -> {
             List<FollowDTO> followers = new ArrayList<>();
+            ProfileIdDTO profileIdDTO = null;
             try {
-                ProfileIdDTO profileIdDTO = profileIdService.getProfileByEntityId(user.getId()).get();
+                profileIdDTO = profileIdService.getProfileByEntityId(user.getId()).get();
                 followers = getFollowersOfProfile(user.getId(), profileIdDTO.getProfileId());
             } catch (AppException e) {
                 LOGGER.error(e.getMessage(), e);
             }
-            return new UserFollowersCount(followers.size(), user);
+            UserDTO userDTO = user.toDTO();
+            userDTO.setProfileId(profileIdDTO.getProfileId());
+            return new UserFollowersCount(followers.size(), userDTO);
         }).sorted((a, b) -> Integer.compare(a.follwersCount, b.follwersCount)).limit(5)
-                .map(userFollowersCount -> userFollowersCount.user.toDTO()).collect(Collectors.toList());
+                .map(userFollowersCount -> userFollowersCount.user).collect(Collectors.toList());
     }
 
     @Override

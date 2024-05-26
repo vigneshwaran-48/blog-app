@@ -29,8 +29,8 @@ spring:
           issuer-uri: https://authorization-server-50019167766.catalystappsail.in
 
 services:
-    api-gateway:
-        base: http://api-gateway:7000
+  api-gateway:
+    base: http://api-gateway:7000
 
 app:
   redis:

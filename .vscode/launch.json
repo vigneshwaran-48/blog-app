@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DBPopulator",
+            "request": "launch",
+            "mainClass": "com.vicky.blog.listener.DBPopulator",
+            "projectName": "application-service"
+        },
+        {
+            "type": "java",
             "name": "BlogUtil",
             "request": "launch",
             "mainClass": "com.vicky.blog.service.blog.BlogUtil",

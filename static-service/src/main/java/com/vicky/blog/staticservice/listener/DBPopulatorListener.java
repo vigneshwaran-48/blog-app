@@ -3,8 +3,12 @@ package com.vicky.blog.staticservice.listener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ public class DBPopulatorListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBPopulatorListener.class);
     private static final String DEFAULT_IMAGE_LOCATION = "classpath:static/blog-banner.jpg";
+    private static final String USER_PROFILE_LOCATION = "classpath:static/user-profile";
 
     @EventListener(ContextRefreshedEvent.class)
     public void onEvent() {
@@ -42,6 +47,8 @@ public class DBPopulatorListener {
                 storeDefaultImage();
             }
             LOGGER.info("Default banner image exists!");
+
+            storeAvatars();
         } catch (AppException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -63,5 +70,31 @@ public class DBPopulatorListener {
 
         staticService.addResource(null, resourceDTO);
         LOGGER.info("Default Banner Image has been stored!");
+    }
+
+    private void storeAvatars() throws AppException {
+        try {
+            Resource userProfileDirResource = resourceLoader.getResource(USER_PROFILE_LOCATION);
+            Path path = Paths.get(userProfileDirResource.getURI());
+
+            try (Stream<Path> paths = Files.walk(path, 1)) {
+                List<Path> files = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+                for (Path avatar : files) {
+                    if (staticService.getResource(null, avatar.getFileName().toString()).isPresent()) {
+                        continue;
+                    }
+                    StaticResourceDTO staticResourceDTO = new StaticResourceDTO();
+                    staticResourceDTO.setVisibility(Visibility.PUBLIC);
+                    staticResourceDTO.setContentType(ContentType.IMAGE_JPG);
+                    staticResourceDTO.setData(Files.readAllBytes(avatar));
+                    staticResourceDTO.setId(avatar.getFileName().toString());
+                    staticService.addResource(null, staticResourceDTO);
+                }  
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new AppException("Error while storing avatars!");
+        }
+        LOGGER.info("Stored avatars!");
     }
 }

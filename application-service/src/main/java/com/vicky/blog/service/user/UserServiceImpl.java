@@ -69,6 +69,7 @@ public class UserServiceImpl implements UserService {
                 profileId = addedUser.getId();
             }
             profileIdService.addProfileId(addedUser.getId(), profileId, ProfileType.USER);
+            preferenceService.enablePreferencesForUser(addedUser.toDTO());
             return addedUser.getId();
         }
         return null;
@@ -97,17 +98,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    // @Caching(evict = {
-    // @CacheEvict(value = "users", key = "#userId"),
-    // @CacheEvict(value = "users", key = "'applicationUsers'")
-    // })
     public String deleteUser(String userId) throws AppException {
         userRepository.deleteById(userId);
         return userId;
     }
 
     @Override
-    // @Cacheable(value = "users", key = "#userId")
     public Optional<UserDTO> getUser(String userId) throws AppException {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
@@ -116,18 +112,12 @@ public class UserServiceImpl implements UserService {
         UserDTO userDTO = user.get().toDTO();
         Optional<String> profileId = profileIdService.getProfileIdByEntityId(userDTO.getId());
         userDTO.setProfileId(profileId.isPresent() ? profileId.get() : userDTO.getId());
-        Optional<PreferenceDTO> preferenceOptional = preferenceService.getPreferences(userId);
-        if (preferenceOptional.isEmpty()) {
-            userDTO.setPreferences(preferenceService.enablePreferencesForUser(userDTO));
-        } else {
-            userDTO.setPreferences(preferenceOptional.get());
-        }
+        userDTO.setPreferences(preferenceService.getPreferences(userId).get());
         LOGGER.info(userDTO.toString());
         return Optional.of(userDTO);
     }
 
     @Override
-    // @Cacheable(value = "users", key = "'applicationUsers'")
     public List<UserDTO> getUsers(String userId) throws AppException {
         if (getUser(userId).isEmpty()) {
             LOGGER.error("User {} is not registered", userId);

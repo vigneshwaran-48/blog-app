@@ -1,0 +1,202 @@
+[
+    {
+        "id": "bot_1",
+        "name": "Alice Johnson",
+        "profileId": "StarlightAlice",
+        "age": 28,
+        "email": "alice.johnson@example.com",
+        "image": "/static/user-profile/alice.jpg",
+        "description": "Loves hiking and outdoor adventures.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_2",
+        "name": "Michael Smith",
+        "profileId": "ThunderMike",
+        "age": 32,
+        "email": "michael.smith@example.com",
+        "image": "/static/user-profile/michael.jpg",
+        "description": "Avid reader and tech enthusiast.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_3",
+        "name": "Jessica Williams",
+        "profileId": "SunshineJess",
+        "age": 24,
+        "email": "jessica.williams@example.com",
+        "image": "/static/user-profile/jessica.jpg",
+        "description": "Passionate about cooking and baking.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_4",
+        "name": "David Brown",
+        "profileId": "WolfpackDave",
+        "age": 29,
+        "email": "david.brown@example.com",
+        "image": "/static/user-profile/david.jpg",
+        "description": "Fitness enthusiast and marathon runner.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_5",
+        "name": "Emily Davis",
+        "profileId": "StarEmily",
+        "age": 26,
+        "email": "emily.davis@example.com",
+        "image": "/static/user-profile/emily.jpg",
+        "description": "Artist and painter.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_6",
+        "name": "James Wilson",
+        "profileId": "JamesBolt",
+        "age": 31,
+        "email": "james.wilson@example.com",
+        "image": "/static/user-profile/james.jpg",
+        "description": "Tech entrepreneur.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_7",
+        "name": "Sarah Miller",
+        "profileId": "MillerMagic",
+        "age": 27,
+        "email": "sarah.miller@example.com",
+        "image": "/static/user-profile/sarah.jpg",
+        "description": "Loves to travel and explore new cultures.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_8",
+        "name": "Christopher Taylor",
+        "profileId": "ChrisThunder",
+        "age": 33,
+        "email": "christopher.taylor@example.com",
+        "image": "/static/user-profile/christopher.jpg",
+        "description": "Gamer and tech geek.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_9",
+        "name": "Olivia Lee",
+        "profileId": "LivStar",
+        "age": 25,
+        "email": "olivia.lee@example.com",
+        "image": "/static/user-profile/olivia.jpg",
+        "description": "Yoga instructor and wellness coach.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_10",
+        "name": "Daniel White",
+        "profileId": "WhiteWolf",
+        "age": 30,
+        "email": "daniel.white@example.com",
+        "image": "/static/user-profile/daniel.jpg",
+        "description": "Music producer.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_11",
+        "name": "Emma Harris",
+        "profileId": "HarrisDreamer",
+        "age": 28,
+        "email": "emma.harris@example.com",
+        "image": "/static/user-profile/emma.jpg",
+        "description": "Fashion designer.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_12",
+        "name": "Matthew Clark",
+        "profileId": "MattMaverick",
+        "age": 34,
+        "email": "matthew.clark@example.com",
+        "image": "/static/user-profile/matthew.jpg",
+        "description": "Architect and designer.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_13",
+        "name": "Sophia Lewis",
+        "profileId": "SophiaSunshine",
+        "age": 22,
+        "email": "sophia.lewis@example.com",
+        "image": "/static/user-profile/sophia.jpg",
+        "description": "Aspiring novelist.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_14",
+        "name": "Ethan Robinson",
+        "profileId": "RoboEthan",
+        "age": 29,
+        "email": "ethan.robinson@example.com",
+        "image": "/static/user-profile/ethan.jpg",
+        "description": "Robotics engineer.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_15",
+        "name": "Isabella Walker",
+        "profileId": "BellaWaves",
+        "age": 26,
+        "email": "isabella.walker@example.com",
+        "image": "/static/user-profile/isabella.jpg",
+        "description": "Marine biologist.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_16",
+        "name": "Liam Martinez",
+        "profileId": "MartinezFlash",
+        "age": 31,
+        "email": "liam.martinez@example.com",
+        "image": "/static/user-profile/liam.jpg",
+        "description": "Photographer.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_17",
+        "name": "Mia Anderson",
+        "profileId": "MiaMagic",
+        "age": 27,
+        "email": "mia.anderson@example.com",
+        "image": "/static/user-profile/mia.jpg",
+        "description": "Graphic designer.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_18",
+        "name": "Noah Perez",
+        "profileId": "PerezPilot",
+        "age": 35,
+        "email": "noah.perez@example.com",
+        "image": "/static/user-profile/noah.jpg",
+        "description": "Commercial pilot.",
+        "gender": "MALE"
+    },
+    {
+        "id": "bot_19",
+        "name": "Ava Thompson",
+        "profileId": "ThompsonTwinkle",
+        "age": 24,
+        "email": "ava.thompson@example.com",
+        "image": "/static/user-profile/ava.jpg",
+        "description": "Dancer and choreographer.",
+        "gender": "FEMALE"
+    },
+    {
+        "id": "bot_20",
+        "name": "Lucas Garcia",
+        "profileId": "GarciaGlider",
+        "age": 28,
+        "email": "lucas.garcia@example.com",
+        "image": "/static/user-profile/lucas.jpg",
+        "description": "Paragliding instructor.",
+        "gender": "MALE"
+    }
+]
