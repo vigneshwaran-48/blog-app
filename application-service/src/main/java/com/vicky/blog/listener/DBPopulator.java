@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -15,11 +16,11 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vicky.blog.common.dto.blog.BlogConstants;
 import com.vicky.blog.common.dto.user.UserDTO;
+import com.vicky.blog.common.dto.user.UserDTO.Gender;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Tag;
-import com.vicky.blog.model.User;
 
 @Component
 public class DBPopulator {
@@ -30,6 +31,9 @@ public class DBPopulator {
     @Autowired
     private UserService userService;
 
+    @Value("${services.api-gateway.base}")
+    private String apiGatewayBase;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DBPopulator.class);
  
     @EventListener(ContextRefreshedEvent.class)
@@ -37,6 +41,7 @@ public class DBPopulator {
         try {
             populateTags();
             populateGuestUser();
+            createBots();
         } catch (IOException | AppException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -71,11 +76,26 @@ public class DBPopulator {
 
     private void createBots() throws AppException, IOException {
         ObjectMapper mapper = new ObjectMapper();
-        InputStream inputStream = getClass().getResourceAsStream("/tags.json");
-        List<User> bots = Arrays.asList(mapper.readValue(inputStream, User.class));
+        InputStream inputStream = getClass().getResourceAsStream("/bots.json");
+        List<UserDTO> bots = Arrays.asList(mapper.readValue(inputStream, UserDTO[].class));
 
-        for (User bot : bots) {
-            
+        for (UserDTO bot : bots) {
+            if (userService.getUser(bot.getId()).isPresent()) {
+                continue;
+            }
+            bot.setImage(getImageForBot(bot.getGender()));
+            userService.addUser(bot);
         }
+        LOGGER.info("Created bots!");
     }
+
+    private String getImageForBot(Gender gender) {
+        int max = 6;
+        int min = 0;
+        int randomNumber = (int) (Math.random() * (max - min)) + min;
+        String offsetStr =  randomNumber == 0 ? "" : "-" + randomNumber;
+        String imageName = "avatar-" + gender.name().toLowerCase() + offsetStr;
+        return apiGatewayBase + "/static/" + imageName + ".jpg";
+    }
+
 }
