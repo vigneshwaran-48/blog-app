@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vicky.blog.common.dto.blog.BlogConstants;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserDTO.Gender;
 import com.vicky.blog.common.exception.AppException;
@@ -112,18 +114,21 @@ public class DBPopulator {
     }
 
     private void populateBotBlogs() throws AppException, IOException {
-        UserDTO userDTO = userService.getUser("bot_15").get();
         ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule())
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).build();
         InputStream inputStream = getClass().getResourceAsStream("/blogs.json");
         List<BlogDTO> blogs = Arrays.asList(mapper.readValue(inputStream, BlogDTO[].class));
         for (BlogDTO blog : blogs) {
             LOGGER.info(blog.toString());
-            blog.setOwner(userDTO);
             blog.setPublised(true);
-            blog.setPublishedAt(profileIdService.getProfileId(userDTO.getProfileId()).get());
-            String blogId = blogService.addBlog(userDTO.getId(), blog);
+            blog.setImage(apiGatewayBase + blog.getImage());
+            blog.setPublishedAt(profileIdService.getProfileId(blog.getOwner().getProfileId()).get());
+            String blogId = blogService.addBlog(blog.getOwner().getId(), blog);
             LOGGER.info("Added blog {}", blogId);
+
+            List<TagDTO> tags = blog.getTags();
+            tagService.applyTagsToBlog(blog.getOwner().getId(), blogId, tags.stream().map(tag -> tag.getId()).collect(Collectors.toList()));
+            LOGGER.info("Applied Tags {} to blog {}", tags, blogId);
         }
     }
 
