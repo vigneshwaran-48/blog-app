@@ -210,5 +210,9 @@
     {
       "name": "Outdoor",
       "description": "The outdoors offers a boundless canvas of freedom and exploration, where every breeze and sunbeam invites you to reconnect with the world around you."
+    },
+    {
+      "name": "Alaska",
+      "description": "Alaska's vast wilderness, with its towering glaciers and untamed landscapes, is a testament to nature's raw, majestic beauty."
     }
   ]

@@ -89,5 +89,39 @@
                 "id": "6656011905f25e5f9fa16cee"
             }
         ]
-    }
+    },
+    {
+        "id": "4",
+        "title": "A Memorable Hike at Mendenhall Glacier Visitor Center, Alaska",
+        "content": "<style>\n  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }\n  h1 { color: #2c3e50; }\n  h2 { color: #2980b9; }\n  p { line-height: 1.6; color: #34495e; }\n  code { background-color: #ecf0f1; padding: 5px; border-radius: 3px; }\n  pre { background-color: #ecf0f1; padding: 10px; border-radius: 5px; margin-top: 10px; }\n  blockquote { border-left: 4px solid #2980b9; padding-left: 10px; color: #7f8c8d; margin: 20px 0; font-style: italic; }\n</style>\n\n\n\n<p>Alaska has always been on my bucket list of places to explore, and this year, I finally made the trip. One of the highlights of my journey was hiking at the Mendenhall Glacier Visitor Center. The experience was nothing short of breathtaking, and I'm excited to share my adventure with you.</p>\n\n<h2>Arrival at Mendenhall Glacier</h2>\n\n<p>Located just 12 miles from downtown Juneau, the Mendenhall Glacier Visitor Center offers a spectacular view of the Mendenhall Glacier. As I arrived at the visitor center, I was immediately struck by the stunning landscape - a massive glacier surrounded by lush forests and serene waters.</p>\n\n<h2>The Trail to Nugget Falls</h2>\n\n<p>My hike began with the trail to Nugget Falls, a relatively easy and well-marked path that leads to a magnificent waterfall near the base of the glacier. Here are some details about the trail:</p>\n\n<ul style='margin-left: 20px; color: #34495e;'>\n  <li style='margin-bottom: 10px;'><strong>Distance</strong>: The trail is about 2 miles round trip.</li>\n  <li style='margin-bottom: 10px;'><strong>Difficulty</strong>: Easy, suitable for all skill levels.</li>\n  <li style='margin-bottom: 10px;'><strong>Scenery</strong>: The trail offers stunning views of the glacier, the waterfall, and the surrounding landscape.</li>\n</ul>\n\n<p>As I walked along the trail, I could hear the roar of Nugget Falls in the distance. The closer I got, the more awe-inspiring the sight became. The waterfall cascaded down with tremendous force, creating a misty spray that added to the ethereal atmosphere.</p>\n\n<h2>Wildlife Encounters</h2>\n\n<p>One of the most exciting parts of the hike was encountering the local wildlife. I was lucky enough to spot several bald eagles soaring overhead and even saw a black bear from a safe distance. Here are some tips for encountering wildlife:</p>\n\n<ul style='margin-left: 20px; color: #34495e;'>\n  <li style='margin-bottom: 10px;'><strong>Stay Calm</strong>: If you encounter wildlife, remain calm and keep your distance.</li>\n  <li style='margin-bottom: 10px;'><strong>Do Not Feed Animals</strong>: Feeding wildlife can be dangerous for both you and the animals.</li>\n  <li style='margin-bottom: 10px;'><strong>Use Binoculars</strong>: Bring binoculars for a closer look at birds and other animals without disturbing them.</li>\n</ul>\n\n<h2>Reflection and Serenity</h2>\n\n<p>After reaching Nugget Falls, I took some time to sit by the water and reflect on the beauty around me. The serenity of the location was overwhelming. The sound of the waterfall, the sight of the glacier, and the pristine environment created a peaceful moment that I'll cherish forever.</p>\n\n<h2>Conclusion</h2>\n\n<p>Hiking at the Mendenhall Glacier Visitor Center was an unforgettable experience. The combination of stunning natural beauty, wildlife encounters, and the sheer presence of the glacier made it one of the best hikes I've ever had. If you ever find yourself in Alaska, I highly recommend making the trip to Mendenhall Glacier. It's an adventure that will leave you with lasting memories and a deep appreciation for the natural world.</p>\n\n<p>Happy hiking!</p>\n",
+        "image": "/static/alaska-banner.jpg",
+        "owner": {
+            "id": "bot_1",
+            "name": "Alice Johnson",
+            "profileId": "StarlightAlice",
+            "age": 28,
+            "email": "alice.johnson@example.com",
+            "image": "/static/user-profile/alice.jpg",
+            "description": "Loves hiking and outdoor adventures.",
+            "gender": "FEMALE"
+        },
+        "description": "Sharing my unforgettable hiking experience at the Mendenhall Glacier Visitor Center in Alaska, complete with stunning views, wildlife encounters, and reflections.",
+        "postedTime": "2023-06-15T10:00:00",
+        "displayPostedDate": "June 15, 2023",
+        "isPublised": true,
+        "tags": [
+          {
+            "id": "6656011905f25e5f9fa16cec"
+          },
+          {
+            "id": "6656011905f25e5f9fa16cee"
+          },
+          {
+            "id": "6656011905f25e5f9fa16ced"
+          },
+          {
+            "id": "66574d509053f52c9a6397eb"
+          }
+        ]
+      }
 ]
