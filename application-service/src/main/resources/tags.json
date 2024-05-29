@@ -214,5 +214,13 @@
     {
       "name": "Alaska",
       "description": "Alaska's vast wilderness, with its towering glaciers and untamed landscapes, is a testament to nature's raw, majestic beauty."
+    },
+    {
+      "name": "Cooking",
+      "description": "Cooking is the art of transforming simple ingredients into a symphony of flavors, creating meals that nourish both body and soul."
+    },
+    {
+      "name": "Baking",
+      "description": "Baking is a delightful alchemy where flour, sugar, and love come together to create comforting, delicious masterpieces."
     }
   ]
