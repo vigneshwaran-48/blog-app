@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -127,7 +128,18 @@ public class DBPopulator {
             LOGGER.info("Added blog {}", blogId);
 
             List<TagDTO> tags = blog.getTags();
-            tagService.applyTagsToBlog(blog.getOwner().getId(), blogId, tags.stream().map(tag -> tag.getId()).collect(Collectors.toList()));
+            for (TagDTO tag : tags) {
+                String tagId = tag.getId();
+                if (tagId == null) {
+                    Optional<TagDTO> tagOptional = tagService.getTagByName(tag.getName());
+                    if (tagOptional.isPresent()) {
+                        tagId = tagOptional.get().getId();
+                    } else {
+                        tagId = tagService.addTag(tag.getName(), tag.getDescription());
+                    }
+                }
+                tagService.applyTagToBlog(blog.getOwner().getId(), blogId, tagId);
+            }
             LOGGER.info("Applied Tags {} to blog {}", tags, blogId);
         }
     }

@@ -20,7 +20,8 @@
         "isPublised": true,
         "tags": [
             {
-                "id": "6649df99ab51111d11220131"
+                "name": "Java",
+                "description": "A high-level, class-based, object-oriented programming language widely used for building enterprise-scale applications."
             }
         ]
     },
@@ -50,7 +51,8 @@
         },
         "tags": [
             {
-                "id": "6649df99ab51111d11220131"
+                "name": "Java",
+                "description": "A high-level, class-based, object-oriented programming language widely used for building enterprise-scale applications."
             }
         ]
     },
@@ -80,13 +82,16 @@
         },
         "tags": [
             {
-                "id": "6656011905f25e5f9fa16cec"
+                "name": "Hiking",
+                "description": "Hiking through the whispering forests and rugged trails brings a sense of peace and adventure, connecting you deeply with nature's grandeur."
             },
             {
-                "id": "6656011905f25e5f9fa16ced"
+                "name": "Adventure",
+                "description": "Adventure is the call to step beyond the familiar, to embrace the unknown, and to discover the extraordinary in every moment."
             },
             {
-                "id": "6656011905f25e5f9fa16cee"
+                "name": "Outdoor",
+                "description": "The outdoors offers a boundless canvas of freedom and exploration, where every breeze and sunbeam invites you to reconnect with the world around you."
             }
         ]
     },
@@ -110,18 +115,22 @@
         "displayPostedDate": "June 15, 2023",
         "isPublised": true,
         "tags": [
-          {
-            "id": "6656011905f25e5f9fa16cec"
-          },
-          {
-            "id": "6656011905f25e5f9fa16cee"
-          },
-          {
-            "id": "6656011905f25e5f9fa16ced"
-          },
-          {
-            "id": "66574d509053f52c9a6397eb"
-          }
+            {
+                "name": "Hiking",
+                "description": "Hiking through the whispering forests and rugged trails brings a sense of peace and adventure, connecting you deeply with nature's grandeur."
+            },
+            {
+                "name": "Adventure",
+                "description": "Adventure is the call to step beyond the familiar, to embrace the unknown, and to discover the extraordinary in every moment."
+            },
+            {
+                "name": "Outdoor",
+                "description": "The outdoors offers a boundless canvas of freedom and exploration, where every breeze and sunbeam invites you to reconnect with the world around you."
+            },
+            {
+                "name": "Alaska",
+                "description": "Alaska's vast wilderness, with its towering glaciers and untamed landscapes, is a testament to nature's raw, majestic beauty."
+            }
         ]
     },
     {
@@ -146,10 +155,136 @@
         "isPublished": true,
         "tags": [
             {
-                "id": "665750f21d30ce7dcec45e77"
+                "name": "Cooking",
+                "description": "Cooking is the art of transforming simple ingredients into a symphony of flavors, creating meals that nourish both body and soul."
             },
             {
-                "id": "665750f21d30ce7dcec45e78"
+              "name": "Baking",
+              "description": "Baking is a delightful alchemy where flour, sugar, and love come together to create comforting, delicious masterpieces."
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "title": "The Ultimate Guide to Marathon Training",
+        "content": "<style>\n  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }\n  h1 { color: #2c3e50; }\n  h2 { color: #2980b9; }\n  p { line-height: 1.6; color: #34495e; }\n</style>\n\n<p>Training for a marathon is a rewarding yet challenging endeavor. It requires dedication, discipline, and a well-structured plan to achieve your goals. Whether you're a seasoned runner or a beginner, this guide will help you prepare for race day.</p>\n\n<h2>Setting Your Goals</h2>\n\n<p>Before you start training, set realistic goals. Consider your current fitness level, the time you have to train, and what you want to achieve. Whether it's completing the marathon, achieving a personal best, or simply enjoying the journey, having clear goals will keep you motivated.</p>\n\n<h2>Creating a Training Plan</h2>\n\n<p>A good training plan includes a mix of running workouts, strength training, and rest days. Here's a basic outline:</p>\n\n<ul style='margin-left: 20px; color: #34495e;'>\n  <li><strong>Base Mileage</strong>: Start by building your base mileage with easy runs.</li>\n  <li><strong>Long Runs</strong>: Gradually increase the distance of your long runs.</li>\n  <li><strong>Speed Work</strong>: Include interval training and tempo runs to build speed.</li>\n  <li><strong>Strength Training</strong>: Incorporate exercises that strengthen your core and legs.</li>\n  <li><strong>Rest and Recovery</strong>: Allow time for your body to recover with rest days and light activity.</li>\n</ul>\n\n<h2>Nutrition and Hydration</h2>\n\n<p>Proper nutrition and hydration are crucial for marathon training. Eat a balanced diet rich in carbohydrates, proteins, and healthy fats. Stay hydrated by drinking water throughout the day and during your runs. Consider sports drinks for longer runs to replenish electrolytes.</p>\n\n<h2>Staying Motivated</h2>\n\n<p>Maintaining motivation over the weeks and months of training can be challenging. Here are some tips:</p>\n\n<ul style='margin-left: 20px; color: #34495e;'>\n  <li><strong>Join a Running Group</strong>: Running with others can make training more enjoyable.</li>\n  <li><strong>Track Your Progress</strong>: Use a running app to monitor your progress and celebrate milestones.</li>\n  <li><strong>Mix Up Your Routes</strong>: Change your running routes to keep things interesting.</li>\n</ul>\n\n<h2>Race Day Preparation</h2>\n\n<p>As race day approaches, taper your training to allow your body to rest. Plan your race day logistics, including transportation, gear, and nutrition. Get plenty of rest the night before and arrive early to the start line.</p>\n\n<h2>Conclusion</h2>\n\n<p>Training for a marathon is a journey that requires commitment and perseverance. By setting clear goals, following a structured training plan, and staying motivated, you can achieve your marathon dreams. Remember to listen to your body and enjoy the process. Good luck and happy running!</p>\n",
+        "description": "A comprehensive guide to marathon training, including goal setting, training plans, nutrition, and race day preparation.",
+        "postedTime": "2023-06-15T10:00:00",
+        "displayPostedDate": "June 15, 2023",
+        "image": "/static/marathon-banner.jpg",
+        "owner": {
+            "id": "bot_4",
+            "name": "David Brown",
+            "profileId": "WolfpackDave",
+            "age": 29,
+            "email": "david.brown@example.com",
+            "image": "/static/user-profile/david.jpg",
+            "description": "Fitness enthusiast and marathon runner.",
+            "gender": "MALE"
+        },
+        "isPublished": true,
+        "tags": [
+            {
+                "name": "Fitness",
+                "description": "All about staying fit and healthy."
+            },
+            {
+                "name": "Marathon",
+                "description": "Training and tips for marathon runners."
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "title": "Nutrition Tips for Marathon Runners",
+        "content": "<style>\n  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }\n  h1 { color: #2c3e50; }\n  h2 { color: #2980b9; }\n  p { line-height: 1.6; color: #34495e; }\n</style>\n\n<p>Nutrition plays a crucial role in marathon training and performance. Fueling your body with the right nutrients helps you train more effectively and recover faster. Here are some essential nutrition tips for marathon runners.</p>\n\n<h2>Carbohydrates: Your Primary Fuel</h2>\n\n<p>Carbohydrates are the primary source of energy for marathon runners. They are stored as glycogen in your muscles and liver, which is used during long runs. Include complex carbohydrates like whole grains, fruits, and vegetables in your diet.</p>\n\n<h2>Protein: Building and Repairing Muscles</h2>\n\n<p>Protein is essential for muscle repair and recovery. Include lean protein sources such as chicken, fish, beans, and legumes in your meals. Consuming protein after your runs helps repair muscle tissues and reduce soreness.</p>\n\n<h2>Fats: An Important Energy Source</h2>\n\n<p>Healthy fats provide a secondary source of energy and support overall health. Include sources of healthy fats such as avocados, nuts, seeds, and olive oil in your diet.</p>\n\n<h2>Hydration: Staying Hydrated</h2>\n\n<p>Proper hydration is vital for marathon training. Drink water throughout the day and more during your runs. For long runs, consider using electrolyte drinks to replenish lost salts and minerals.</p>\n\n<h2>Pre-Run Nutrition</h2>\n\n<p>Eating the right foods before your run can improve your performance. Consume a balanced meal with carbohydrates, protein, and fats 2-3 hours before your run. If you're short on time, a small snack like a banana or an energy bar 30-60 minutes before running can help.</p>\n\n<h2>Post-Run Nutrition</h2>\n\n<p>After your run, refuel with a meal rich in carbohydrates and protein within 30-60 minutes. This helps replenish glycogen stores and aids in muscle recovery. Consider a smoothie with fruit, yogurt, and a scoop of protein powder for a quick recovery meal.</p>\n\n<h2>Race Day Nutrition</h2>\n\n<p>On race day, stick to familiar foods that you've tested during your training. Have a light, carbohydrate-rich breakfast a few hours before the race. During the marathon, use energy gels or snacks to keep your energy levels up.</p>\n\n<h2>Conclusion</h2>\n\n<p>Nutrition is a key component of successful marathon training. By fueling your body with the right nutrients, you can enhance your performance and recovery. Listen to your body, stay hydrated, and enjoy your running journey!</p>\n",
+        "description": "Essential nutrition tips for marathon runners, focusing on carbohydrates, protein, fats, hydration, and pre- and post-run nutrition.",
+        "postedTime": "2023-06-20T10:00:00",
+        "displayPostedDate": "June 20, 2023",
+        "image": "/static/nutrition-banner.jpg",
+        "owner": {
+            "id": "bot_4",
+            "name": "David Brown",
+            "profileId": "WolfpackDave",
+            "age": 29,
+            "email": "david.brown@example.com",
+            "image": "/static/user-profile/david.jpg",
+            "description": "Fitness enthusiast and marathon runner.",
+            "gender": "MALE"
+        },
+        "isPublished": true,
+        "tags": [
+            {
+                "name": "Nutrition",
+                "description": "Tips and advice on nutrition for athletes."
+            },
+            {
+                "name": "Marathon",
+                "description": "Training and tips for marathon runners."
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "title": "Exploring the World of Watercolor Painting",
+        "content": "<style>\n  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }\n  h1 { color: #2c3e50; }\n  h2 { color: #2980b9; }\n  p { line-height: 1.6; color: #34495e; }\n</style>\n\n<p>Watercolor painting is a versatile and expressive medium that has been cherished by artists for centuries. Its translucent quality and ability to create soft, flowing washes make it unique and captivating. Whether you're a beginner or an experienced artist, exploring the world of watercolor can be a rewarding journey.</p>\n\n<h2>Getting Started with Watercolors</h2>\n\n<p>To begin your watercolor journey, you'll need some basic supplies:</p>\n\n<ul style='margin-left: 20px; color: #34495e;'>\n  <li><strong>Watercolor Paints</strong>: Start with a set of high-quality paints in primary colors.</li>\n  <li><strong>Brushes</strong>: Invest in a few good brushes, including round and flat brushes in various sizes.</li>\n  <li><strong>Paper</strong>: Use watercolor paper that can withstand wet media without warping.</li>\n  <li><strong>Palette</strong>: A palette for mixing colors.</li>\n  <li><strong>Water Containers</strong>: Two containers for clean and dirty water.</li>\n</ul>\n\n<h2>Basic Techniques</h2>\n\n<p>Mastering basic techniques is essential for creating beautiful watercolor paintings. Here are some fundamental techniques to get you started:</p>\n\n<ul style='margin-left: 20px; color: #34495e;'>\n  <li><strong>Wet-on-Wet</strong>: Apply wet paint onto a wet surface for soft, blended effects.</li>\n  <li><strong>Wet-on-Dry</strong>: Apply wet paint onto a dry surface for more defined edges and details.</li>\n  <li><strong>Glazing</strong>: Layering transparent washes of color to build depth and richness.</li>\n  <li><strong>Dry Brush</strong>: Use a dry brush with minimal paint for textured, detailed effects.</li>\n  <li><strong>Salt Technique</strong>: Sprinkle salt onto wet paint to create interesting textures as it dries.</li>\n</ul>\n\n<h2>Finding Inspiration</h2>\n\n<p>Inspiration for watercolor painting can be found everywhere. Nature, urban landscapes, still life, and abstract compositions are just a few sources. Carry a sketchbook with you to capture ideas and practice sketching regularly.</p>\n\n<h2>Developing Your Style</h2>\n\n<p>As you gain confidence with watercolor, start experimenting with different styles and subjects. Try loose, expressive paintings as well as detailed, realistic ones. Over time, you'll develop your unique artistic voice.</p>\n\n<h2>Joining a Community</h2>\n\n<p>Joining a community of watercolor artists can provide support, feedback, and inspiration. Look for local art classes, workshops, and online forums where you can connect with other artists.</p>\n\n<h2>Conclusion</h2>\n\n<p>Watercolor painting is a journey of exploration and expression. With the right tools, techniques, and inspiration, you can create stunning works of art. Remember to enjoy the process, be patient with yourself, and let your creativity flow. Happy painting!</p>\n",
+        "description": "An introductory guide to watercolor painting, covering essential supplies, basic techniques, finding inspiration, and developing your style.",
+        "postedTime": "2023-07-01T14:00:00",
+        "displayPostedDate": "July 1, 2023",
+        "image": "/static/watercolor-banner.jpg",
+        "owner": {
+            "id": "bot_5",
+            "name": "Emily Davis",
+            "profileId": "StarEmily",
+            "age": 27,
+            "email": "emily.davis@example.com",
+            "image": "/static/user-profile/emily.jpg",
+            "description": "Passionate about painting and exploring different art forms.",
+            "gender": "FEMALE"
+        },
+        "isPublished": true,
+        "tags": [
+            {
+                "name": "Art",
+                "description": "All about creating and appreciating art."
+            },
+            {
+                "name": "Watercolor",
+                "description": "Techniques and tips for watercolor painting."
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "title": "Creating Stunning Landscape Paintings in Watercolor",
+        "content": "<style>\n  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }\n  h1 { color: #2c3e50; }\n  h2 { color: #2980b9; }\n  p { line-height: 1.6; color: #34495e; }\n</style>\n\n<p>Landscape painting is a timeless genre that captures the beauty of nature in all its forms. Watercolor, with its fluidity and translucence, is a perfect medium for creating stunning landscapes. Whether you're painting a serene forest, a bustling cityscape, or a tranquil beach, these tips will help you bring your landscapes to life.</p>\n\n<h2>Choosing Your Subject</h2>\n\n<p>Start by choosing a subject that inspires you. It could be a place you've visited, a photograph, or an imaginary scene. Consider the mood you want to convey and the elements that will be central to your composition.</p>\n\n<h2>Planning Your Composition</h2>\n\n<p>A well-planned composition is key to a successful landscape painting. Sketch a rough outline of your scene, focusing on the placement of major elements like mountains, trees, and water. Use the rule of thirds to create a balanced and harmonious composition.</p>\n\n<h2>Layering and Building Depth</h2>\n\n<p>Watercolor painting is all about layering. Start with light washes to establish the basic shapes and colors. Gradually build up layers to add depth and detail. Use a combination of wet-on-wet and wet-on-dry techniques to create different textures and effects.</p>\n\n<h2>Capturing Light and Shadow</h2>\n\n<p>Light and shadow play a crucial role in creating a sense of depth and realism. Observe how light interacts with your subject and use a range of values to depict shadows and highlights. Pay attention to the direction of light and how it affects the colors in your scene.</p>\n\n<h2>Adding Details</h2>\n\n<p>Details can bring your landscape to life. Use fine brushes and dry brush techniques to add intricate details like leaves, branches, and reflections. Be mindful of overworking your painting; sometimes, less is more.</p>\n\n<h2>Experimenting with Techniques</h2>\n\n<p>Don't be afraid to experiment with different techniques and styles. Try incorporating splattering, sponging, and masking fluid to create unique textures and effects. Each painting is an opportunity to learn and grow as an artist.</p>\n\n<h2>Finding Your Style</h2>\n\n<p>As you gain experience, you'll develop your style. Embrace your unique way of seeing and depicting the world. Whether you prefer loose, expressive landscapes or detailed, realistic ones, let your personality shine through in your work.</p>\n\n<h2>Conclusion</h2>\n\n<p>Creating stunning landscape paintings in watercolor is a rewarding and fulfilling endeavor. With practice and patience, you can capture the beauty of nature and convey your vision on paper. Remember to enjoy the process, stay inspired, and keep exploring new techniques. Happy painting!</p>\n",
+        "description": "Tips and techniques for creating stunning landscape paintings in watercolor, from choosing your subject to adding details and experimenting with different styles.",
+        "postedTime": "2023-07-10T14:00:00",
+        "displayPostedDate": "July 10, 2023",
+        "image": "/static/landscape-banner.jpg",
+        "owner": {
+            "id": "bot_5",
+            "name": "Emily Davis",
+            "profileId": "StarEmily",
+            "age": 27,
+            "email": "emily.davis@example.com",
+            "image": "/static/user-profile/emily.jpg",
+            "description": "Passionate about painting and exploring different art forms.",
+            "gender": "FEMALE"
+        },
+        "isPublished": true,
+        "tags": [
+            {
+                "name": "Art",
+                "description": "All about creating and appreciating art."
+            },
+            {
+                "name": "Landscape",
+                "description": "Techniques and tips for painting landscapes."
+            },
+            {
+                "name": "Watercolor",
+                "description": "Techniques and tips for watercolor painting."
             }
         ]
     }
