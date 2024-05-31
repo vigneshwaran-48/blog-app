@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.hc.core5.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +46,8 @@ public class TagServiceImpl implements TagService {
     @Autowired
     private UserService userService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
+
     @Override
     @UserIdValidator(positions = 0)
     @BlogIdValidator(userIdPosition = 0, blogIdPosition = 1)
@@ -51,6 +55,11 @@ public class TagServiceImpl implements TagService {
         Optional<Tag> tagOptional = tagRepository.findById(tagId);
         if (tagOptional.isEmpty()) {
             throw new AppException(HttpStatus.SC_BAD_REQUEST, "Given tag id not exists!");
+        }
+        Optional<BlogTag> existingBlogTag = blogTagRepoistory.findByBlogIdAndTagId(blogId, tagId);
+        if (existingBlogTag.isPresent()) {
+            LOGGER.info("Tag {} has already been tagged to the blog {}", tagId, blogId);
+            return;
         }
         BlogDTO blog = blogService.getBlog(userId, blogId).get();
         BlogTag blogTag = new BlogTag();
