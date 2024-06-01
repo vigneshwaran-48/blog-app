@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +15,18 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vicky.blog.common.dto.blog.BlogConstants;
+import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.dto.user.UserDTO.Gender;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.BlogService;
+import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Tag;
@@ -31,17 +40,24 @@ public class DBPopulator {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ProfileIdService profileIdService;
+
+    @Autowired
+    private BlogService blogService;
+
     @Value("${services.api-gateway.base}")
     private String apiGatewayBase;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBPopulator.class);
- 
+
     @EventListener(ContextRefreshedEvent.class)
     public void onEvent() {
         try {
             populateTags();
             populateGuestUser();
             createBots();
+            populateBotBlogs();
         } catch (IOException | AppException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -93,9 +109,39 @@ public class DBPopulator {
         int max = 6;
         int min = 0;
         int randomNumber = (int) (Math.random() * (max - min)) + min;
-        String offsetStr =  randomNumber == 0 ? "" : "-" + randomNumber;
+        String offsetStr = randomNumber == 0 ? "" : "-" + randomNumber;
         String imageName = "avatar-" + gender.name().toLowerCase() + offsetStr;
         return apiGatewayBase + "/static/" + imageName + ".jpg";
+    }
+
+    private void populateBotBlogs() throws AppException, IOException {
+        ObjectMapper mapper = JsonMapper.builder().addModule(new JavaTimeModule())
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).build();
+        InputStream inputStream = getClass().getResourceAsStream("/blogs.json");
+        List<BlogDTO> blogs = Arrays.asList(mapper.readValue(inputStream, BlogDTO[].class));
+        for (BlogDTO blog : blogs) {
+            LOGGER.info(blog.toString());
+            blog.setPublised(true);
+            blog.setImage(apiGatewayBase + blog.getImage());
+            blog.setPublishedAt(profileIdService.getProfileId(blog.getOwner().getProfileId()).get());
+            String blogId = blogService.addBlog(blog.getOwner().getId(), blog);
+            LOGGER.info("Added blog {}", blogId);
+
+            List<TagDTO> tags = blog.getTags();
+            for (TagDTO tag : tags) {
+                String tagId = tag.getId();
+                if (tagId == null) {
+                    Optional<TagDTO> tagOptional = tagService.getTagByName(tag.getName());
+                    if (tagOptional.isPresent()) {
+                        tagId = tagOptional.get().getId();
+                    } else {
+                        tagId = tagService.addTag(tag.getName(), tag.getDescription());
+                    }
+                }
+                tagService.applyTagToBlog(blog.getOwner().getId(), blogId, tagId);
+            }
+            LOGGER.info("Applied Tags {} to blog {}", tags, blogId);
+        }
     }
 
 }

@@ -37,6 +37,7 @@ public class DBPopulatorListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBPopulatorListener.class);
     private static final String DEFAULT_IMAGE_LOCATION = "classpath:static/blog-banner.jpg";
     private static final String USER_PROFILE_LOCATION = "classpath:static/user-profile";
+    private static final String BLOG_LOCATION = "classpath:static/blog";
 
     @EventListener(ContextRefreshedEvent.class)
     public void onEvent() {
@@ -49,6 +50,7 @@ public class DBPopulatorListener {
             LOGGER.info("Default banner image exists!");
 
             storeAvatars();
+            storeBannerImages();
         } catch (AppException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -96,5 +98,29 @@ public class DBPopulatorListener {
             throw new AppException("Error while storing avatars!");
         }
         LOGGER.info("Stored avatars!");
+    }
+
+    private void storeBannerImages() {
+        try {
+            Resource blogDirResource = resourceLoader.getResource(BLOG_LOCATION);
+            Path path = Paths.get(blogDirResource.getURI());
+
+            try (Stream<Path> paths = Files.walk(path, 1)) {
+                List<Path> files = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+                for (Path blogBanner : files) {
+                    if (staticService.getResource(null, blogBanner.getFileName().toString()).isPresent()) {
+                        continue;
+                    }
+                    StaticResourceDTO staticResourceDTO = new StaticResourceDTO();
+                    staticResourceDTO.setVisibility(Visibility.PUBLIC);
+                    staticResourceDTO.setContentType(ContentType.IMAGE_JPG);
+                    staticResourceDTO.setData(Files.readAllBytes(blogBanner));
+                    staticResourceDTO.setId(blogBanner.getFileName().toString());
+                    staticService.addResource(null, staticResourceDTO);
+                }  
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 }

@@ -316,6 +316,7 @@ public class BlogServiceImpl implements BlogService {
             }
             BlogDTO blogDTO = blog.toDTO();
             blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+            blogDTO.setTags(tagService.getTagsOfBlog(userId, blogDTO.getId()));
             blogsForFeed.add(blogDTO);
         }
         BlogFeedsDTO feedsDTO = new BlogFeedsDTO();
