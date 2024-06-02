@@ -33,7 +33,7 @@ import com.vicky.blog.service.I18NMessages.I18NMessage;
 import com.vicky.blog.service.organization.OrganizationConstants;
 
 @Component
-class BlogUtil {
+public class BlogUtil {
 
     @Autowired
     private I18NMessages i18nMessages;
@@ -77,7 +77,7 @@ class BlogUtil {
         return htmlTextContent;
     }
 
-    String getDisplayPostedData(LocalDateTime postedDateTime) {
+    public String getDisplayPostedData(LocalDateTime postedDateTime) {
 
         long minutesDifference = ChronoUnit.MINUTES.between(postedDateTime, LocalDateTime.now());
         if(minutesDifference <= 60) {

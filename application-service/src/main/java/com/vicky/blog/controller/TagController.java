@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicky.blog.common.dto.EmptyResponse;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsResponse;
 import com.vicky.blog.common.dto.blog.BlogsResponse;
 import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.tag.TagResponse;
@@ -199,6 +201,35 @@ public class TagController {
         response.setStatus(HttpStatus.SC_OK);
         response.setPath(request.getServletPath());
         response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{tagName}/blog/feeds")
+    public ResponseEntity<BlogFeedsResponse> getBlogsOfTagForFeeds(@RequestParam(required = false) Integer page,
+    @RequestParam(required = false) Integer size, @PathVariable String tagName, Principal principal,
+            HttpServletRequest request) throws AppException {
+
+        String userId = userIdExtracter.getUserId(principal);
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
+            size = 20;
+        }
+        Optional<TagDTO> tagDTO = tagService.getTagByName(tagName);
+        if (tagDTO.isEmpty()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "Tag not exists!");
+        }
+        BlogFeedsDTO feeds = tagService.getBlogsOfTagForFeeds(userId, tagDTO.get().getId(), page, size);
+
+        BlogFeedsResponse response = new BlogFeedsResponse();
+        response.setBlogs(feeds.getFeeds());
+        response.setMessage("success");
+        response.setPath(request.getServletPath());
+        response.setStatus(HttpStatus.SC_OK);
+        response.setTime(LocalDateTime.now());
+        response.setNextPageStatus(feeds.getStatus());
 
         return ResponseEntity.ok().body(response);
     }
