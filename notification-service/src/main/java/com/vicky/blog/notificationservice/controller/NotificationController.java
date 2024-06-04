@@ -83,4 +83,19 @@ public class NotificationController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    @PostMapping("/seen")
+    public ResponseEntity<EmptyResponse> markAllAsSeen(Principal principal, HttpServletRequest request) throws AppException {
+        
+        String userId = userIdExtracter.getUserId(principal);
+        notificationService.markAllAsRead(userId);
+
+        EmptyResponse response = new EmptyResponse();
+        response.setMessage("Marked all notifications as seen!");
+        response.setStatus(HttpStatus.SC_OK);
+        response.setPath(request.getServletPath());
+        response.setTime(LocalDateTime.now());
+
+        return ResponseEntity.ok().body(response);
+    }
 }

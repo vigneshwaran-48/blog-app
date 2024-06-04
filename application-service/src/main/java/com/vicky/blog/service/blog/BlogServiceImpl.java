@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
+import com.vicky.blog.annotation.PostProcess;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
@@ -39,6 +40,7 @@ import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
+import com.vicky.blog.common.utility.PostProcessType;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.mongo.BlogMongoRepository;

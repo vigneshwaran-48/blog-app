@@ -113,5 +113,17 @@ public class NotificationServiceImpl implements NotificationService {
             throw new AppException("Error while marking as read the notification");
         }
     }
+
+    @Override
+    public void markAllAsRead(String userId) throws AppException {
+        Optional<UserDTO> user = userService.getUser(userId);
+        if(user.isEmpty()) {
+            throw new AppException(HttpStatus.SC_BAD_REQUEST, "User" + userId + " not exists!");
+        }
+        List<Notification> notifications = notificationRepository.findByUserId(userId);
+        for (Notification notification : notifications) {
+            markAsRead(userId, notification.getId());
+        }
+    }
     
 }

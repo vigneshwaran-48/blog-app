@@ -38,5 +38,11 @@ public class NotificationServiceImpl implements NotificationService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'markAsRead'");
     }
+
+    @Override
+    public void markAllAsRead(String userId) throws AppException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'markAllAsRead'");
+    }
     
 }
