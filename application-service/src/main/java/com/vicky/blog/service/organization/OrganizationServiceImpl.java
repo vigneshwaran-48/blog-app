@@ -10,10 +10,6 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.UserIdValidator;
@@ -130,7 +126,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Cacheable(value = "organizations", key = "'organization_' + #id")
     public Optional<OrganizationDTO> getOrganization(String userId, String id) throws AppException {
 
         Optional<Organization> organization = organizationRepository.findById(id);
@@ -153,12 +148,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Caching(evict = {
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #userId + '_visible'"),
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #id"),
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #organizationId + '_users'"),
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #userId"),
-    // })
     public boolean deleteOrganization(String userId, String id) throws AppException {
         Optional<Organization> organization = organizationRepository.findById(id);
         if (organization.isEmpty()) {
@@ -309,11 +298,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Caching(evict = {
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #organizationId + '_users'"),
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #userId"),
-    //     @CacheEvict(value = "organizations", key = "'organization_' + #userId + '_' + 'role'")
-    // })
     public void changePermissionForUser(String userId, String organizationId, String userToChangePermission,
             UserOrganizationRole role) throws AppException {
 
@@ -371,7 +355,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Cacheable(value = "organizations", key = "'organization_' + #userId")
     public List<OrganizationDTO> getOrganizationsOfUser(String userId) throws AppException {
 
         List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
@@ -388,7 +371,6 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @UserIdValidator(positions = 0)
-    // @Cacheable(value = "organizations", key = "'organization_' + #userId + '_' + #role")
     public List<OrganizationDTO> getOrganizationUserHasPermission(String userId, UserOrganizationRole role)
             throws AppException {
         List<OrganizationUser> orgsOfUser = organizationUserRepository.findByUserId(userId);
