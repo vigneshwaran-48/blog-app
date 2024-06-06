@@ -24,6 +24,11 @@ services:
     api-gateway:
         base: https://api-gateway-50018270010.catalystappsail.in
 
+mail:
+    google:
+        appPassword: ${GOOGLE_APP_PASSWORD}
+        email: vapps48@gmail.com
+
 logging:
     level:
         org:

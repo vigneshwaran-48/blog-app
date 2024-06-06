@@ -40,3 +40,8 @@ logging:
 services:
     api-gateway:
         base: http://api-gateway:7000
+
+mail:
+    google:
+        appPassword: hjlotkvcvilecnzb
+        email: vapps48@gmail.com
