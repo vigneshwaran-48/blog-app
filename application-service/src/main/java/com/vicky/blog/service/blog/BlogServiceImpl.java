@@ -44,6 +44,7 @@ import com.vicky.blog.common.utility.PostProcessType;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.mongo.BlogMongoRepository;
+import com.vicky.blog.util.UserContextHolder;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -69,7 +70,7 @@ public class BlogServiceImpl implements BlogService {
     private FollowService followService;
 
     @Autowired
-    private NotificationService notificationService;
+    private BlogPublishNotifier blogPublishNotifier;
 
     @Autowired
     private TagService tagService;
@@ -197,21 +198,15 @@ public class BlogServiceImpl implements BlogService {
 
         LOGGER.info("Published blog at {}", profileIdDTO.getProfileId());
 
-        List<FollowDTO> followers = followService.getFollowersOfProfile(userId, profileIdDTO.getProfileId());
-        NotificationDTO notification = new NotificationDTO();
-        notification.setSenderType(NotificationSenderType.USER);
-        notification.setMessage(user.getName() + " has published a blog");
+        String organizationId = organizationDTO != null ? organizationDTO.getId() : null;
+        String organizationName = organizationDTO != null ? organizationDTO.getName() : null;
 
-        if (profileIdDTO.getType() == ProfileType.ORGANIZATION) {
-            notification.setSenderType(NotificationSenderType.ORGANIZATION);
-            notification.setOrganizationId(organizationDTO.getId());
-            notification.setMessage(organizationDTO.getName() + " has published a blog");
-        }
-        for (FollowDTO follower : followers) {
-            notification.setUserId(follower.getFollower().getEntityId());
-            notificationService.addNotification(userId, notification);
-        }
-        LOGGER.info("Notified the profile {} followers", profileIdDTO.getProfileId());
+        blogPublishNotifier.setData(userId, profileIdDTO.getProfileId(), profileIdDTO.getType(), user.getName(),
+                organizationId, organizationName);
+        String accessToken = UserContextHolder.getContext().getAccessToken();
+        new Thread(() -> {
+            blogPublishNotifier.execute(accessToken);
+        }).start();
     }
 
     @Override
