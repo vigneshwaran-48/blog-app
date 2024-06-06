@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
 import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.exception.AppException;
 
@@ -32,5 +33,7 @@ public interface TagService {
     Optional<TagDTO> getTag(String id) throws AppException;
 
     List<BlogDTO> getAllBlogsOfTag(String tagId) throws AppException;
+
+    BlogFeedsDTO getBlogsOfTagForFeeds(String userId, String tagId, int page, int size) throws AppException;
 
 }

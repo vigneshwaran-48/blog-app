@@ -1,5 +1,6 @@
 package com.vicky.blog.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,25 +9,35 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.BlogIdValidator;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
+import com.vicky.blog.common.dto.blog.BlogFeedsDTO.PageStatus;
+import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.dto.tag.TagDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.BlogService;
+import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.BlogTag;
+import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.model.Tag;
 import com.vicky.blog.model.TagFollow;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.mongo.BlogTagRepoistory;
 import com.vicky.blog.repository.mongo.TagFollowRepository;
 import com.vicky.blog.repository.mongo.TagRepository;
+import com.vicky.blog.service.blog.BlogUtil;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -45,6 +56,12 @@ public class TagServiceImpl implements TagService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
+    private BlogUtil blogUtil;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
 
@@ -165,5 +182,39 @@ public class TagServiceImpl implements TagService {
         for (String tagId : tagIds) {
             applyTagToBlog(userId, blogId, tagId);
         }
+    }
+
+    @Override
+    public BlogFeedsDTO getBlogsOfTagForFeeds(String userId, String tagId, int page, int size) throws AppException {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BlogTag> blogs = blogTagRepoistory.findByTagId(tagId, pageable);
+        List<BlogDTO> blogsForFeed = new ArrayList<>();
+        for (BlogTag blogTag : blogs) {
+            Blog blog = blogTag.getBlog();
+            ProfileId profileId = blog.getPublishedAt();
+            if (profileId.getType() == ProfileType.ORGANIZATION) {
+                try {
+                    organizationService.getOrganization(userId, profileId.getEntityId());
+                } catch (OrganizationNotAccessible e) {
+                    // Ignoring
+                    // If this happens then the user not have access to the organization
+                    // publishin blogs.
+                    LOGGER.info("User {} not have access to the blog {}", userId, blog.getId());
+                    continue;
+                }
+            }
+            BlogDTO blogDTO = blog.toDTO();
+            blogDTO.setDisplayPostedDate(blogUtil.getDisplayPostedData(blogDTO.getPostedTime()));
+            blogDTO.setTags(getTagsOfBlog(userId, blogDTO.getId()));
+            blogsForFeed.add(blogDTO);
+        }
+        BlogFeedsDTO feedsDTO = new BlogFeedsDTO();
+        feedsDTO.setFeeds(blogsForFeed);
+        if (blogsForFeed.size() < size) {
+            feedsDTO.setStatus(PageStatus.NOT_AVAILABLE);
+        } else {
+            feedsDTO.setStatus(PageStatus.AVAILABLE);
+        }
+        return feedsDTO;
     }
 }
