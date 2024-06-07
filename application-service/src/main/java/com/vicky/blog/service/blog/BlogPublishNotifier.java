@@ -14,8 +14,7 @@ import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
 import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.service.FollowService;
 import com.vicky.blog.common.service.NotificationService;
-import com.vicky.blog.common.utility.Notifier;
-import com.vicky.blog.util.UserContextHolder;
+import com.vicky.blog.util.Notifier;
 
 @Component
 public class BlogPublishNotifier extends Notifier {
@@ -29,9 +28,7 @@ public class BlogPublishNotifier extends Notifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlogPublishNotifier.class);
 
     @Override
-    public void execute(String accessToken) {
-
-        UserContextHolder.getContext().setAccessToken(accessToken);
+    public void execute() {
 
         String userId = (String) data[0];
         String profileId = (String) data[1];

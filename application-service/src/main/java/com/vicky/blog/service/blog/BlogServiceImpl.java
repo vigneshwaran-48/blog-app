@@ -18,14 +18,10 @@ import org.springframework.stereotype.Service;
 
 import com.vicky.blog.annotation.BlogAccessTracker;
 import com.vicky.blog.annotation.BlogIdValidator;
-import com.vicky.blog.annotation.PostProcess;
 import com.vicky.blog.annotation.UserIdValidator;
 import com.vicky.blog.common.dto.blog.BlogDTO;
 import com.vicky.blog.common.dto.blog.BlogFeedsDTO;
 import com.vicky.blog.common.dto.blog.BlogFeedsDTO.PageStatus;
-import com.vicky.blog.common.dto.follower.FollowDTO;
-import com.vicky.blog.common.dto.notification.NotificationDTO;
-import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSenderType;
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import com.vicky.blog.common.dto.profile.ProfileDTO.ProfileType;
@@ -35,16 +31,15 @@ import com.vicky.blog.common.exception.AppException;
 import com.vicky.blog.common.exception.OrganizationNotAccessible;
 import com.vicky.blog.common.service.BlogService;
 import com.vicky.blog.common.service.FollowService;
-import com.vicky.blog.common.service.NotificationService;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.ProfileIdService;
 import com.vicky.blog.common.service.TagService;
 import com.vicky.blog.common.service.UserService;
-import com.vicky.blog.common.utility.PostProcessType;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.mongo.BlogMongoRepository;
 import com.vicky.blog.util.UserContextHolder;
+import com.vicky.blog.util.Notifier.NotifierType;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -205,7 +200,7 @@ public class BlogServiceImpl implements BlogService {
                 organizationId, organizationName);
         String accessToken = UserContextHolder.getContext().getAccessToken();
         new Thread(() -> {
-            blogPublishNotifier.execute(accessToken);
+            blogPublishNotifier.execute(accessToken, NotifierType.BLOG_PUBLISH);
         }).start();
     }
 
