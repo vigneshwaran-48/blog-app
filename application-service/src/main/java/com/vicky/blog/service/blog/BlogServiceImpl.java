@@ -38,7 +38,7 @@ import com.vicky.blog.common.service.UserService;
 import com.vicky.blog.model.Blog;
 import com.vicky.blog.model.ProfileId;
 import com.vicky.blog.repository.mongo.BlogMongoRepository;
-import com.vicky.blog.util.UserContextHolder;
+import com.vicky.blog.util.NotifierUtil;
 import com.vicky.blog.util.Notifier.NotifierType;
 
 @Service
@@ -65,10 +65,10 @@ public class BlogServiceImpl implements BlogService {
     private FollowService followService;
 
     @Autowired
-    private BlogPublishNotifier blogPublishNotifier;
+    private TagService tagService;
 
     @Autowired
-    private TagService tagService;
+    private NotifierUtil notifierUtil;
 
     @Override
     @UserIdValidator(positions = 0)
@@ -196,12 +196,8 @@ public class BlogServiceImpl implements BlogService {
         String organizationId = organizationDTO != null ? organizationDTO.getId() : null;
         String organizationName = organizationDTO != null ? organizationDTO.getName() : null;
 
-        blogPublishNotifier.setData(userId, profileIdDTO.getProfileId(), profileIdDTO.getType(), user.getName(),
-                organizationId, organizationName);
-        String accessToken = UserContextHolder.getContext().getAccessToken();
-        new Thread(() -> {
-            blogPublishNotifier.execute(accessToken, NotifierType.BLOG_PUBLISH);
-        }).start();
+        notifierUtil.notify(NotifierType.BLOG_PUBLISH, userId, profileIdDTO.getProfileId(), profileIdDTO.getType(),
+                user.getName(), organizationId, organizationName);
     }
 
     @Override
