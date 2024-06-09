@@ -29,7 +29,6 @@ import com.vicky.blog.model.CommentLike;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.mongo.CommentLikeMongoRepository;
 import com.vicky.blog.repository.mongo.CommentMongoRepository;
-import com.vicky.blog.util.Notifier;
 import com.vicky.blog.util.Notifier.NotifierType;
 import com.vicky.blog.util.NotifierUtil;
 
