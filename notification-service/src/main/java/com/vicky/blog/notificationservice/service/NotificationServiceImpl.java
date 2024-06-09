@@ -16,6 +16,7 @@ import com.vicky.blog.common.dto.notification.NotificationDTO.NotificationSender
 import com.vicky.blog.common.dto.organization.OrganizationDTO;
 import com.vicky.blog.common.dto.user.UserDTO;
 import com.vicky.blog.common.exception.AppException;
+import com.vicky.blog.common.service.EmailService;
 import com.vicky.blog.common.service.NotificationService;
 import com.vicky.blog.common.service.OrganizationService;
 import com.vicky.blog.common.service.UserService;
@@ -33,6 +34,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private EmailService emailService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
@@ -83,7 +87,10 @@ public class NotificationServiceImpl implements NotificationService {
         if(savedNotification == null) {
             throw new AppException("Error while adding notification");
         }
-        return savedNotification.toDTO();
+        NotificationDTO savedNotificationDTO = savedNotification.toDTO();
+        UserDTO reveiverDTO = userService.getUser(savedNotificationDTO.getUserId()).get();
+        emailService.sendEmail(reveiverDTO.getEmail(), "You got a Notification", savedNotificationDTO.getMessage());
+        return savedNotificationDTO;
     }
 
     @Override

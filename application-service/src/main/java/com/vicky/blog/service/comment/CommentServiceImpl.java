@@ -29,6 +29,8 @@ import com.vicky.blog.model.CommentLike;
 import com.vicky.blog.model.User;
 import com.vicky.blog.repository.mongo.CommentLikeMongoRepository;
 import com.vicky.blog.repository.mongo.CommentMongoRepository;
+import com.vicky.blog.util.Notifier.NotifierType;
+import com.vicky.blog.util.NotifierUtil;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -44,6 +46,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private BlogService blogService;
+
+    @Autowired
+    private NotifierUtil notifierUtil;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
     private static final int MAXIMUM_DEPTH_LEVEL = 2;
@@ -77,6 +82,7 @@ public class CommentServiceImpl implements CommentService {
             LOGGER.info("Error while adding comment to blog {} by user {}", blogId, userId);
             throw new AppException( "Error while adding comment to blog");
         }
+        notifierUtil.notify(NotifierType.COMMENT_NOTIFIER, user, blog.getOwner(), blog);
         return savedComment.toDTO();
     }
 
