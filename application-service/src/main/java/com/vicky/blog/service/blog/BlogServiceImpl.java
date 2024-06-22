@@ -78,7 +78,6 @@ public class BlogServiceImpl implements BlogService {
         blogDTO.setOwner(user);
         blogDTO.setDescription(blogUtil.getDescriptionForBlog(blogDTO.getContent()));
         blogUtil.validateAndFormatBlogData(blogDTO);
-
         blogDTO.setPostedTime(LocalDateTime.now());
 
         Blog blog = Blog.build(blogDTO);

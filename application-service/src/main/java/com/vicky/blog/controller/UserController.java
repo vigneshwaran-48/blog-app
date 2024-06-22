@@ -210,4 +210,11 @@ public class UserController {
 
         return ResponseEntity.ok().body(response);
     }
+
+   public ResponseEntity<EmptyResponse> createAccount(@RequestParam String profileId, @RequestParam String description,
+       Principal principal, HttpServletRequest request) throws AppException {
+
+       String userId = userIdExtracter.getUserId(principal);
+       userService.createAccount();
+   }
 }

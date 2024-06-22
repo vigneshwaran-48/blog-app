@@ -1,226 +1,226 @@
 [
-    {
-      "name": "Java",
-      "description": "A high-level, class-based, object-oriented programming language widely used for building enterprise-scale applications."
-    },
-    {
-      "name": "Spring Boot",
-      "description": "An open-source, microservice-based Java web framework that simplifies the creation of production-ready applications."
-    },
-    {
-      "name": "Python",
-      "description": "A versatile, high-level programming language known for its ease of learning and powerful libraries for data analysis, web development, and automation."
-    },
-    {
-      "name": "JavaScript",
-      "description": "A dynamic programming language commonly used to create interactive effects within web browsers."
-    },
-    {
-      "name": "React",
-      "description": "A JavaScript library for building user interfaces, particularly single-page applications where data changes over time."
-    },
-    {
-      "name": "Node.js",
-      "description": "A JavaScript runtime built on Chrome's V8 JavaScript engine, enabling server-side scripting and building scalable network applications."
-    },
-    {
-      "name": "HTML",
-      "description": "The standard markup language used for creating web pages and web applications."
-    },
-    {
-      "name": "CSS",
-      "description": "A style sheet language used for describing the presentation of a document written in HTML or XML."
-    },
-    {
-      "name": "Angular",
-      "description": "A TypeScript-based open-source web application framework led by the Angular Team at Google."
-    },
-    {
-      "name": "Vue.js",
-      "description": "A progressive JavaScript framework used for building user interfaces and single-page applications."
-    },
-    {
-      "name": "Django",
-      "description": "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
-    },
-    {
-      "name": "Flask",
-      "description": "A lightweight WSGI web application framework in Python that is designed to make getting started quick and easy."
-    },
-    {
-      "name": "SQL",
-      "description": "A standard language for managing and manipulating databases."
-    },
-    {
-      "name": "NoSQL",
-      "description": "A non-relational database design that provides a mechanism for storage and retrieval of data that is modeled in means other than tabular relations."
-    },
-    {
-      "name": "MongoDB",
-      "description": "A NoSQL database program that uses JSON-like documents with optional schemas."
-    },
-    {
-      "name": "PostgreSQL",
-      "description": "An advanced, open-source relational database management system emphasizing extensibility and SQL compliance."
-    },
-    {
-      "name": "MySQL",
-      "description": "An open-source relational database management system based on SQL."
-    },
-    {
-      "name": "AWS",
-      "description": "Amazon Web Services offers reliable, scalable, and inexpensive cloud computing services."
-    },
-    {
-      "name": "Azure",
-      "description": "Microsoft Azure is a cloud computing service for building, testing, deploying, and managing applications and services through Microsoft-managed data centers."
-    },
-    {
-      "name": "Google Cloud",
-      "description": "A suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products."
-    },
-    {
-      "name": "DevOps",
-      "description": "A set of practices that combines software development (Dev) and IT operations (Ops) aimed at shortening the development lifecycle and providing continuous delivery with high software quality."
-    },
-    {
-      "name": "Docker",
-      "description": "An open platform for developing, shipping, and running applications in isolated containers."
-    },
-    {
-      "name": "Kubernetes",
-      "description": "An open-source system for automating the deployment, scaling, and management of containerized applications."
-    },
-    {
-      "name": "Machine Learning",
-      "description": "A branch of artificial intelligence focused on building applications that learn from data and improve their accuracy over time without being programmed to do so."
-    },
-    {
-      "name": "Data Science",
-      "description": "An interdisciplinary field focused on extracting knowledge and insights from structured and unstructured data."
-    },
-    {
-      "name": "Artificial Intelligence",
-      "description": "The simulation of human intelligence in machines that are programmed to think and learn like humans."
-    },
-    {
-      "name": "Big Data",
-      "description": "Large and complex data sets that require advanced data processing applications for analysis and management."
-    },
-    {
-      "name": "Blockchain",
-      "description": "A decentralized digital ledger that records transactions across many computers in such a way that the registered transactions cannot be altered retroactively."
-    },
-    {
-      "name": "Cybersecurity",
-      "description": "The practice of protecting systems, networks, and programs from digital attacks."
-    },
-    {
-      "name": "Cryptocurrency",
-      "description": "A digital or virtual currency that uses cryptography for security and operates independently of a central bank."
-    },
-    {
-      "name": "IoT",
-      "description": "The Internet of Things refers to the network of physical devices, vehicles, and other objects embedded with sensors, software, and connectivity to exchange data."
-    },
-    {
-      "name": "AR/VR",
-      "description": "Augmented Reality and Virtual Reality are technologies that create immersive digital experiences, augmenting the real world or creating entirely new environments."
-    },
-    {
-      "name": "PHP",
-      "description": "A popular general-purpose scripting language that is especially suited to web development."
-    },
-    {
-      "name": "Ruby on Rails",
-      "description": "A server-side web application framework written in Ruby under the MIT License."
-    },
-    {
-      "name": "Swift",
-      "description": "A powerful and intuitive programming language for macOS, iOS, watchOS, and tvOS."
-    },
-    {
-      "name": "Kotlin",
-      "description": "A modern programming language that makes developers happier and more productive, officially supported for Android development."
-    },
-    {
-      "name": "Rust",
-      "description": "A language empowering everyone to build reliable and efficient software with a focus on safety and performance."
-    },
-    {
-      "name": "Go",
-      "description": "A statically typed, compiled programming language designed at Google known for its simplicity and performance."
-    },
-    {
-      "name": "C++",
-      "description": "A general-purpose programming language created as an extension of C, with a focus on performance, efficiency, and flexibility."
-    },
-    {
-      "name": "C#",
-      "description": "A modern, object-oriented programming language developed by Microsoft as part of its .NET initiative."
-    },
-    {
-      "name": "TypeScript",
-      "description": "A strongly typed programming language that builds on JavaScript, giving you better tooling at any scale."
-    },
-    {
-      "name": "GraphQL",
-      "description": "A query language for your API, and a server-side runtime for executing queries by using a type system you define for your data."
-    },
-    {
-      "name": "REST",
-      "description": "Representational State Transfer is an architectural style for designing networked applications."
-    },
-    {
-      "name": "Microservices",
-      "description": "An architectural style that structures an application as a collection of loosely coupled services, which implement business capabilities."
-    },
-    {
-      "name": "Agile",
-      "description": "A set of principles for software development under which requirements and solutions evolve through the collaborative effort of self-organizing and cross-functional teams."
-    },
-    {
-      "name": "Scrum",
-      "description": "An agile process framework for managing complex knowledge work, with an initial emphasis on software development."
-    },
-    {
-      "name": "Jenkins",
-      "description": "An open-source automation server that helps to automate the parts of software development related to building, testing, and deploying."
-    },
-    {
-      "name": "Terraform",
-      "description": "An open-source infrastructure as code software tool created by HashiCorp."
-    },
-    {
-      "name": "Ansible",
-      "description": "An open-source software provisioning, configuration management, and application-deployment tool enabling infrastructure as code."
-    },
-    {
-      "name": "Elasticsearch",
-      "description": "A distributed, RESTful search and analytics engine capable of addressing a growing number of use cases."
-    },
-    {
-      "name": "Hiking",
-      "description": "Hiking through the whispering forests and rugged trails brings a sense of peace and adventure, connecting you deeply with nature's grandeur."
-    },
-    {
-      "name": "Adventure",
-      "description": "Adventure is the call to step beyond the familiar, to embrace the unknown, and to discover the extraordinary in every moment."
-    },
-    {
-      "name": "Outdoor",
-      "description": "The outdoors offers a boundless canvas of freedom and exploration, where every breeze and sunbeam invites you to reconnect with the world around you."
-    },
-    {
-      "name": "Alaska",
-      "description": "Alaska's vast wilderness, with its towering glaciers and untamed landscapes, is a testament to nature's raw, majestic beauty."
-    },
-    {
-      "name": "Cooking",
-      "description": "Cooking is the art of transforming simple ingredients into a symphony of flavors, creating meals that nourish both body and soul."
-    },
-    {
-      "name": "Baking",
-      "description": "Baking is a delightful alchemy where flour, sugar, and love come together to create comforting, delicious masterpieces."
-    }
-  ]
+	{
+		"name": "Java",
+		"description": "A high-level, class-based, object-oriented programming language widely used for building enterprise-scale applications."
+	},
+	{
+		"name": "Spring Boot",
+		"description": "An open-source, microservice-based Java web framework that simplifies the creation of production-ready applications."
+	},
+	{
+		"name": "Python",
+		"description": "A versatile, high-level programming language known for its ease of learning and powerful libraries for data analysis, web development, and automation."
+	},
+	{
+		"name": "JavaScript",
+		"description": "A dynamic programming language commonly used to create interactive effects within web browsers."
+	},
+	{
+		"name": "React",
+		"description": "A JavaScript library for building user interfaces, particularly single-page applications where data changes over time."
+	},
+	{
+		"name": "Node.js",
+		"description": "A JavaScript runtime built on Chrome's V8 JavaScript engine, enabling server-side scripting and building scalable network applications."
+	},
+	{
+		"name": "HTML",
+		"description": "The standard markup language used for creating web pages and web applications."
+	},
+	{
+		"name": "CSS",
+		"description": "A style sheet language used for describing the presentation of a document written in HTML or XML."
+	},
+	{
+		"name": "Angular",
+		"description": "A TypeScript-based open-source web application framework led by the Angular Team at Google."
+	},
+	{
+		"name": "Vue.js",
+		"description": "A progressive JavaScript framework used for building user interfaces and single-page applications."
+	},
+	{
+		"name": "Django",
+		"description": "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
+	},
+	{
+		"name": "Flask",
+		"description": "A lightweight WSGI web application framework in Python that is designed to make getting started quick and easy."
+	},
+	{
+		"name": "SQL",
+		"description": "A standard language for managing and manipulating databases."
+	},
+	{
+		"name": "NoSQL",
+		"description": "A non-relational database design that provides a mechanism for storage and retrieval of data that is modeled in means other than tabular relations."
+	},
+	{
+		"name": "MongoDB",
+		"description": "A NoSQL database program that uses JSON-like documents with optional schemas."
+	},
+	{
+		"name": "PostgreSQL",
+		"description": "An advanced, open-source relational database management system emphasizing extensibility and SQL compliance."
+	},
+	{
+		"name": "MySQL",
+		"description": "An open-source relational database management system based on SQL."
+	},
+	{
+		"name": "AWS",
+		"description": "Amazon Web Services offers reliable, scalable, and inexpensive cloud computing services."
+	},
+	{
+		"name": "Azure",
+		"description": "Microsoft Azure is a cloud computing service for building, testing, deploying, and managing applications and services through Microsoft-managed data centers."
+	},
+	{
+		"name": "Google Cloud",
+		"description": "A suite of cloud computing services that runs on the same infrastructure that Google uses internally for its end-user products."
+	},
+	{
+		"name": "DevOps",
+		"description": "A set of practices that combines software development (Dev) and IT operations (Ops) aimed at shortening the development lifecycle and providing continuous delivery with high software quality."
+	},
+	{
+		"name": "Docker",
+		"description": "An open platform for developing, shipping, and running applications in isolated containers."
+	},
+	{
+		"name": "Kubernetes",
+		"description": "An open-source system for automating the deployment, scaling, and management of containerized applications."
+	},
+	{
+		"name": "Machine Learning",
+		"description": "A branch of artificial intelligence focused on building applications that learn from data and improve their accuracy over time without being programmed to do so."
+	},
+	{
+		"name": "Data Science",
+		"description": "An interdisciplinary field focused on extracting knowledge and insights from structured and unstructured data."
+	},
+	{
+		"name": "Artificial Intelligence",
+		"description": "The simulation of human intelligence in machines that are programmed to think and learn like humans."
+	},
+	{
+		"name": "Big Data",
+		"description": "Large and complex data sets that require advanced data processing applications for analysis and management."
+	},
+	{
+		"name": "Blockchain",
+		"description": "A decentralized digital ledger that records transactions across many computers in such a way that the registered transactions cannot be altered retroactively."
+	},
+	{
+		"name": "Cybersecurity",
+		"description": "The practice of protecting systems, networks, and programs from digital attacks."
+	},
+	{
+		"name": "Cryptocurrency",
+		"description": "A digital or virtual currency that uses cryptography for security and operates independently of a central bank."
+	},
+	{
+		"name": "IoT",
+		"description": "The Internet of Things refers to the network of physical devices, vehicles, and other objects embedded with sensors, software, and connectivity to exchange data."
+	},
+	{
+		"name": "AR/VR",
+		"description": "Augmented Reality and Virtual Reality are technologies that create immersive digital experiences, augmenting the real world or creating entirely new environments."
+	},
+	{
+		"name": "PHP",
+		"description": "A popular general-purpose scripting language that is especially suited to web development."
+	},
+	{
+		"name": "Ruby on Rails",
+		"description": "A server-side web application framework written in Ruby under the MIT License."
+	},
+	{
+		"name": "Swift",
+		"description": "A powerful and intuitive programming language for macOS, iOS, watchOS, and tvOS."
+	},
+	{
+		"name": "Kotlin",
+		"description": "A modern programming language that makes developers happier and more productive, officially supported for Android development."
+	},
+	{
+		"name": "Rust",
+		"description": "A language empowering everyone to build reliable and efficient software with a focus on safety and performance."
+	},
+	{
+		"name": "Go",
+		"description": "A statically typed, compiled programming language designed at Google known for its simplicity and performance."
+	},
+	{
+		"name": "C++",
+		"description": "A general-purpose programming language created as an extension of C, with a focus on performance, efficiency, and flexibility."
+	},
+	{
+		"name": "C#",
+		"description": "A modern, object-oriented programming language developed by Microsoft as part of its .NET initiative."
+	},
+	{
+		"name": "TypeScript",
+		"description": "A strongly typed programming language that builds on JavaScript, giving you better tooling at any scale."
+	},
+	{
+		"name": "GraphQL",
+		"description": "A query language for your API, and a server-side runtime for executing queries by using a type system you define for your data."
+	},
+	{
+		"name": "REST",
+		"description": "Representational State Transfer is an architectural style for designing networked applications."
+	},
+	{
+		"name": "Microservices",
+		"description": "An architectural style that structures an application as a collection of loosely coupled services, which implement business capabilities."
+	},
+	{
+		"name": "Agile",
+		"description": "A set of principles for software development under which requirements and solutions evolve through the collaborative effort of self-organizing and cross-functional teams."
+	},
+	{
+		"name": "Scrum",
+		"description": "An agile process framework for managing complex knowledge work, with an initial emphasis on software development."
+	},
+	{
+		"name": "Jenkins",
+		"description": "An open-source automation server that helps to automate the parts of software development related to building, testing, and deploying."
+	},
+	{
+		"name": "Terraform",
+		"description": "An open-source infrastructure as code software tool created by HashiCorp."
+	},
+	{
+		"name": "Ansible",
+		"description": "An open-source software provisioning, configuration management, and application-deployment tool enabling infrastructure as code."
+	},
+	{
+		"name": "Elasticsearch",
+		"description": "A distributed, RESTful search and analytics engine capable of addressing a growing number of use cases."
+	},
+	{
+		"name": "Hiking",
+		"description": "Hiking through the whispering forests and rugged trails brings a sense of peace and adventure, connecting you deeply with nature's grandeur."
+	},
+	{
+		"name": "Adventure",
+		"description": "Adventure is the call to step beyond the familiar, to embrace the unknown, and to discover the extraordinary in every moment."
+	},
+	{
+		"name": "Outdoor",
+		"description": "The outdoors offers a boundless canvas of freedom and exploration, where every breeze and sunbeam invites you to reconnect with the world around you."
+	},
+	{
+		"name": "Alaska",
+		"description": "Alaska's vast wilderness, with its towering glaciers and untamed landscapes, is a testament to nature's raw, majestic beauty."
+	},
+	{
+		"name": "Cooking",
+		"description": "Cooking is the art of transforming simple ingredients into a symphony of flavors, creating meals that nourish both body and soul."
+	},
+	{
+		"name": "Baking",
+		"description": "Baking is a delightful alchemy where flour, sugar, and love come together to create comforting, delicious masterpieces."
+	}
+]

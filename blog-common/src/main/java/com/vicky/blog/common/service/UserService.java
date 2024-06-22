@@ -15,5 +15,6 @@ public interface UserService {
     Optional<UserDTO> getUser(String userId) throws AppException;
     List<UserDTO> getUsers(String userId) throws AppException;
     UserType getUserType(String userId) throws AppException;
+    void createAccount(String profileId, String description) throws AppException;
 
 }

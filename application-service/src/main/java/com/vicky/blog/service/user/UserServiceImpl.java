@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.vicky.blog.common.dto.profile.ProfileIdDTO;
 import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,6 +149,15 @@ public class UserServiceImpl implements UserService {
             // Need to add logic for premium users.
             return UserType.NORMAL;
         }
+    }
+    
+    @Override
+    public void createAccount(String profileId, String description) throws AppException {
+      Optional<ProfileIdDTO> profileIdDTO = profileIdService.getProfileId(profileId);
+      if (profileIdDTO.isPresent()) {
+        LOGGER.error("Profile id {} already exists for user {}", profileId, profileIdDTO.getUser().getId());
+        throw new AppException(HttpStatus.SC_BAD_REQUEST, "Profile Id already exists!");
+      }
     }
 
     private void checkAndFillMissingDataForPatchUpdate(UserDTO newData, User existingData) throws AppException {

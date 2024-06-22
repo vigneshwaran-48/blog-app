@@ -58,5 +58,11 @@ public class UserServiceImpl implements UserService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getUserType'");
     }
+
+    @Override
+    public void createAccount(String profileId, String description) throws AppException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createAccount'");
+    }
     
 }
